@@ -53,8 +53,8 @@ class Customer
   public function validateFromRequest($account, $wsRequest)
   {
     $this->agencyTypeId = $wsRequest->requireNumericAndPositive('type');
-    $this->firstName = trim($wsRequest->requireNotNullOrEmpty('first_name'));
-    $this->lastName = trim($wsRequest->requireNotNullOrEmpty('last_name'));
+    $this->firstName = preg_replace('/\s+/', ' ', trim($wsRequest->requireNotNullOrEmpty('first_name')));
+    $this->lastName = preg_replace('/\s+/', ' ', trim($wsRequest->requireNotNullOrEmpty('last_name')));
     $this->country = trim($wsRequest->requireNotNullOrEmpty('country'));
     $this->state = trim($wsRequest->requireNotNullOrEmpty('state'));
     $this->phone = trim($wsRequest->requireNotNullOrEmpty('phone'));
