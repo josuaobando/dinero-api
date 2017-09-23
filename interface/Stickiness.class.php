@@ -12,6 +12,8 @@ class Stickiness
   const STATUS_CODE_SUCCESS = '1';
   /**
    * There was an issue with the authentication process or there was an invalid state in the execution.
+   *
+   * This Receiver is not linked to this Sender
    */
   const STATUS_CODE_FAILED = '2';
   /**
