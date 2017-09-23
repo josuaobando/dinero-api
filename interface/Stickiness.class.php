@@ -471,7 +471,7 @@ class Stickiness
             throw new InvalidStateException("This Customer is not linked to this Person");
             break;
           default:
-            throw new InvalidStateException("Due to external factors, we cannot confirm this transaction.");
+            ExceptionManager::handleException(new InvalidStateException("Due to external factors, we cannot confirm this transaction with the API."));
         }
       }
 
