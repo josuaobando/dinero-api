@@ -402,10 +402,11 @@ class Stickiness
             }
             break;
           case self::STATUS_CODE_LINKED_OTHER:
-            throw new InvalidStateException("The Customer is linked to another Agency.");
+            throw new InvalidStateException("The Customer is linked to another Agency (Merchant).");
             break;
           case self::STATUS_CODE_FAILED:
-            throw new InvalidStateException("This Customer is not linked to this Person");
+            //throw new InvalidStateException("The Person is linked to another Customer.");
+            throw new InvalidStateException("Due to external factors, we cannot give this Customer a Person.");
             break;
           default:
             throw new InvalidStateException("Due to external factors, we cannot give this Customer a Person.");
@@ -465,10 +466,11 @@ class Stickiness
             }
             break;
           case self::STATUS_CODE_LINKED_OTHER:
-            throw new InvalidStateException("The Customer is linked to another Agency.");
+            throw new InvalidStateException("The Customer is linked to another Agency (Merchant).");
             break;
           case self::STATUS_CODE_FAILED:
-            throw new InvalidStateException("This Customer is not linked to this Person");
+            //throw new InvalidStateException("The Person is linked to another Customer.");
+            throw new InvalidStateException("Due to external factors, we cannot give this Customer a Person.");
             break;
           default:
             ExceptionManager::handleException(new InvalidStateException("Due to external factors, we cannot confirm this transaction with the API."));
