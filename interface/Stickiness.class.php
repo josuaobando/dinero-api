@@ -41,9 +41,6 @@ class Stickiness
    */
   const STATUS_VERIFICATION_REJECTED = 'rejected';
 
-  const AGENCY_CANAS = '13';
-  const AGENCY_PAVON = '14';
-
   /**
    * @var int
    */
@@ -405,8 +402,11 @@ class Stickiness
           case self::STATUS_CODE_LINKED_OTHER:
             throw new InvalidStateException("The Customer is linked to another Agency.");
             break;
+          case self::STATUS_CODE_FAILED:
+            throw new InvalidStateException("This Customer is not linked to this Person");
+            break;
           default:
-            //do nothing
+            throw new InvalidStateException("Due to external factors, we cannot give this Customer a Person.");
         }
       }else{
         throw new InvalidStateException("The Customer cannot be verify.");
@@ -465,8 +465,11 @@ class Stickiness
           case self::STATUS_CODE_LINKED_OTHER:
             throw new InvalidStateException("The Customer is linked to another Agency.");
             break;
+          case self::STATUS_CODE_FAILED:
+            throw new InvalidStateException("This Customer is not linked to this Person");
+            break;
           default:
-            //do nothing
+            throw new InvalidStateException("Due to external factors, we cannot confirm this transaction.");
         }
       }
 

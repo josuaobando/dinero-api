@@ -28,6 +28,11 @@ class Account
   private $username;
 
   /**
+   * @var fullname
+   */
+  private $fullname;
+
+  /**
    * password
    *
    * @var string
@@ -77,8 +82,7 @@ class Account
   public function __construct($username = null)
   {
     $this->tblAccount = TblAccount::getInstance();
-    if($username)
-    {
+    if($username){
       $this->username = $username;
       $this->loadAccount();
     }
@@ -95,15 +99,14 @@ class Account
     $this->companyId = $accountData['Company_Id'];
     $this->accountId = $accountData['Account_Id'];
     $this->password = $accountData['Password'];
+    $this->fullname = $accountData['FullName'];
     $this->apiUser = $accountData['API_User'];
     $this->apiPass = $accountData['API_Pass'];
 
     //get account permissions
     $permissions = $this->tblAccount->getPermission($this->accountId);
-    if($permissions)
-    {
-      foreach($permissions as $permission)
-      {
+    if($permissions){
+      foreach($permissions as $permission){
         array_push($this->permission, $permission['PermissionCode']);
       }
     }
@@ -197,8 +200,7 @@ class Account
   public function changePassword($newPassword)
   {
     $r = $this->tblAccount->changePassword($this->accountId, $newPassword);
-    if($r)
-    {
+    if($r){
       $this->password = $newPassword;
     }
 
@@ -216,6 +218,11 @@ class Account
 
     $data['username'] = $this->username;
     $data['authenticated'] = $this->authenticated;
+
+    if($this->authenticated){
+      $data['fullName'] = $this->fullname;
+      $data['permission'] = $this->permission;
+    }
 
     return $data;
   }

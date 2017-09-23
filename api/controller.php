@@ -10,7 +10,7 @@ function startController()
 {
   //check if the request was sent using json
   $wsRequest = new WSRequest(json_decode(file_get_contents("php://input"), true));
-  if ($wsRequest->isEmpty()){
+  if($wsRequest->isEmpty()){
     //if empty try with the regular request
     $wsRequest->overwriteRequest($_REQUEST);
   }
@@ -19,33 +19,36 @@ function startController()
   $prefix = "ctrl_";
 
   //check if the requested function is valid
-  $f = $wsRequest->getParam(WSProcessor::REQUESTED_FUNCTION);
+  $action = $wsRequest->getParam('f');
 
   //get session id
-  $sessionId = $wsRequest->getParam('sid');
-  if($sessionId)
-  {
+  $sessionId = $wsRequest->getParam('token');
+  if($sessionId){
     Session::startSession($sessionId);
     $account = Session::getAccount();
-    if($account->isAuthenticated())
-    {
+    if($account->isAuthenticated()){
       //call the proper function
-      if(function_exists($prefix.$f))
-      {
+      if(function_exists($prefix . $action)){
         //call the function and exit since the function will do the whole work
-        call_user_func($prefix.$f);
+        call_user_func($prefix . $action);
         exit();
-      }
-      else
-      {
+      }else{
         //this section is to handle the invalid function error
-        $wsResponse = new WSResponseError("Invalid function in controller($f)");
+        $wsResponse = new WSResponseError("Invalid function in controller($action)");
       }
-    }
-    else
-    {
+    }else{
       //this section is to handle the invalid function error
       $wsResponse = new WSResponseError('Session has expired');
+    }
+  }elseif($action === 'authenticate'){
+    //call the proper function
+    if(function_exists($prefix . $action)){
+      //call the function and exit since the function will do the whole work
+      call_user_func($prefix . $action);
+      exit();
+    }else{
+      //this section is to handle the invalid function error
+      $wsResponse = new WSResponseError("Invalid function in controller($action)");
     }
   }
 
@@ -59,7 +62,7 @@ function startController()
 /**
  * login account
  */
-function ctrl_login()
+function ctrl_authenticate()
 {
   require_once('api/client.php');
 }

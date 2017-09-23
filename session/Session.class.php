@@ -31,6 +31,7 @@ class Session
       $sessionId = Encrypt::genKey();
     }
 
+    self::$sid = $sessionId;
     session_id($sessionId);
     session_start();
 
