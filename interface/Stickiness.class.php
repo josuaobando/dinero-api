@@ -11,9 +11,9 @@ class Stickiness
    */
   const STATUS_CODE_SUCCESS = '1';
   /**
-   * There was an issue with the authentication process or there was an invalid state in the execution.
+   * #1: There was an issue with the authentication process or there was an invalid state in the execution.
    *
-   * This Receiver is not linked to this Sender
+   * #2: This Receiver is not linked to this Sender
    */
   const STATUS_CODE_FAILED = '2';
   /**
@@ -260,6 +260,17 @@ class Stickiness
   }
 
   /**
+   *  disable stickiness
+   */
+  private function disable()
+  {
+    if($this->stickinessId)
+    {
+      $this->tblStickiness->disable($this->stickinessId);
+    }
+  }
+
+  /**
    * restore or get stickiness data
    */
   public function restore()
@@ -405,6 +416,7 @@ class Stickiness
             throw new InvalidStateException("The Customer is linked to another Agency (Merchant).");
             break;
           case self::STATUS_CODE_FAILED:
+            $this->disable();
             //throw new InvalidStateException("The Person is linked to another Customer.");
             throw new InvalidStateException("Due to external factors, we cannot give this Customer a Person.");
             break;
@@ -469,6 +481,7 @@ class Stickiness
             throw new InvalidStateException("The Customer is linked to another Agency (Merchant).");
             break;
           case self::STATUS_CODE_FAILED:
+            $this->disable();
             //throw new InvalidStateException("The Person is linked to another Customer.");
             throw new InvalidStateException("Due to external factors, we cannot give this Customer a Person.");
             break;

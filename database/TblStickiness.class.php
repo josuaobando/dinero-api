@@ -76,6 +76,22 @@ class TblStickiness extends Db
     return $this->executeUpdate($sql, $params);
   }
 
+  /**
+   * disable stickiness
+   *
+   * @param $stickinessId
+   *
+   * @return int
+   */
+  public function disable($stickinessId)
+  {
+    $sql = "CALL spStickiness_Disable('{stickinessId}')";
+
+    $params = array();
+    $params['stickinessId'] = $stickinessId;
+
+    return $this->executeUpdate($sql, $params);
+  }
 
   /**
    * get stickiness by id
