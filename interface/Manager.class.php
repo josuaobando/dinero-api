@@ -90,7 +90,7 @@ class Manager
     $limit->evaluate();
 
     //check stickiness
-    $isRegister = false;
+    $isRegister = true;
     $person = new Person();
     $stickiness = new Stickiness();
     for($i = 1; $i <= 2; $i++){
