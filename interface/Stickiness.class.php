@@ -421,14 +421,15 @@ class Stickiness
             break;
           case self::STATUS_CODE_LINKED_OTHER_CUSTOMER:
             //TODO: Pending
-            throw new InvalidStateException("This Person is not linked to this Customer.");
+            ExceptionManager::handleException(new InvalidStateException("This Person is not linked to this Customer. "  . __FUNCTION__));
+            return false;
             break;
           case self::STATUS_CODE_FAILED:
-            ExceptionManager::handleException(new InvalidStateException("The Person [$this->person] is linked to another Customer."));
+            ExceptionManager::handleException(new InvalidStateException("The Person [$this->person] is linked to another Customer. "  . __FUNCTION__));
             return false;
             break;
           default:
-            ExceptionManager::handleException(new InvalidStateException("Code: $resultCode  Message: $resultCodeMessage"));
+            ExceptionManager::handleException(new InvalidStateException("Code: $resultCode  Message: $resultCodeMessage "  . __FUNCTION__));
             throw new InvalidStateException("Due to external factors, we cannot give this Customer a Person.");
         }
       }else{
@@ -493,7 +494,9 @@ class Stickiness
             break;
           case self::STATUS_CODE_LINKED_OTHER_CUSTOMER:
             //TODO: Pending
-            throw new InvalidStateException("This Person is not linked to this Customer.");
+            $this->disable();
+            ExceptionManager::handleException(new InvalidStateException("This Person is not linked to this Customer. " . __FUNCTION__));
+            throw new InvalidStateException("Please, use another Customer.");
             break;
           case self::STATUS_CODE_FAILED:
             $this->disable();
@@ -501,7 +504,7 @@ class Stickiness
             throw new InvalidStateException("Due to external factors, we cannot give this Customer a Person.");
             break;
           default:
-            ExceptionManager::handleException(new InvalidStateException("Code: $resultCode  Message: $resultCodeMessage"));
+            ExceptionManager::handleException(new InvalidStateException("Code: $resultCode  Message: $resultCodeMessage " . __FUNCTION__));
         }
       }
 
