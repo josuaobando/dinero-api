@@ -80,15 +80,17 @@ class TblStickiness extends Db
    * disable stickiness
    *
    * @param $stickinessId
+   * @param $isActive
    *
    * @return int
    */
-  public function disable($stickinessId)
+  public function isActive($stickinessId, $isActive)
   {
-    $sql = "CALL spStickiness_Disable('{stickinessId}')";
+    $sql = "CALL spStickiness_IsActive('{stickinessId}', '{isActive}')";
 
     $params = array();
     $params['stickinessId'] = $stickinessId;
+    $params['isActive'] = $isActive;
 
     return $this->executeUpdate($sql, $params);
   }

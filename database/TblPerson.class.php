@@ -65,6 +65,25 @@ class TblPerson extends Db
 		
 		return $this->executeUpdate($sql, $params); 
 	}
+
+  /**
+   * change the isActive flag in a person.
+   *
+   * @param int $personId
+   * @param bool $isActive
+   *
+   * @return int
+   */
+  public function isActive($personId, $isActive)
+  {
+    $sql = "CALL spPerson_IsActive('{personId}', '{isActive}')";
+
+    $params = array();
+    $params['personId'] = $personId;
+    $params['isActive'] = $isActive;
+
+    return $this->executeUpdate($sql, $params);
+  }
 	
 }
 ?>

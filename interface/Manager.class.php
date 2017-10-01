@@ -90,25 +90,43 @@ class Manager
     $limit->evaluate();
 
     //check stickiness
+    $isRegister = false;
+    $person = new Person();
     $stickiness = new Stickiness();
-    $stickiness->restoreByCustomerId($customer->getCustomerId());
-    //get person id from stickiness
-    $personId = $stickiness->getPersonId();
-    if(!$personId){
-      //select and block the person for following transactions
-      $personSelected = $this->getPersonAvailable($amount, $customer->getAgencyTypeId(), $customer->getAgencyId());
-      $personId = $personSelected['Person_Id'];
+    for($i = 1; $i <= 2; $i++){
+      $stickiness->restoreByCustomerId($customer->getCustomerId());
+
+      //get person id from stickiness
+      $personId = $stickiness->getPersonId();
+      if(!$personId){
+        //select and block the person for following transactions
+        $personSelected = $this->getPersonAvailable($amount, $customer->getAgencyTypeId(), $customer->getAgencyId());
+        $personId = $personSelected['Person_Id'];
+      }
+
+      //create person object
+      $person = new Person($personId);
+      //Check to API Controller and Register Stickiness
+      $stickiness->setCustomerId($customer->getCustomerId());
+      $stickiness->setCustomer($customer->getCustomer());
+      $stickiness->setPersonId($person->getPersonId());
+      $stickiness->setPersonalId($person->getPersonalId());
+      $stickiness->setPerson($person->getName());
+      $isRegister = $stickiness->register();
+
+      //if can no register, block data and try again
+      if(!$isRegister){
+        $stickiness->disable();
+        $person->inactive();
+      }else{
+        break;
+      }
     }
 
-    //create person object
-    $person = new Person($personId);
-    //Check to API Controller and Register Stickiness
-    $stickiness->setCustomerId($customer->getCustomerId());
-    $stickiness->setCustomer($customer->getCustomer());
-    $stickiness->setPersonId($person->getPersonId());
-    $stickiness->setPersonalId($person->getPersonalId());
-    $stickiness->setPerson($person->getName());
-    $stickiness->register();
+    if(!$isRegister){
+      throw new InvalidStateException("Due to external factors, we cannot give this Customer a Person.");
+    }
+
     //block person
     $person->block();
 

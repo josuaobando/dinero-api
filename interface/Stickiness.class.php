@@ -28,6 +28,10 @@ class Stickiness
    * [Rejected] Already linked to other receiver
    */
   const STATUS_CODE_LINKED_OTHER = '5';
+  /**
+   * [Rejected] This receiver is not linked to this sender
+   */
+  const STATUS_CODE_LINKED_OTHER_CUSTOMER = '6';
 
   /**
    * Pending Stickiness
@@ -262,11 +266,10 @@ class Stickiness
   /**
    *  disable stickiness
    */
-  private function disable()
+  public function disable()
   {
-    if($this->stickinessId)
-    {
-      $this->tblStickiness->disable($this->stickinessId);
+    if($this->stickinessId){
+      $this->tblStickiness->isActive($this->stickinessId, 0);
     }
   }
 
@@ -301,8 +304,7 @@ class Stickiness
     $this->customerId = $customerId;
 
     $stickinessData = $this->tblStickiness->getByCustomerId($this->customerId);
-    if($stickinessData)
-    {
+    if($stickinessData){
       $this->stickinessId = $stickinessData['Stickiness_Id'];
       $this->verificationId = $stickinessData['Verification_Id'];
       $this->verification = $stickinessData['Verification'];
@@ -311,8 +313,7 @@ class Stickiness
       $this->customerId = $stickinessData['Customer_Id'];
       $this->customer = $stickinessData['Customer'];
 
-      if(!$this->personId)
-      {
+      if(!$this->personId){
         $this->personId = $stickinessData['Person_Id'];
         $this->person = $stickinessData['Person'];
         $this->personalId = $stickinessData['PersonalId'];
@@ -372,6 +373,8 @@ class Stickiness
 
   /**
    * The web service checks if the sender is still available for new receiver's, is already linked to a receiver or is linked to a different merchant or company.
+   *
+   * @throws InvalidStateException
    */
   public function register()
   {
@@ -401,6 +404,7 @@ class Stickiness
           $this->verification = $verification->status;
         }
 
+        $resultCodeMessage = $result->systemMessage;
         $resultCode = $result->code;
         switch($resultCode){
           case self::STATUS_CODE_SUCCESS:
@@ -415,12 +419,16 @@ class Stickiness
           case self::STATUS_CODE_LINKED_OTHER:
             throw new InvalidStateException("The Customer is linked to another Agency (Merchant).");
             break;
+          case self::STATUS_CODE_LINKED_OTHER_CUSTOMER:
+            //TODO: Pending
+            throw new InvalidStateException("This Person is not linked to this Customer.");
+            break;
           case self::STATUS_CODE_FAILED:
-            $this->disable();
-            //throw new InvalidStateException("The Person is linked to another Customer.");
-            throw new InvalidStateException("Due to external factors, we cannot give this Customer a Person.");
+            ExceptionManager::handleException(new InvalidStateException("The Person [$this->person] is linked to another Customer."));
+            return false;
             break;
           default:
+            ExceptionManager::handleException(new InvalidStateException("Code: $resultCode  Message: $resultCodeMessage"));
             throw new InvalidStateException("Due to external factors, we cannot give this Customer a Person.");
         }
       }else{
@@ -431,6 +439,8 @@ class Stickiness
       //create stickiness
       $this->create();
     }
+
+    return true;
   }
 
   /**
@@ -466,6 +476,7 @@ class Stickiness
           $this->authCode = $verification->authCode;
         }
 
+        $resultCodeMessage = $result->systemMessage;
         $resultCode = $result->code;
         switch($resultCode){
           case self::STATUS_CODE_SUCCESS:
@@ -480,13 +491,17 @@ class Stickiness
           case self::STATUS_CODE_LINKED_OTHER:
             throw new InvalidStateException("The Customer is linked to another Agency (Merchant).");
             break;
+          case self::STATUS_CODE_LINKED_OTHER_CUSTOMER:
+            //TODO: Pending
+            throw new InvalidStateException("This Person is not linked to this Customer.");
+            break;
           case self::STATUS_CODE_FAILED:
             $this->disable();
             //throw new InvalidStateException("The Person is linked to another Customer.");
             throw new InvalidStateException("Due to external factors, we cannot give this Customer a Person.");
             break;
           default:
-            ExceptionManager::handleException(new InvalidStateException("Due to external factors, we cannot confirm this transaction with the API."));
+            ExceptionManager::handleException(new InvalidStateException("Code: $resultCode  Message: $resultCodeMessage"));
         }
       }
 

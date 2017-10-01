@@ -14,6 +14,7 @@ class Person
   private $stateId;
   private $stateName;
   private $available;
+  private $isActive;
   private $name;
 
   private $personalId;
@@ -139,7 +140,7 @@ class Person
    */
   public function getFrom()
   {
-    return $this->countryName.", ".$this->stateName;
+    return $this->countryName . ", " . $this->stateName;
   }
 
   /**
@@ -179,32 +180,35 @@ class Person
    *
    * @param int $personId
    */
-  public function __construct($personId)
+  public function __construct($personId = null)
   {
-    $this->personId = $personId;
+    if($personId){
+      $this->personId = $personId;
 
-    $this->tblPerson = TblPerson::getInstance();
-    $personData = $this->tblPerson->getPerson($personId);
+      $this->tblPerson = TblPerson::getInstance();
+      $personData = $this->tblPerson->getPerson($personId);
 
-    $this->country = $personData['Country'];
-    $this->countryId = $personData['Country_Id'];
-    $this->countryName = $personData['CountryName'];
-    $this->state = $personData['CountryState'];
-    $this->stateId = $personData['CountryState_Id'];
-    $this->stateName = $personData['CountryStateName'];
-    $this->available = $personData['Available'];
-    $this->name = $personData['Name'];
+      $this->country = $personData['Country'];
+      $this->countryId = $personData['Country_Id'];
+      $this->countryName = $personData['CountryName'];
+      $this->state = $personData['CountryState'];
+      $this->stateId = $personData['CountryState_Id'];
+      $this->stateName = $personData['CountryStateName'];
+      $this->available = $personData['Available'];
+      $this->isActive = $personData['IsActive'];
+      $this->name = $personData['Name'];
 
-    $this->personalId = $personData['PersonalId'];
-    $this->typeId = $personData['TypeId'];
-    $this->expirationDateId = $personData['ExpirationDateId'];
-    $this->address = $personData['Address'];
-    $this->city = $personData['City'];
-    $this->birthDate = $personData['BirthDate'];
-    $this->maritalStatus = $personData['MaritalStatus'];
-    $this->gender = $personData['Gender'];
-    $this->profession = $personData['Profession'];
-    $this->phone = $personData['Phone'];
+      $this->personalId = $personData['PersonalId'];
+      $this->typeId = $personData['TypeId'];
+      $this->expirationDateId = $personData['ExpirationDateId'];
+      $this->address = $personData['Address'];
+      $this->city = $personData['City'];
+      $this->birthDate = $personData['BirthDate'];
+      $this->maritalStatus = $personData['MaritalStatus'];
+      $this->gender = $personData['Gender'];
+      $this->profession = $personData['Profession'];
+      $this->phone = $personData['Phone'];
+    }
   }
 
   /**
@@ -213,6 +217,14 @@ class Person
   public function block()
   {
     $this->tblPerson->available($this->personId, 0);
+  }
+
+  /**
+   * inactive this person
+   */
+  public function inactive()
+  {
+    $this->tblPerson->isActive($this->personId, 0);
   }
 
   /**
