@@ -98,7 +98,7 @@ class Manager
 
       //get person id from stickiness
       $personId = $stickiness->getPersonId();
-      if(!$personId){
+      if(!$personId || !$isRegister){
         //select and block the person for following transactions
         $personSelected = $this->getPersonAvailable($amount, $customer->getAgencyTypeId(), $customer->getAgencyId());
         $personId = $personSelected['Person_Id'];
