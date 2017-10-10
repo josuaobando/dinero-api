@@ -105,6 +105,24 @@ class TblCustomer extends Db
 
     return $rows;
   }
+
+  /**
+   * @param $customerName
+   *
+   * @return array
+   */
+  public function getSimilarSearch($customerName)
+  {
+    $sql = "CALL spCustomer_SimilarSearch('{customerName}')";
+
+    $params = array();
+    $params['customerName'] = $customerName;
+
+    $rows = array();
+    $this->executeQuery($sql, $rows, $params);
+
+    return $rows;
+  }
 	
 	/**
 	 * Validate if customer [firstname + lastname] is blocked by the Network

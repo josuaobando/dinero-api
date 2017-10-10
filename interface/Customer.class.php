@@ -98,7 +98,7 @@ class Customer
     //validate if exist a similar customer
     $maxPercent = 0;
     $customerNameSimilar = null;
-    $customerNameRequest = $this->getCustomer();
+    $customerNameRequest = strtoupper($this->getCustomer());
 
     //validate if customer is blacklisted
     $this->isBlacklisted();
@@ -108,7 +108,7 @@ class Customer
       $similarList = $this->tblCustomer->getSimilar($companyId, $this->agencyTypeId, $this->firstName, $this->lastName);
       if($similarList && COUNT($similarList) > 0){
         foreach($similarList as $similar){
-          $registerCustomerName = $similar['CustomerName'];
+          $registerCustomerName = strtoupper($similar['CustomerName']);
           similar_text($customerNameRequest, $registerCustomerName, $percent);
           if($percent >= CoreConfig::CUSTOMER_SIMILAR_PERCENT && $percent > $maxPercent){
 

@@ -257,9 +257,7 @@ class Stickiness
   private function createProvider()
   {
     if(!$this->stickinessId){
-      $this->stickinessId = $this->tblStickiness->create($this->customerId, $this->personId, $this->verificationId, $this->verification);
-    }else{
-      $this->tblStickiness->update($this->stickinessId, $this->verificationId, $this->verification);
+      $this->stickinessId = $this->tblStickiness->create($this->customerId, $this->personId);
     }
   }
 
@@ -306,8 +304,6 @@ class Stickiness
     $stickinessData = $this->tblStickiness->getByCustomerId($this->customerId);
     if($stickinessData){
       $this->stickinessId = $stickinessData['Stickiness_Id'];
-      $this->verificationId = $stickinessData['Verification_Id'];
-      $this->verification = $stickinessData['Verification'];
       $this->agencyP2P = $stickinessData['AgencyP2P'];
 
       $this->customerId = $stickinessData['Customer_Id'];
@@ -319,6 +315,32 @@ class Stickiness
         $this->personalId = $stickinessData['PersonalId'];
       }
 
+    }
+
+  }
+
+  /**
+   * restore or get stickiness data
+   *
+   * @param $transactionId
+   */
+  public function restoreByTransactionId($transactionId)
+  {
+    $tblStickinessTransaction = TblStickinessTransaction::getInstance();
+    $stickinessTransactionData = $tblStickinessTransaction->get($transactionId);
+    if($stickinessTransactionData){
+
+      $this->stickinessId = $stickinessTransactionData['Stickiness_Id'];
+      $this->verificationId = $stickinessTransactionData['Verification_Id'];
+      $this->verification = $stickinessTransactionData['Verification'];
+      $this->agencyP2P = $stickinessTransactionData['AgencyP2P'];
+
+      $this->customerId = $stickinessTransactionData['Customer_Id'];
+      $this->customer = $stickinessTransactionData['Customer'];
+
+      $this->personId = $stickinessTransactionData['Person_Id'];
+      $this->person = $stickinessTransactionData['Person'];
+      $this->personalId = $stickinessTransactionData['PersonalId'];
     }
 
   }
@@ -421,15 +443,15 @@ class Stickiness
             break;
           case self::STATUS_CODE_LINKED_OTHER_CUSTOMER:
             //TODO: Pending
-            ExceptionManager::handleException(new InvalidStateException("Code: $resultCode  Message: $resultCodeMessage : "  . __FUNCTION__));
+            ExceptionManager::handleException(new InvalidStateException("Code: $resultCode  Message: $resultCodeMessage : " . __FUNCTION__));
             throw new InvalidStateException("The Customer is linked to another Agency (Merchant).");
             break;
           case self::STATUS_CODE_FAILED:
-            ExceptionManager::handleException(new InvalidStateException("The Person [$this->person] is linked to another Customer. : "  . __FUNCTION__));
+            ExceptionManager::handleException(new InvalidStateException("The Person [$this->person] is linked to another Customer. : " . __FUNCTION__));
             throw new InvalidStateException("Due to external factors, we cannot give this Customer a Person.");
             break;
           default:
-            ExceptionManager::handleException(new InvalidStateException("Code: $resultCode  Message: $resultCodeMessage : "  . __FUNCTION__));
+            ExceptionManager::handleException(new InvalidStateException("Code: $resultCode  Message: $resultCodeMessage : " . __FUNCTION__));
             throw new InvalidStateException("Due to external factors, we cannot give this Customer a Person.");
         }
       }else{
@@ -493,12 +515,12 @@ class Stickiness
             throw new InvalidStateException("The Customer is linked to another Agency (Merchant).");
             break;
           case self::STATUS_CODE_LINKED_OTHER_CUSTOMER:
-            ExceptionManager::handleException(new InvalidStateException("Code: $resultCode  Message: $resultCodeMessage : "  . __FUNCTION__));
+            ExceptionManager::handleException(new InvalidStateException("Code: $resultCode  Message: $resultCodeMessage : " . __FUNCTION__));
             throw new InvalidStateException("The Customer is linked to another Agency (Merchant).");
             break;
           case self::STATUS_CODE_FAILED:
             $this->disable();
-            ExceptionManager::handleException(new InvalidStateException("The Person [$this->person] is linked to another Customer. : "  . __FUNCTION__));
+            ExceptionManager::handleException(new InvalidStateException("The Person [$this->person] is linked to another Customer. : " . __FUNCTION__));
             throw new InvalidStateException("Due to external factors, we cannot give this Customer a Person.");
             break;
           default:

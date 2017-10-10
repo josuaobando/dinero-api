@@ -130,6 +130,27 @@ class Log
 
     @file_put_contents(CoreConfig::LOG_PATH . $logFile, $content, FILE_APPEND);
   }
+
+  /**
+   * customer function for logging
+   *
+   * @param $file
+   * @param $message
+   */
+  public static function custom2($file, $message)
+  {
+    if (!defined('CoreConfig::LOG_PATH') || !is_dir(CoreConfig::LOG_PATH))
+    {
+      //no valid path has been defined
+      return;
+    }
+
+    $content = "{message} \n";
+    $content = str_replace("{message}", $message, $content);
+    $logFile = "/" . Log::$prefix . $file . Log::$extension;
+
+    @file_put_contents(CoreConfig::LOG_PATH . $logFile, $content, FILE_APPEND);
+  }
 	
 	/**
 	 * log information

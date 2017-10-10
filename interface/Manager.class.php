@@ -90,13 +90,12 @@ class Manager
     $limit->evaluate();
 
     //check stickiness
-    $isRegister = true;
     $stickiness = new Stickiness();
     $stickiness->restoreByCustomerId($customer->getCustomerId());
 
     //get person id from stickiness
     $personId = $stickiness->getPersonId();
-    if(!$personId || !$isRegister){
+    if(!$personId){
       //select and block the person for following transactions
       $personSelected = $this->getPersonAvailable($amount, $customer->getAgencyTypeId(), $customer->getAgencyId());
       $personId = $personSelected['Person_Id'];
@@ -264,7 +263,7 @@ class Manager
     if($update && $transaction->getTransactionStatusId() == Transaction::STATUS_APPROVED){
 
       $stickiness = new Stickiness();
-      $stickiness->restoreByCustomerId($transaction->getCustomerId());
+      $stickiness->restoreByTransactionId($transaction->getTransactionId());
       if($stickiness->getStickinessId()){
 
         //Completed to API Controller
