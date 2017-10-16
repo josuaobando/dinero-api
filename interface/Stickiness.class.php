@@ -13,9 +13,9 @@ class Stickiness
   /**
    * #1: There was an issue with the authentication process or there was an invalid state in the execution.
    *
-   * #2: This Receiver is not linked to this Sender
+   * #2: Receiver already linked to other company
    */
-  const STATUS_CODE_FAILED = '2';
+  const STATUS_CODE_LINKED_OTHER_COMPANY = '2';
   /**
    * Already linked to a one of your receivers
    */
@@ -25,7 +25,7 @@ class Stickiness
    */
   const STATUS_CODE_LINKED_PENDING = '4';
   /**
-   * [Rejected] Already linked to other receiver
+   * [Rejected] Already linked to other receiver or company
    */
   const STATUS_CODE_LINKED_OTHER = '5';
   /**
@@ -439,16 +439,15 @@ class Stickiness
             }
             break;
           case self::STATUS_CODE_LINKED_OTHER:
-            throw new InvalidStateException("The Customer is linked to another Agency (Merchant).");
+            throw new InvalidStateException("The Customer is linked to another Agency (Merchant) or Person.");
             break;
           case self::STATUS_CODE_LINKED_OTHER_CUSTOMER:
             //TODO: Pending
             ExceptionManager::handleException(new InvalidStateException("Code: $resultCode  Message: $resultCodeMessage : " . __FUNCTION__));
             throw new InvalidStateException("The Customer is linked to another Agency (Merchant).");
             break;
-          case self::STATUS_CODE_FAILED:
-            ExceptionManager::handleException(new InvalidStateException("The Person [$this->person] is linked to another Customer. : " . __FUNCTION__));
-            throw new InvalidStateException("Due to external factors, we cannot give this Customer a Person.");
+          case self::STATUS_CODE_LINKED_OTHER_COMPANY:
+            throw new InvalidStateException("The Customer is linked to another Agency (Merchant).");
             break;
           default:
             ExceptionManager::handleException(new InvalidStateException("Code: $resultCode  Message: $resultCodeMessage : " . __FUNCTION__));
@@ -512,13 +511,13 @@ class Stickiness
             }
             break;
           case self::STATUS_CODE_LINKED_OTHER:
-            throw new InvalidStateException("The Customer is linked to another Agency (Merchant).");
+            throw new InvalidStateException("The Customer is linked to another Agency (Merchant) or Person.");
             break;
           case self::STATUS_CODE_LINKED_OTHER_CUSTOMER:
             ExceptionManager::handleException(new InvalidStateException("Code: $resultCode  Message: $resultCodeMessage : " . __FUNCTION__));
             throw new InvalidStateException("The Customer is linked to another Agency (Merchant).");
             break;
-          case self::STATUS_CODE_FAILED:
+          case self::STATUS_CODE_LINKED_OTHER_COMPANY:
             $this->disable();
             ExceptionManager::handleException(new InvalidStateException("The Person [$this->person] is linked to another Customer. : " . __FUNCTION__));
             throw new InvalidStateException("Due to external factors, we cannot give this Customer a Person.");
