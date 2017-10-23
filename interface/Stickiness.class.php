@@ -383,7 +383,7 @@ class Stickiness
 
       $wsConnector = new WS();
       $wsConnector->setReader(new Reader_Json());
-      $result = $wsConnector->execPost(CoreConfig::WS_STICKINESS_URL . 'account/', $params);
+      $result = $wsConnector->execPost(CoreConfig::WS_STICKINESS_URL.'account/', $params);
 
       return ($result && $result->code == 1);
     }catch(WSException $ex){
@@ -411,7 +411,7 @@ class Stickiness
 
         $wsConnector = new WS();
         $wsConnector->setReader(new Reader_Json());
-        $result = $wsConnector->execPost(CoreConfig::WS_STICKINESS_URL . 'check/', $params);
+        $result = $wsConnector->execPost(CoreConfig::WS_STICKINESS_URL.'check/', $params);
 
         $this->tblStickiness->addProviderMessage($this->stickinessId, $wsConnector->getLastRequest(), $result);
       }catch(Exception $ex){
@@ -441,16 +441,12 @@ class Stickiness
           case self::STATUS_CODE_LINKED_OTHER:
             throw new InvalidStateException("The Customer is linked to another Agency (Merchant) or Person.");
             break;
-          case self::STATUS_CODE_LINKED_OTHER_CUSTOMER:
-            //TODO: Pending
-            ExceptionManager::handleException(new InvalidStateException("Code: $resultCode  Message: $resultCodeMessage : " . __FUNCTION__));
-            throw new InvalidStateException("The Customer is linked to another Agency (Merchant).");
-            break;
           case self::STATUS_CODE_LINKED_OTHER_COMPANY:
+          case self::STATUS_CODE_LINKED_OTHER_CUSTOMER:
             throw new InvalidStateException("The Customer is linked to another Agency (Merchant).");
             break;
           default:
-            ExceptionManager::handleException(new InvalidStateException("Code: $resultCode  Message: $resultCodeMessage : " . __FUNCTION__));
+            ExceptionManager::handleException(new InvalidStateException("Code: $resultCode  Message: $resultCodeMessage : (".__FUNCTION__.")"));
             throw new InvalidStateException("Due to external factors, we cannot give this Customer a Person.");
         }
       }else{
@@ -482,7 +478,7 @@ class Stickiness
 
         $wsConnector = new WS();
         $wsConnector->setReader(new Reader_Json());
-        $result = $wsConnector->execPost(CoreConfig::WS_STICKINESS_URL . 'confirm/', $params);
+        $result = $wsConnector->execPost(CoreConfig::WS_STICKINESS_URL.'confirm/', $params);
 
         $this->tblStickiness->addProviderMessage($this->stickinessId, $wsConnector->getLastRequest(), $result);
       }catch(Exception $ex){
@@ -513,17 +509,14 @@ class Stickiness
           case self::STATUS_CODE_LINKED_OTHER:
             throw new InvalidStateException("The Customer is linked to another Agency (Merchant) or Person.");
             break;
+          case self::STATUS_CODE_LINKED_OTHER_COMPANY:
           case self::STATUS_CODE_LINKED_OTHER_CUSTOMER:
-            ExceptionManager::handleException(new InvalidStateException("Code: $resultCode  Message: $resultCodeMessage : " . __FUNCTION__));
+            $this->disable();
+            ExceptionManager::handleException(new InvalidStateException("The Person [$this->person] is linked to another Customer. (".__FUNCTION__.")"));
             throw new InvalidStateException("The Customer is linked to another Agency (Merchant).");
             break;
-          case self::STATUS_CODE_LINKED_OTHER_COMPANY:
-            $this->disable();
-            ExceptionManager::handleException(new InvalidStateException("The Person [$this->person] is linked to another Customer. : " . __FUNCTION__));
-            throw new InvalidStateException("Due to external factors, we cannot give this Customer a Person.");
-            break;
           default:
-            ExceptionManager::handleException(new InvalidStateException("Code: $resultCode  Message: $resultCodeMessage : " . __FUNCTION__));
+            ExceptionManager::handleException(new InvalidStateException("Code: $resultCode  Message: $resultCodeMessage : (".__FUNCTION__.")"));
         }
       }
 
