@@ -390,11 +390,12 @@ class Transaction
   {
     if($this->controlNumber)
     {
-      $transactionData = $this->tblTransaction->getTransactioByControlNumber($this->controlNumber);
+      $transactionData = $this->tblTransaction->getTransactionByControlNumber($this->controlNumber);
       if($transactionData && count($transactionData) > 0)
       {
         $transactionId = $transactionData['Transaction_Id'];
-        if($this->transactionId != $transactionId)
+        $transactionStatusId = $transactionData['TransactionStatus_Id'];
+        if($this->transactionId != $transactionId && $transactionStatusId == self::STATUS_APPROVED)
         {
           throw new InvalidStateException("The Tracking Number [$this->controlNumber] already exists, check it please!");
         }

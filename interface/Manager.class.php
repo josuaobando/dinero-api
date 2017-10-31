@@ -258,9 +258,7 @@ class Manager
     $transaction->setControlNumber($controlNumber);
     $transaction->setAccountId($this->account->getAccountId());
 
-    //update transaction after the validation of the data
-    $update = $transaction->update();
-    if($update && $transaction->getTransactionStatusId() == Transaction::STATUS_APPROVED){
+    if($transaction->getTransactionStatusId() == Transaction::STATUS_APPROVED){
 
       $stickiness = new Stickiness();
       $stickiness->restoreByTransactionId($transaction->getTransactionId());
@@ -285,7 +283,11 @@ class Manager
         }
 
       }
+
     }
+
+    //update transaction after the validation of the data
+    $update = $transaction->update();
 
     return $update;
   }

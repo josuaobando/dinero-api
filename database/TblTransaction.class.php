@@ -131,7 +131,7 @@ class TblTransaction extends Db
 	 * 
 	 * @return array
 	 */
-	public function getTransactioByControlNumber($controlNumber)
+	public function getTransactionByControlNumber($controlNumber)
 	{
 		$sql = "CALL transaction_byReference('{controlNumber}')";
 	
