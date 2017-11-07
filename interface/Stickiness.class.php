@@ -511,12 +511,10 @@ class Stickiness
             break;
           case self::STATUS_CODE_LINKED_OTHER_COMPANY:
           case self::STATUS_CODE_LINKED_OTHER_CUSTOMER:
-            $this->disable();
-            ExceptionManager::handleException(new InvalidStateException("The Person [$this->person] is linked to another Customer. (".__FUNCTION__.")"));
-            throw new InvalidStateException("The Customer is linked to another Agency (Merchant).");
+            throw new InvalidStateException("The Person [$this->person] is linked to another Customer.");
             break;
           default:
-            ExceptionManager::handleException(new InvalidStateException("Code: $resultCode  Message: $resultCodeMessage : (".__FUNCTION__.")"));
+            ExceptionManager::handleException(new InvalidStateException("Invalid Response Code >> Code: $resultCode  Message: $resultCodeMessage : (".__FUNCTION__.")"));
         }
       }
 
