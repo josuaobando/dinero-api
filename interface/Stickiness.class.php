@@ -25,7 +25,7 @@ class Stickiness
    */
   const STATUS_CODE_LINKED_PENDING = '4';
   /**
-   * [Rejected] Already linked to other receiver or company
+   * [Rejected] Already linked to other company
    */
   const STATUS_CODE_LINKED_OTHER = '5';
   /**
@@ -76,6 +76,10 @@ class Stickiness
    */
   private $agencyP2P;
   /**
+   * @var int
+   */
+  private $agencyP2P_Url;
+  /**
    * @var string
    */
   private $person;
@@ -98,6 +102,11 @@ class Stickiness
    * @var TblStickiness
    */
   private $tblStickiness;
+
+  /**
+   * @var array
+   */
+  private $stickinessTransactionData;
 
   /**
    * new instance
@@ -282,6 +291,7 @@ class Stickiness
       $this->verificationId = $stickinessData['Verification_Id'];
       $this->verification = $stickinessData['Verification'];
       $this->agencyP2P = $stickinessData['AgencyP2P'];
+      $this->agencyP2P_Url = $stickinessData['AgencyP2P_Url'];
 
       $this->customerId = $stickinessData['Customer_Id'];
       $this->customer = $stickinessData['Customer'];
@@ -305,6 +315,7 @@ class Stickiness
     if($stickinessData){
       $this->stickinessId = $stickinessData['Stickiness_Id'];
       $this->agencyP2P = $stickinessData['AgencyP2P'];
+      $this->agencyP2P_Url = $stickinessData['AgencyP2P_Url'];
 
       $this->customerId = $stickinessData['Customer_Id'];
       $this->customer = $stickinessData['Customer'];
@@ -327,20 +338,21 @@ class Stickiness
   public function restoreByTransactionId($transactionId)
   {
     $tblStickinessTransaction = TblStickinessTransaction::getInstance();
-    $stickinessTransactionData = $tblStickinessTransaction->get($transactionId);
-    if($stickinessTransactionData){
+    $this->stickinessTransactionData = $tblStickinessTransaction->get($transactionId);
+    if($this->stickinessTransactionData){
 
-      $this->stickinessId = $stickinessTransactionData['Stickiness_Id'];
-      $this->verificationId = $stickinessTransactionData['Verification_Id'];
-      $this->verification = $stickinessTransactionData['Verification'];
-      $this->agencyP2P = $stickinessTransactionData['AgencyP2P'];
+      $this->stickinessId = $this->stickinessTransactionData['Stickiness_Id'];
+      $this->verificationId = $this->stickinessTransactionData['Verification_Id'];
+      $this->verification = $this->stickinessTransactionData['Verification'];
+      $this->agencyP2P = $this->stickinessTransactionData['AgencyP2P'];
+      $this->agencyP2P_Url = $this->stickinessTransactionData['AgencyP2P_Url'];
 
-      $this->customerId = $stickinessTransactionData['Customer_Id'];
-      $this->customer = $stickinessTransactionData['Customer'];
+      $this->customerId = $this->stickinessTransactionData['Customer_Id'];
+      $this->customer = $this->stickinessTransactionData['Customer'];
 
-      $this->personId = $stickinessTransactionData['Person_Id'];
-      $this->person = $stickinessTransactionData['Person'];
-      $this->personalId = $stickinessTransactionData['PersonalId'];
+      $this->personId = $this->stickinessTransactionData['Person_Id'];
+      $this->person = $this->stickinessTransactionData['Person'];
+      $this->personalId = $this->stickinessTransactionData['PersonalId'];
     }
 
   }
@@ -383,7 +395,7 @@ class Stickiness
 
       $wsConnector = new WS();
       $wsConnector->setReader(new Reader_Json());
-      $result = $wsConnector->execPost(CoreConfig::WS_STICKINESS_URL.'account/', $params);
+      $result = $wsConnector->execPost($this->agencyP2P_Url . 'account/', $params);
 
       return ($result && $result->code == 1);
     }catch(WSException $ex){
@@ -411,7 +423,7 @@ class Stickiness
 
         $wsConnector = new WS();
         $wsConnector->setReader(new Reader_Json());
-        $result = $wsConnector->execPost(CoreConfig::WS_STICKINESS_URL.'check/', $params);
+        $result = $wsConnector->execPost($this->agencyP2P_Url . 'check/', $params);
 
         $this->tblStickiness->addProviderMessage($this->stickinessId, $wsConnector->getLastRequest(), $result);
       }catch(Exception $ex){
@@ -439,14 +451,14 @@ class Stickiness
             }
             break;
           case self::STATUS_CODE_LINKED_OTHER:
-            throw new InvalidStateException("The Customer is linked to another Agency (Merchant) or Person.");
+            throw new InvalidStateException("The Customer is linked to another Merchant");
             break;
           case self::STATUS_CODE_LINKED_OTHER_COMPANY:
           case self::STATUS_CODE_LINKED_OTHER_CUSTOMER:
             throw new InvalidStateException("The Customer is linked to another Agency (Merchant).");
             break;
           default:
-            ExceptionManager::handleException(new InvalidStateException("Invalid Response Code >> Code: $resultCode  Message: $resultCodeMessage : (".__FUNCTION__.")"));
+            ExceptionManager::handleException(new InvalidStateException("Invalid Response Code >> Code: $resultCode  Message: $resultCodeMessage : (" . __FUNCTION__ . ")"));
             throw new InvalidStateException("Due to external factors, we cannot give this Customer a Person.");
         }
       }else{
@@ -476,9 +488,22 @@ class Stickiness
         $params['receiverId'] = $this->personalId;
         $params['controlNumber'] = $this->controlNumber;
 
+        $apiURL = $this->agencyP2P_Url;
+
+        $agencyTypeId = $this->stickinessTransactionData['AgencyType_Id'];
+        if($agencyTypeId == Transaction::AGENCY_RIA){
+          $createdDate = $this->stickinessTransactionData['CreatedDate'];
+
+          $limitDate =  strtotime('2017-11-09');
+          $transactionDate =  strtotime($createdDate);
+          if($transactionDate <= $limitDate){
+            $apiURL = CoreConfig::WS_STICKINESS_URL;
+          }
+        }
+
         $wsConnector = new WS();
         $wsConnector->setReader(new Reader_Json());
-        $result = $wsConnector->execPost(CoreConfig::WS_STICKINESS_URL.'confirm/', $params);
+        $result = $wsConnector->execPost($apiURL . 'confirm/', $params);
 
         $this->tblStickiness->addProviderMessage($this->stickinessId, $wsConnector->getLastRequest(), $result);
       }catch(Exception $ex){
@@ -509,10 +534,10 @@ class Stickiness
           case self::STATUS_CODE_LINKED_OTHER:
           case self::STATUS_CODE_LINKED_OTHER_COMPANY:
           case self::STATUS_CODE_LINKED_OTHER_CUSTOMER:
-          throw new InvalidStateException("Customer is linked with another Agency (Merchant) or Person. Reject this transaction.");
+            throw new InvalidStateException("Customer is linked with another Merchant or Person. Reject this transaction.");
             break;
           default:
-            ExceptionManager::handleException(new InvalidStateException("Invalid Response Code >> Code: $resultCode  Message: $resultCodeMessage : (".__FUNCTION__.")"));
+            ExceptionManager::handleException(new InvalidStateException("Invalid Response Code >> Code: $resultCode  Message: $resultCodeMessage : (" . __FUNCTION__ . ")"));
             throw new InvalidStateException("Customer is linked with another Agency (Merchant) or Person. Reject this transaction.");
         }
       }
