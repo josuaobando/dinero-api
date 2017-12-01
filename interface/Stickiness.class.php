@@ -74,6 +74,10 @@ class Stickiness
   /**
    * @var int
    */
+  private $agencyTypeId;
+  /**
+   * @var int
+   */
   private $agencyP2P;
   /**
    * @var int
@@ -278,13 +282,21 @@ class Stickiness
     if($this->stickinessId){
       $this->tblStickiness->isActive($this->stickinessId, 0);
 
-      if($this->stickinessTransactionData){
-        $stickinessTransactionId = $this->stickinessTransactionData['StickinessTransaction_Id'];
-        $verificationId = $this->stickinessTransactionData['Verification_Id'];
+      try{
+        if($this->stickinessTransactionData){
+          $stickinessTransactionId = $this->stickinessTransactionData['StickinessTransaction_Id'];
+          $verificationId = $this->stickinessTransactionData['Verification_Id'];
 
-        $tblStickinessTransaction = TblStickinessTransaction::getInstance();
-        $tblStickinessTransaction->update($stickinessTransactionId, $verificationId, 'rejected', 0);
+          $tblStickinessTransaction = TblStickinessTransaction::getInstance();
+          $tblStickinessTransaction->update($stickinessTransactionId, $verificationId, 'rejected', 0);
+
+          $tblCustomer = TblCustomer::getInstance();
+          $tblCustomer->block($this->customer, $this->agencyTypeId, 'P2P Blocked');
+        }
+      }catch(Exception $ex){
+        ExceptionManager::handleException($ex);
       }
+
     }
   }
 
@@ -298,6 +310,8 @@ class Stickiness
       $this->stickinessId = $stickinessData['Stickiness_Id'];
       $this->verificationId = $stickinessData['Verification_Id'];
       $this->verification = $stickinessData['Verification'];
+
+      $this->agencyTypeId = $stickinessData['AgencyType_Id'];
       $this->agencyP2P = $stickinessData['AgencyP2P'];
       $this->agencyP2P_Url = $stickinessData['AgencyP2P_Url'];
 
@@ -322,6 +336,7 @@ class Stickiness
     $stickinessData = $this->tblStickiness->getByCustomerId($this->customerId);
     if($stickinessData){
       $this->stickinessId = $stickinessData['Stickiness_Id'];
+      $this->agencyTypeId = $stickinessData['AgencyType_Id'];
       $this->agencyP2P = $stickinessData['AgencyP2P'];
       $this->agencyP2P_Url = $stickinessData['AgencyP2P_Url'];
 
