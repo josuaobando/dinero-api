@@ -279,24 +279,25 @@ class Stickiness
    */
   public function rejectProvider()
   {
-    if($this->stickinessId){
-      $this->tblStickiness->isActive($this->stickinessId, 0);
+    try{
 
-      try{
+      $tblCustomer = TblCustomer::getInstance();
+      $tblCustomer->block($this->customer, $this->agencyTypeId, 'P2P Blocked');
+
+      if($this->stickinessId){
+        $this->tblStickiness->isActive($this->stickinessId, 0);
+
         if($this->stickinessTransactionData){
           $stickinessTransactionId = $this->stickinessTransactionData['StickinessTransaction_Id'];
           $verificationId = $this->stickinessTransactionData['Verification_Id'];
 
           $tblStickinessTransaction = TblStickinessTransaction::getInstance();
           $tblStickinessTransaction->update($stickinessTransactionId, $verificationId, 'rejected', 0);
-
-          $tblCustomer = TblCustomer::getInstance();
-          $tblCustomer->block($this->customer, $this->agencyTypeId, 'P2P Blocked');
         }
-      }catch(Exception $ex){
-        ExceptionManager::handleException($ex);
-      }
 
+      }
+    }catch(Exception $ex){
+      ExceptionManager::handleException($ex);
     }
   }
 
