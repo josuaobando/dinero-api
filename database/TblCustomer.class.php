@@ -146,6 +146,24 @@ class TblCustomer extends Db
 	
 	  return $result['isBlocked'];
 	}
+
+  /**
+   * @param $customer
+   * @param $agencyTypeId
+   * @param $description
+   * @return int
+   */
+  public function block($customer, $agencyTypeId, $description)
+  {
+    $sql = "CALL spCustomer_Block('{customer}', '{agencyTypeId}', '{description}')";
+
+    $params = array();
+    $params['agencyTypeId'] = $agencyTypeId;
+    $params['customer'] = $customer;
+    $params['description'] = $description;
+
+    return $this->executeUpdate($sql, $params);
+  }
 	
 	/**
 	 * get stats
