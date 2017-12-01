@@ -273,10 +273,18 @@ class Stickiness
   /**
    *  disable stickiness
    */
-  public function disable()
+  public function rejectProvider()
   {
     if($this->stickinessId){
       $this->tblStickiness->isActive($this->stickinessId, 0);
+
+      if($this->stickinessTransactionData){
+        $stickinessTransactionId = $this->stickinessTransactionData['StickinessTransaction_Id'];
+        $verificationId = $this->stickinessTransactionData['Verification_Id'];
+
+        $tblStickinessTransaction = TblStickinessTransaction::getInstance();
+        $tblStickinessTransaction->update($stickinessTransactionId, $verificationId, 'rejected', 0);
+      }
     }
   }
 
@@ -447,14 +455,14 @@ class Stickiness
             if($this->verification == self::STATUS_VERIFICATION_PENDING){
               $this->createProvider();
             }else{
+              $this->rejectProvider();
               throw new InvalidStateException("The Customer is linked to another Person.");
             }
             break;
           case self::STATUS_CODE_LINKED_OTHER:
-            throw new InvalidStateException("The Customer is linked to another Merchant");
-            break;
           case self::STATUS_CODE_LINKED_OTHER_COMPANY:
           case self::STATUS_CODE_LINKED_OTHER_CUSTOMER:
+            $this->rejectProvider();
             throw new InvalidStateException("The Customer is linked to another Agency (Merchant).");
             break;
           default:
@@ -488,22 +496,9 @@ class Stickiness
         $params['receiverId'] = $this->personalId;
         $params['controlNumber'] = $this->controlNumber;
 
-        $apiURL = $this->agencyP2P_Url;
-
-        $agencyTypeId = $this->stickinessTransactionData['AgencyType_Id'];
-        if($agencyTypeId == Transaction::AGENCY_RIA){
-          $createdDate = $this->stickinessTransactionData['CreatedDate'];
-
-          $limitDate =  strtotime('2017-11-09');
-          $transactionDate =  strtotime($createdDate);
-          if($transactionDate <= $limitDate){
-            $apiURL = CoreConfig::WS_STICKINESS_URL;
-          }
-        }
-
         $wsConnector = new WS();
         $wsConnector->setReader(new Reader_Json());
-        $result = $wsConnector->execPost($apiURL . 'confirm/', $params);
+        $result = $wsConnector->execPost($this->agencyP2P_Url . 'confirm/', $params);
 
         $this->tblStickiness->addProviderMessage($this->stickinessId, $wsConnector->getLastRequest(), $result);
       }catch(Exception $ex){
@@ -528,12 +523,14 @@ class Stickiness
             if($this->verification == self::STATUS_VERIFICATION_APPROVED){
               $this->createProvider();
             }else{
+              $this->rejectProvider();
               throw new InvalidStateException("The Customer is linked to another Person.");
             }
             break;
           case self::STATUS_CODE_LINKED_OTHER:
           case self::STATUS_CODE_LINKED_OTHER_COMPANY:
           case self::STATUS_CODE_LINKED_OTHER_CUSTOMER:
+            $this->rejectProvider();
             throw new InvalidStateException("Customer is linked with another Merchant or Person. Reject this transaction.");
             break;
           default:
