@@ -155,7 +155,7 @@ class TblCustomer extends Db
    */
   public function block($customer, $agencyTypeId, $description)
   {
-    $sql = "CALL spCustomer_Block('{customer}', '{agencyTypeId}', '{description}')";
+    $sql = "CALL spCustomer_Block('{agencyTypeId}', '{customer}', '{description}')";
 
     $params = array();
     $params['agencyTypeId'] = $agencyTypeId;
