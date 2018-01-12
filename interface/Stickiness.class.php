@@ -280,10 +280,14 @@ class Stickiness
   public function rejectProvider()
   {
     try{
-
       $tblCustomer = TblCustomer::getInstance();
       $tblCustomer->block($this->customer, $this->agencyTypeId, 'P2P Blocked');
+      Log::custom('Blocked', "Agency: $this->agencyTypeId Customer: $this->customer");
+    }catch(Exception $ex){
+      ExceptionManager::handleException($ex);
+    }
 
+    try{
       if($this->stickinessId){
         $this->tblStickiness->isActive($this->stickinessId, 0);
 
