@@ -123,6 +123,25 @@ class TblCustomer extends Db
 
     return $rows;
   }
+
+  /**
+   * @param $agencyTypeId
+   * @param $customer
+   * @return array
+   */
+  public function getSimilarSearchBlacklisted($agencyTypeId, $customer)
+  {
+    $sql = "CALL spCustomer_Similar_Blacklisted('{agencyTypeId}', '{customerName}')";
+
+    $params = array();
+    $params['agencyTypeId'] = $agencyTypeId;
+    $params['customerName'] = $customer;
+
+    $rows = array();
+    $this->executeQuery($sql, $rows, $params);
+
+    return $rows;
+  }
 	
 	/**
 	 * Validate if customer [firstname + lastname] is blocked by the Network
