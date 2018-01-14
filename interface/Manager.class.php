@@ -57,9 +57,10 @@ class Manager
    * start and create a new transaction
    *
    * @param WSRequest $wsRequest
-   * @param int $transactionType
+   * @param $transactionType
    *
    * @return \WSResponseOk
+   * @throws \InvalidParameterException
    * @throws \InvalidStateException
    */
   public function startTransaction($wsRequest, $transactionType)
@@ -89,27 +90,44 @@ class Manager
     $limit = new Limit($transaction, $customer);
     $limit->evaluate();
 
+    //------------------begin validation
     //check stickiness
+    $isRegister = true;
+    $person = new Person();
     $stickiness = new Stickiness();
-    $stickiness->restoreByCustomerId($customer->getCustomerId());
+    for($i = 1; $i <= 2; $i++){
+      $stickiness->restoreByCustomerId($customer->getCustomerId());
 
-    //get person id from stickiness
-    $personId = $stickiness->getPersonId();
-    if(!$personId){
-      //select and block the person for following transactions
-      $personSelected = $this->getPersonAvailable($amount, $customer->getAgencyTypeId(), $customer->getAgencyId());
-      $personId = $personSelected['Person_Id'];
+      //get person id from stickiness
+      $personId = $stickiness->getPersonId();
+      if(!$personId || !$isRegister){
+        //select and block the person for following transactions
+        $personSelected = $this->getPersonAvailable($amount, $customer->getAgencyTypeId(), $customer->getAgencyId());
+        $personId = $personSelected['Person_Id'];
+      }
+
+      //create person object
+      $person = new Person($personId);
+      //Check to API Controller and Register Stickiness
+      $stickiness->setCustomerId($customer->getCustomerId());
+      $stickiness->setCustomer($customer->getCustomer());
+      $stickiness->setPersonId($person->getPersonId());
+      $stickiness->setPersonalId($person->getPersonalId());
+      $stickiness->setPerson($person->getName());
+      $isRegister = $stickiness->register();
+
+      //if can no register, block data and try again
+      if(!$isRegister){
+        $person->inactive();
+      }else{
+        break;
+      }
     }
 
-    //create person object
-    $person = new Person($personId);
-    //Check to API Controller and Register Stickiness
-    $stickiness->setCustomerId($customer->getCustomerId());
-    $stickiness->setCustomer($customer->getCustomer());
-    $stickiness->setPersonId($person->getPersonId());
-    $stickiness->setPersonalId($person->getPersonalId());
-    $stickiness->setPerson($person->getName());
-    $stickiness->register();
+    if(!$isRegister){
+      throw new InvalidStateException("Due to external factors, we cannot give this Customer a Person.");
+    }
+    //------------------end validation
 
     //block person
     $person->block();

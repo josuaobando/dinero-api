@@ -281,8 +281,10 @@ class Stickiness
   {
     try{
       $tblCustomer = TblCustomer::getInstance();
-      $tblCustomer->block($this->customer, $this->agencyTypeId, 'P2P Blocked');
-      Log::custom('Blocked', "Agency: $this->agencyTypeId Customer: $this->customer");
+      $blocked = $tblCustomer->block($this->customer, $this->agencyTypeId, 'P2P Blocked');
+      if($blocked){
+        Log::custom('Blocked', "Agency: $this->agencyTypeId Customer: $this->customer");
+      }
     }catch(Exception $ex){
       ExceptionManager::handleException($ex);
     }
@@ -479,8 +481,11 @@ class Stickiness
               throw new InvalidStateException("The Customer is linked to another Person.");
             }
             break;
-          case self::STATUS_CODE_LINKED_OTHER:
           case self::STATUS_CODE_LINKED_OTHER_COMPANY:
+            ExceptionManager::handleException(new InvalidStateException("The Person [$this->person] is linked to another Customer [$this->customer]. "  . __FUNCTION__));
+            return false;
+            break;
+          case self::STATUS_CODE_LINKED_OTHER:
           case self::STATUS_CODE_LINKED_OTHER_CUSTOMER:
             $this->rejectProvider();
             throw new InvalidStateException("The Customer is linked to another Agency (Merchant).");
