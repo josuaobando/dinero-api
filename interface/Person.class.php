@@ -16,6 +16,8 @@ class Person
   private $available;
   private $isActive;
   private $name;
+  private $firstname;
+  private $lastname;
 
   private $personalId;
   private $typeId;
@@ -134,13 +136,43 @@ class Person
   }
 
   /**
+   * get the first name
+   *
+   * @return string
+   */
+  public function getFirstName()
+  {
+    return $this->firstname;
+  }
+
+  /**
+   * get the last name
+   *
+   * @return string
+   */
+  public function getLastName()
+  {
+    return $this->lastname;
+  }
+
+  /**
+   * get full name
+   *
+   * @return string
+   */
+  public function getFullName()
+  {
+    return $this->firstname.' '.$this->lastname;
+  }
+
+  /**
    * get the from representation
    *
    * @return string
    */
   public function getFrom()
   {
-    return $this->countryName . ", " . $this->stateName;
+    return $this->countryName.", ".$this->stateName;
   }
 
   /**
@@ -197,6 +229,8 @@ class Person
       $this->available = $personData['Available'];
       $this->isActive = $personData['IsActive'];
       $this->name = $personData['Name'];
+      $this->firstname = $personData['FirstName'];
+      $this->lastname = $personData['LastName'];
 
       $this->personalId = $personData['PersonalId'];
       $this->typeId = $personData['TypeId'];
@@ -245,6 +279,9 @@ class Person
     $data = array();
 
     $data['name'] = $this->name;
+    $data['firstName'] = $this->firstname;
+    $data['lastName'] = $this->lastname;
+
     $data['country'] = $this->countryName;
     $data['state'] = $this->stateName;
 
@@ -265,7 +302,10 @@ class Person
     $data['countryName'] = $this->countryName;
     $data['state'] = $this->state;
     $data['stateName'] = $this->stateName;
+
     $data['name'] = $this->name;
+    $data['firstName'] = $this->firstname;
+    $data['lastName'] = $this->lastname;
 
     $data['personalId'] = $this->personalId;
     $data['typeId'] = $this->typeId;
