@@ -279,8 +279,8 @@ class Person
     $data = array();
 
     $data['name'] = $this->name;
-    $data['firstName'] = $this->firstname;
-    $data['lastName'] = $this->lastname;
+    //$data['firstName'] = $this->firstname;
+    //$data['lastName'] = $this->lastname;
 
     $data['country'] = $this->countryName;
     $data['state'] = $this->stateName;
