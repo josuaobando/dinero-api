@@ -162,7 +162,7 @@ class Person
    */
   public function getFullName()
   {
-    return $this->lastname.' '.$this->firstname.' '.$this->lastname;
+    return $this->firstname.' '.$this->lastname;
   }
 
   /**
@@ -229,8 +229,8 @@ class Person
       $this->available = $personData['Available'];
       $this->isActive = $personData['IsActive'];
       $this->name = $personData['Name'];
-      $this->firstname = $personData['FirstName'];
-      $this->lastname = $personData['LastName'];
+      $this->firstname = $personData['Name'];
+      $this->lastname = $personData['Surnames'];
 
       $this->personalId = $personData['PersonalId'];
       $this->typeId = $personData['TypeId'];
@@ -278,12 +278,12 @@ class Person
   {
     $data = array();
 
-    if(!$this->firstname){
+    if(!$this->lastname){
       $data['name'] = $this->name;
     }else{
       $data['name'] = $this->getFullName();
-      $data['firstName'] = $this->name;
-      $data['lastName'] = $this->firstname.' '.$this->lastname;
+      $data['firstName'] = $this->firstname;
+      $data['lastName'] = $this->lastname;
     }
 
     $data['country'] = $this->countryName;
@@ -307,12 +307,12 @@ class Person
     $data['state'] = $this->state;
     $data['stateName'] = $this->stateName;
 
-    if(!$this->firstname){
+    if(!$this->lastname){
       $data['name'] = $this->name;
     }else{
       $data['name'] = $this->getFullName();
-      $data['firstName'] = $this->name;
-      $data['lastName'] = $this->firstname.' '.$this->lastname;
+      $data['firstName'] = $this->firstname;
+      $data['lastName'] = $this->lastname;
     }
 
     $data['personalId'] = $this->personalId;
