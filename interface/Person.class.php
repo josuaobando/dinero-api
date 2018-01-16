@@ -162,7 +162,7 @@ class Person
    */
   public function getFullName()
   {
-    return $this->firstname.' '.$this->lastname;
+    return $this->lastname.' '.$this->firstname.' '.$this->lastname;
   }
 
   /**
@@ -278,9 +278,13 @@ class Person
   {
     $data = array();
 
-    $data['name'] = $this->name;
-    //$data['firstName'] = $this->firstname;
-    //$data['lastName'] = $this->lastname;
+    if(!$this->firstname){
+      $data['name'] = $this->name;
+    }else{
+      $data['name'] = $this->getFullName();
+      $data['firstName'] = $this->name;
+      $data['lastName'] = $this->firstname.' '.$this->lastname;
+    }
 
     $data['country'] = $this->countryName;
     $data['state'] = $this->stateName;
