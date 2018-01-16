@@ -307,9 +307,13 @@ class Person
     $data['state'] = $this->state;
     $data['stateName'] = $this->stateName;
 
-    $data['name'] = $this->name;
-    $data['firstName'] = $this->firstname;
-    $data['lastName'] = $this->lastname;
+    if(!$this->firstname){
+      $data['name'] = $this->name;
+    }else{
+      $data['name'] = $this->getFullName();
+      $data['firstName'] = $this->name;
+      $data['lastName'] = $this->firstname.' '.$this->lastname;
+    }
 
     $data['personalId'] = $this->personalId;
     $data['typeId'] = $this->typeId;
