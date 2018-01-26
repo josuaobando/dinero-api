@@ -46,7 +46,16 @@ class Manager
   {
     $availableList = $this->tblManager->getPersonsAvailable($this->account->getAccountId(), $amount, $agencyTypeId, $agencyId);
     if(!$availableList || !is_array($availableList) || count($availableList) == 0){
-      throw new InvalidStateException("there are not names available");
+
+      try{
+        $subject = "There are not names available";
+        $body = "There are not names available. \n\n Agency Type: $agencyTypeId \n\n Agency Id: $agencyId";
+        MailManager::sendEmail(MailManager::getRecipients(), $subject, $body);
+      }catch(WSException $ex){
+        //do nothing
+      }
+
+      throw new InvalidStateException("There are not names available");
     }
     $selectedId = array_rand($availableList, 1);
 
