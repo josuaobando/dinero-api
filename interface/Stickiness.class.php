@@ -521,9 +521,22 @@ class Stickiness
         $params['receiverId'] = $this->personalId;
         $params['controlNumber'] = $this->controlNumber;
 
+        //temporal
+        $apiURL = $this->agencyP2P_Url;
+        $agencyTypeId = $this->stickinessTransactionData['AgencyType_Id'];
+        if($agencyTypeId == Transaction::AGENCY_RIA){
+          $createdDate = $this->stickinessTransactionData['CreatedDate'];
+          $limitDate =  strtotime('2018-03-11');
+          $transactionDate =  strtotime($createdDate);
+          if($transactionDate <= $limitDate){
+            $apiURL = CoreConfig::WS_STICKINESS_URL;
+          }
+        }
+        //temporal
+
         $wsConnector = new WS();
         $wsConnector->setReader(new Reader_Json());
-        $result = $wsConnector->execPost($this->agencyP2P_Url . 'confirm/', $params);
+        $result = $wsConnector->execPost($apiURL . 'confirm/', $params);
 
         $this->tblStickiness->addProviderMessage($this->stickinessId, $wsConnector->getLastRequest(), $result);
       }catch(Exception $ex){

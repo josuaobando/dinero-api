@@ -276,6 +276,9 @@ class Manager
     $transaction = new Transaction();
     $transaction->restore($transactionId);
 
+    //get current status
+    $currentStatusId = $transaction->getTransactionStatusId();
+
     //set new values
     $transaction->setTransactionStatusId($statusId);
     $transaction->setReason($reason);
@@ -285,28 +288,30 @@ class Manager
     $transaction->setControlNumber($controlNumber);
     $transaction->setAccountId($this->account->getAccountId());
 
-    if($transaction->getTransactionStatusId() == Transaction::STATUS_APPROVED){
+    //validate if is update transaction
+    if($currentStatusId != Transaction::STATUS_APPROVED && $statusId == Transaction::STATUS_APPROVED){
 
       $stickiness = new Stickiness();
       $stickiness->restoreByTransactionId($transaction->getTransactionId());
       if($stickiness->getStickinessId()){
 
-        //Completed to API Controller
-        $stickiness->setControlNumber($controlNumber);
-        $stickiness->complete();
+        //restore stickiness transaction
+        $stickinessTransaction = new StickinessTransaction();
+        $stickinessTransaction->setTransactionId($transaction->getTransactionId());
+        $stickinessTransaction->restore();
 
-        if($stickiness->getStickinessId()){
-          //restore stickiness transaction
-          $stickinessTransaction = new StickinessTransaction();
-          $stickinessTransaction->setTransactionId($transaction->getTransactionId());
-          $stickinessTransaction->restore();
-          if($stickinessTransaction->getStickinessTransactionId()){
-            //update stickiness transaction
-            $stickinessTransaction->setVerification($stickiness->getVerification());
-            $stickinessTransaction->setVerificationId($stickiness->getVerificationId());
-            $stickinessTransaction->setAuthCode($stickiness->getAuthCode());
-            $stickinessTransaction->update();
-          }
+        if($stickinessTransaction->getStickinessTransactionId() && !$stickinessTransaction->getAuthCode()){
+
+          //Completed to API Controller
+          $stickiness->setControlNumber($controlNumber);
+          $stickiness->complete();
+
+          //update stickiness transaction
+          $stickinessTransaction->setVerification($stickiness->getVerification());
+          $stickinessTransaction->setVerificationId($stickiness->getVerificationId());
+          $stickinessTransaction->setAuthCode($stickiness->getAuthCode());
+          $stickinessTransaction->update();
+
         }
 
       }
