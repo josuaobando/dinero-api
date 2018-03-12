@@ -150,7 +150,6 @@ class Customer
     $customerName = ($customerName) ? $customerName : $this->getCustomer();
     $customerName = strtoupper($customerName);
     $similarList = $this->tblCustomer->getSimilarSearchBlacklisted($this->agencyTypeId, $customerName);
-    //$isBlacklisted = $this->tblCustomer->getIsBlacklisted($customerName, $this->agencyTypeId);
     if($similarList && COUNT($similarList) > 0){
       foreach($similarList as $similar){
         $registerCustomerName = strtoupper($similar['CustomerName']);
@@ -165,12 +164,13 @@ class Customer
     if($isBlacklisted){
       $agencyType = $this->agencyTypeId;
       if($agencyType == Transaction::AGENCY_MONEY_GRAM){
-        throw new InvalidStateException("The Customer has been blacklisted by MG International. Suggest RIA option.");
+        $agencyType = 'MG';
       }elseif($agencyType == Transaction::AGENCY_WESTERN_UNION){
-        throw new InvalidStateException("The Customer has been blacklisted by WU International. Suggest RIA option.");
+        $agencyType = 'WU';
       }elseif($agencyType == Transaction::AGENCY_RIA){
-        throw new InvalidStateException("The Customer has been blacklisted by RIA International");
+        $agencyType = 'RIA';
       }
+      throw new InvalidStateException("The Customer has been blacklisted by $agencyType International");
     }
   }
 
