@@ -526,7 +526,7 @@ class Stickiness
         $agencyTypeId = $this->stickinessTransactionData['AgencyType_Id'];
         if($agencyTypeId == Transaction::AGENCY_RIA){
           $createdDate = $this->stickinessTransactionData['CreatedDate'];
-          $limitDate =  strtotime('2018-03-11');
+          $limitDate =  strtotime('2018-03-11 21:00:00');
           $transactionDate =  strtotime($createdDate);
           if($transactionDate <= $limitDate){
             $apiURL = CoreConfig::WS_STICKINESS_URL;
