@@ -145,8 +145,6 @@ class Customer
    */
   public function isBlacklisted($customerName = null)
   {
-    $maxPercent = 0;
-    $isBlacklisted = false;
     $customerName = ($customerName) ? $customerName : $this->getCustomer();
     $customerName = strtoupper($customerName);
     $similarList = $this->tblCustomer->getSimilarSearchBlacklisted($this->agencyTypeId, $customerName);
@@ -154,24 +152,22 @@ class Customer
       foreach($similarList as $similar){
         $registerCustomerName = strtoupper($similar['CustomerName']);
         similar_text($customerName, $registerCustomerName, $percent);
-        if($percent >= CoreConfig::CUSTOMER_SIMILAR_PERCENT && $percent > $maxPercent){
-          $maxPercent = $percent;
-          $isBlacklisted = true;
+        if($percent >= CoreConfig::CUSTOMER_SIMILAR_PERCENT){
+
+          $agencyType = $this->agencyTypeId;
+          if($agencyType == Transaction::AGENCY_MONEY_GRAM){
+            $agencyType = 'MG';
+          }elseif($agencyType == Transaction::AGENCY_WESTERN_UNION){
+            $agencyType = 'WU';
+          }elseif($agencyType == Transaction::AGENCY_RIA){
+            $agencyType = 'RIA';
+          }
+          throw new InvalidStateException("The Customer has been blacklisted by $agencyType International");
+
         }
       }
     }
 
-    if($isBlacklisted){
-      $agencyType = $this->agencyTypeId;
-      if($agencyType == Transaction::AGENCY_MONEY_GRAM){
-        $agencyType = 'MG';
-      }elseif($agencyType == Transaction::AGENCY_WESTERN_UNION){
-        $agencyType = 'WU';
-      }elseif($agencyType == Transaction::AGENCY_RIA){
-        $agencyType = 'RIA';
-      }
-      throw new InvalidStateException("The Customer has been blacklisted by $agencyType International");
-    }
   }
 
   /**
