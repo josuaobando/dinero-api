@@ -40,12 +40,13 @@ class TblTransaction extends Db
 	 * @param float $fee
 	 * @param int $agencyId
 	 * @param int $accountId
-	 * 
+   * @param string $reference
+	 *
 	 * @return int
 	 */
-	public function insert($transactionTypeId, $transactionStatusId, $agencyTypeId, $customerId, $personId, $username, $amount, $fee, $agencyId, $accountId)
+	public function insert($transactionTypeId, $transactionStatusId, $agencyTypeId, $customerId, $personId, $username, $amount, $fee, $agencyId, $accountId, $reference)
 	{
-		$sql = "CALL transaction_insert('{transactionTypeId}', '{transactionStatusId}', '{agencyTypeId}', '{agencyId}', '{customerId}', '{personId}', '{username}', '{amount}', '{fee}', '{accountId}', @TransactionId)";
+		$sql = "CALL transaction_insert('{transactionTypeId}', '{transactionStatusId}', '{agencyTypeId}', '{agencyId}', '{customerId}', '{personId}', '{username}', '{amount}', '{fee}', '{accountId}', '{reference}', @TransactionId)";
 		
 		$params = array();
 		$params['transactionTypeId'] = $transactionTypeId;
@@ -58,6 +59,7 @@ class TblTransaction extends Db
 		$params['amount'] = $amount;
 		$params['fee'] = $fee;
 		$params['accountId'] = $accountId;
+    $params['reference'] = $reference;
 		
 		$this->setOutputParams(array('TransactionId'));
 		$this->executeUpdate($sql, $params);

@@ -76,6 +76,7 @@ class Manager
   {
     $amount = $wsRequest->requireNumericAndPositive('amount');
     $username = trim($wsRequest->requireNotNullOrEmpty('uid'));
+    $reference = trim($wsRequest->getParam('reference'));
 
     $transactionStatus = ($transactionType == Transaction::TYPE_RECEIVER) ? Transaction::STATUS_REQUESTED : Transaction::STATUS_SUBMITTED;
 
@@ -91,6 +92,7 @@ class Manager
     $transaction->setCustomerId($customer->getCustomerId());
     $transaction->setTransactionTypeId($transactionType);
     $transaction->setTransactionStatusId($transactionStatus);
+    $transaction->setReference($reference);
     $transaction->setUsername($username);
     $transaction->setAmount($amount);
     $transaction->setFee(0);

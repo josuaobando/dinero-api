@@ -82,6 +82,11 @@ class Transaction
   private $reason;
 
   /**
+   * @var string
+   */
+  private $reference;
+
+  /**
    * Transaction Type
    */
   const TYPE_RECEIVER = 1;
@@ -194,6 +199,14 @@ class Transaction
   public function getFee()
   {
     return $this->fee;
+  }
+
+  /**
+   * @return string
+   */
+  public function getReference()
+  {
+    return $this->reference;
   }
 
   /**
@@ -315,11 +328,19 @@ class Transaction
   }
 
   /**
+   * @param string $reference
+   */
+  public function setReference($reference)
+  {
+    $this->reference = $reference;
+  }
+
+  /**
    * create new transaction and load the Transaction ID
    */
   public function create()
   {
-    $this->transactionId = $this->tblTransaction->insert($this->transactionTypeId, $this->transactionStatusId, $this->agencyTypeId, $this->customerId, $this->personId, $this->username, $this->amount, $this->fee, $this->agencyId, $this->accountId);
+    $this->transactionId = $this->tblTransaction->insert($this->transactionTypeId, $this->transactionStatusId, $this->agencyTypeId, $this->customerId, $this->personId, $this->username, $this->amount, $this->fee, $this->agencyId, $this->accountId, $this->reference);
   }
 
   /**
@@ -353,6 +374,7 @@ class Transaction
     $this->API = $transactionData['API'];
     $this->reason = $transactionData['Reason'];
     $this->note = $transactionData['Note'];
+    $this->reference = $transactionData['Reference'];
   }
 
   /**
@@ -420,6 +442,7 @@ class Transaction
     $data['fee'] = $this->fee;
     $data['notes'] = $this->reason;
     $data['controlNumber'] = $this->controlNumber;
+    $data['reference'] = $this->reference;
 
     return $data;
   }
