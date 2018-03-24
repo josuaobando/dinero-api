@@ -279,6 +279,7 @@ class Stickiness
    */
   public function rejectProvider()
   {
+    /*
     try{
       $tblCustomer = TblCustomer::getInstance();
       $blocked = $tblCustomer->block($this->customer, $this->agencyTypeId, 'P2P Blocked');
@@ -288,7 +289,7 @@ class Stickiness
     }catch(Exception $ex){
       ExceptionManager::handleException($ex);
     }
-
+    */
     try{
       if($this->stickinessId){
         $this->tblStickiness->isActive($this->stickinessId, 0);
