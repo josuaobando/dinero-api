@@ -86,8 +86,7 @@ class WS
    */
   public function addHeader($header)
   {
-    if(in_array($header, $this->headers))
-    {
+    if(in_array($header, $this->headers)){
       return;
     }
     array_push($this->headers, $header);
@@ -254,7 +253,7 @@ class WS
    */
   public function execPostMethod($webservice, $method, $params = null)
   {
-    $webservice .= "/".$method;
+    $webservice .= "/" . $method;
 
     return $this->execPost($webservice, $params);
   }
@@ -305,12 +304,9 @@ class WS
 
     $obj = $connector->execSoapCall($wsdl, $method, $params, $headers, $options, $setup);
 
-    if($setup['keepPrevRequest'])
-    {
-      $this->lastRequest .= "\n".$connector->__toString();
-    }
-    else
-    {
+    if($setup['keepPrevRequest']){
+      $this->lastRequest .= "\n" . $connector->__toString();
+    }else{
       $this->lastRequest = $connector->__toString();
     }
     $this->lastStats = $connector->getLastStats();
@@ -325,8 +321,7 @@ class WS
       (is_null(CoreConfig::TRACK_WS_STATS_PATTERN) ||    //search pattern is set to match everything
         preg_match(CoreConfig::TRACK_WS_STATS_PATTERN, $wsdl) > 0 //webservice matches the pattern
       )
-    )
-    {
+    ){
       $data = array();
       $data['request'] = $this->lastRequest;
       $data['response'] = Util::objToStr($obj);
@@ -338,8 +333,7 @@ class WS
       MQueue::push(MQueue::TYPE_STATS_WS, $data);
     }
 
-    if(!$obj)
-    {
+    if(!$obj){
       $this->lastError = $connector->getLastError();
       $this->lastErrorCode = $connector->getLastErrorCode();
 
@@ -363,8 +357,7 @@ class WS
   private function execWS($webservice, $postParams, $getParams)
   {
     $connector = new Connector();
-    if($postParams)
-    {
+    if($postParams){
       $connector->setPostParams($postParams);
     }
     $connector->setUsernamePassword($this->username, $this->password);
@@ -396,8 +389,7 @@ class WS
       (is_null(CoreConfig::TRACK_WS_STATS_PATTERN) ||    //search pattern is set to match everything
         preg_match(CoreConfig::TRACK_WS_STATS_PATTERN, $webservice) > 0 //webservice matches the pattern
       )
-    )
-    {
+    ){
       $data = array();
       $data['request'] = $this->lastRequest;
       $data['response'] = $this->lastContent;
@@ -410,16 +402,14 @@ class WS
     }
 
     $this->success = $connector->success();
-    if(!$this->success)
-    {
+    if(!$this->success){
       $this->lastError = $connector->getLastError();
       $this->lastErrorCode = $connector->getLastErrorCode();
 
       throw new WSException($connector->__toString(), $data);
     }
 
-    if($this->reader)
-    {
+    if($this->reader){
       return $this->reader->parse($this->lastContent);
     }
 

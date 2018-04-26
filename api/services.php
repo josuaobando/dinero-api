@@ -13,10 +13,8 @@ Log::custom('Job', 'Service has started');
 $tblStickiness = TblStickiness::getInstance();
 
 $stickinessPending = $tblStickiness->getPending();
-foreach($stickinessPending as $pending)
-{
-  try
-  {
+foreach($stickinessPending as $pending){
+  try{
     $customerId = $pending['Customer_Id'];
     $personId = $pending['Person_Id'];
 
@@ -31,18 +29,14 @@ foreach($stickinessPending as $pending)
 
     $logData = Util::toString($pending);
     Log::custom('Job', 'Check Pending Transaction', $logData);
-  }
-  catch(Exception $ex)
-  {
+  }catch(Exception $ex){
     ExceptionManager::handleException($ex);
   }
 }
 
 $stickinessApproved = $tblStickiness->getApproved();
-foreach($stickinessApproved as $approved)
-{
-  try
-  {
+foreach($stickinessApproved as $approved){
+  try{
     $customerId = $approved['Customer_Id'];
     $personId = $approved['Person_Id'];
     $stickinessId = $approved['Stickiness_Id'];
@@ -75,9 +69,7 @@ foreach($stickinessApproved as $approved)
 
     $logData = Util::toString($approved);
     Log::custom('Job', 'Check Approved Transaction', $logData);
-  }
-  catch(Exception $ex)
-  {
+  }catch(Exception $ex){
     ExceptionManager::handleException($ex);
   }
 

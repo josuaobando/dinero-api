@@ -6,6 +6,7 @@
 class WSResponse
 {
   protected $state = null;
+  protected $code = null;
   protected $userMessage = null;
   protected $systemMessage = null;
 
@@ -48,6 +49,16 @@ class WSResponse
   }
 
   /**
+   * set response result code
+   *
+   * @param string $code
+   */
+  public function setCode($code)
+  {
+    $this->code = $code;
+  }
+
+  /**
    * add a new element to the response
    *
    * @param string $name
@@ -55,8 +66,7 @@ class WSResponse
    */
   public function addElement($name, $element)
   {
-    if(!$name || trim($name) == '')
-    {
+    if(!$name || trim($name) == ''){
       return;
     }
     $this->elements[$name] = $element;
@@ -69,8 +79,7 @@ class WSResponse
    */
   public function removeElement($name)
   {
-    if (!$name || trim($name)=='')
-    {
+    if(!$name || trim($name) == ''){
       return;
     }
     unset($this->elements[$name]);
@@ -91,8 +100,7 @@ class WSResponse
    */
   public function setFormat($format)
   {
-    if(strtolower($format) != self::FORMAT_XML && strtolower($format) != self::FORMAT_JSON)
-    {
+    if(strtolower($format) != self::FORMAT_XML && strtolower($format) != self::FORMAT_JSON){
       return;
     }
     $this->format = $format;
@@ -105,22 +113,22 @@ class WSResponse
    */
   private function getXMLResponse()
   {
-    $xml = new XmlElement('result');
-
     $xmlState = new XmlElement("code");
     $xmlState->setValue($this->state);
+
+    $xmlError = new XmlElement("error");
+    $xmlError->setValue($this->code);
 
     $xmlSystemMessage = new XmlElement("message");
     $xmlSystemMessage->setValue($this->systemMessage);
 
+    $xml = new XmlElement('result');
     $xml->addElement($xmlState);
+    $xml->addElement($xmlError);
     $xml->addElement($xmlSystemMessage);
 
-    if(count($this->elements) > 0)
-    {
-      //$xmlElements = new XmlElement('response');
+    if(count($this->elements) > 0){
       $xml->loadArray($this->elements);
-      //$xml->addElement($xmlElements);
     }
 
     return $xml->__toString();
@@ -137,55 +145,34 @@ class WSResponse
     $data['code'] = $this->state;
     $data['message'] = $this->systemMessage;
 
-    if(count($this->elements) > 0)
-    {
+    if(count($this->elements) > 0){
       $elements = array();
-      foreach($this->elements as $key => $value)
-      {
-        if(is_object($value))
-        {
-          if(method_exists($value, self::TO_ARRAY_METHOD))
-          {
+      foreach($this->elements as $key => $value){
+        if(is_object($value)){
+          if(method_exists($value, self::TO_ARRAY_METHOD)){
             $elements[$key] = call_user_func(array($value, self::TO_ARRAY_METHOD));
-          }
-          else
-          {
-            if($value instanceof XmlElement)
-            {
+          }else{
+            if($value instanceof XmlElement){
               $elements[$key] = $value->xmlToArray();
-            }
-            else
-            {
+            }else{
               $elements[$key] = $value;
             }
           }
-        }
-        else
-        {
-          if(is_array($value))
-          {
-            foreach($value as $item)
-            {
-              if(is_object($item))
-              {
-                if(method_exists($item, 'toArray'))
-                {
+        }else{
+          if(is_array($value)){
+            foreach($value as $item){
+              if(is_object($item)){
+                if(method_exists($item, 'toArray')){
                   $arrayData = call_user_func(array($item, 'toArray'));
                   $elements[$key][] = $arrayData;
-                }
-                else if($item instanceof stdClass)
-                {
+                }else if($item instanceof stdClass){
                   $elements[$key][] = get_object_vars($item);
                 }
-              }
-              else
-              {
+              }else{
                 $elements[$key] = $value;
               }
             }
-          }
-          else
-          {
+          }else{
             $elements[$key] = $value;
           }
         }
@@ -216,21 +203,14 @@ class WSResponse
    */
   public function toString($format)
   {
-    $wsResponseTxt = "";
-
-    if($format == self::FORMAT_JSON)
-    {
+    if($format == self::FORMAT_JSON){
       $wsResponseTxt = $this->getJSONResponse();
 
-      if($this->JSONCallback)
-      {
-        $wsResponseTxt = $this->JSONCallback." ( $wsResponseTxt )";
+      if($this->JSONCallback){
+        $wsResponseTxt = $this->JSONCallback . " ( $wsResponseTxt )";
       }
 
-    }
-    else
-    {
-      //default: self::FORMAT_XML
+    }else{
       $wsResponseTxt = $this->getXMLResponse();
     }
 

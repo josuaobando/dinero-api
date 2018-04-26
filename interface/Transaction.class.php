@@ -384,8 +384,7 @@ class Transaction
    */
   public function getTransactionStatus()
   {
-    switch($this->transactionStatusId)
-    {
+    switch($this->transactionStatusId){
       case Transaction::STATUS_REQUESTED:
         return "requested";
       case Transaction::STATUS_SUBMITTED:
@@ -399,8 +398,6 @@ class Transaction
       default:
         return "unknown";
     }
-
-    return "unknown";
   }
 
   /**
@@ -410,15 +407,12 @@ class Transaction
    */
   private function validateControlNumber()
   {
-    if($this->controlNumber)
-    {
+    if($this->controlNumber){
       $transactionData = $this->tblTransaction->getTransactionByControlNumber($this->controlNumber);
-      if($transactionData && count($transactionData) > 0)
-      {
+      if($transactionData && count($transactionData) > 0){
         $transactionId = $transactionData['Transaction_Id'];
         $transactionStatusId = $transactionData['TransactionStatus_Id'];
-        if($this->transactionId != $transactionId && $transactionStatusId == self::STATUS_APPROVED)
-        {
+        if($this->transactionId != $transactionId && $transactionStatusId == self::STATUS_APPROVED){
           throw new InvalidStateException("The Tracking Number [$this->controlNumber] already exists, check it please!");
         }
       }

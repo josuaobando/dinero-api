@@ -76,7 +76,7 @@ class Limit
   /**
    * Limits evaluation
    *
-   * @throws InvalidStateException
+   * @throws LimitException
    */
   public function evaluate()
   {
@@ -84,11 +84,9 @@ class Limit
     $transactionTypeId = $this->transaction->getTransactionTypeId();
     $this->stats = $this->customer->getStats($transactionTypeId);
 
-    foreach($this->limitDetails as $limit)
-    {
+    foreach($this->limitDetails as $limit){
       $limitTransactionType = $limit['TransactionType_Id'];
-      if($limitTransactionType == 0 || $limitTransactionType == $transactionTypeId)
-      {
+      if($limitTransactionType == 0 || $limitTransactionType == $transactionTypeId){
         $limitScope = $limit['LimitScope'];
         $function = "check$limitScope";
         $this->$function($limit);
@@ -101,15 +99,14 @@ class Limit
    *
    * @param array $limit
    *
-   * @throws InvalidStateException
+   * @throws LimitException
    */
   private function checkCustomer($limit)
   {
     $limitValue = $limit['Value'];
     $limitInterval = strtoupper($limit['LimitInterval']);
     $limitType = strtoupper($limit['LimitType']);
-    switch($limitType)
-    {
+    switch($limitType){
       case self::LIMIT_TYPE_MIN:
         //do nothing
         break;
@@ -118,27 +115,23 @@ class Limit
         break;
       case self::LIMIT_TYPE_COUNT:
 
-        switch($limitInterval)
-        {
+        switch($limitInterval){
           case self::LIMIT_INTERVAL_DAILY:
             $dailyTransactions = $this->stats['DailyTransactions'];
-            if($dailyTransactions && $dailyTransactions >= $limitValue)
-            {
-              throw new InvalidStateException("Limits: The Customer has exceeded the Daily limit of ".$this->stats['TransactionTypeName']."s");
+            if($dailyTransactions && $dailyTransactions >= $limitValue){
+              throw new LimitException("Limits: The Customer has exceeded the Daily limit of " . $this->stats['TransactionTypeName'] . "s");
             }
             break;
           case self::LIMIT_INTERVAL_WEEKLY:
             $weeklyTransactions = $this->stats['WeeklyTransactions'];
-            if($weeklyTransactions && $weeklyTransactions >= $limitValue)
-            {
-              throw new InvalidStateException("Limits: The Customer has exceeded the Weekly limit of ".$this->stats['TransactionTypeName']."s");
+            if($weeklyTransactions && $weeklyTransactions >= $limitValue){
+              throw new LimitException("Limits: The Customer has exceeded the Weekly limit of " . $this->stats['TransactionTypeName'] . "s");
             }
             break;
           case self::LIMIT_INTERVAL_MONTHLY:
             $monthlyTransactions = $this->stats['MonthlyTransactions'];
-            if($monthlyTransactions && $monthlyTransactions >= $limitValue)
-            {
-              throw new InvalidStateException("Limits: The Customer has exceeded the Monthly limit of ".$this->stats['TransactionTypeName']."s");
+            if($monthlyTransactions && $monthlyTransactions >= $limitValue){
+              throw new LimitException("Limits: The Customer has exceeded the Monthly limit of " . $this->stats['TransactionTypeName'] . "s");
             }
             break;
         }
@@ -151,24 +144,21 @@ class Limit
    *
    * @param array $limit
    *
-   * @throws InvalidStateException
+   * @throws LimitException
    */
   private function checkTransaction($limit)
   {
     $limitValue = $limit['Value'];
     $limitType = strtoupper($limit['LimitType']);
-    switch($limitType)
-    {
+    switch($limitType){
       case self::LIMIT_TYPE_MIN:
-        if($limitValue > $this->transaction->getAmount())
-        {
-          throw new InvalidStateException("Limits: The minimum allowed amount is: ".$limit['Value']." USD");
+        if($limitValue > $this->transaction->getAmount()){
+          throw new LimitException("Limits: The minimum allowed amount is: " . $limit['Value'] . " USD");
         }
         break;
       case self::LIMIT_TYPE_MAX:
-        if($limitValue < $this->transaction->getAmount())
-        {
-          throw new InvalidStateException("Limits: The maximum allowed amount is: ".$limit['Value']." USD");
+        if($limitValue < $this->transaction->getAmount()){
+          throw new LimitException("Limits: The maximum allowed amount is: " . $limit['Value'] . " USD");
         }
         break;
       case self::LIMIT_TYPE_COUNT:
@@ -182,7 +172,7 @@ class Limit
    *
    * @param array $limit
    *
-   * @throws InvalidStateException
+   * @throws LimitException
    */
   private function checkPerson($limit)
   {

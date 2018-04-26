@@ -11,8 +11,7 @@ require_once('system/Startup.class.php');
  */
 function login($wsRequest)
 {
-  try
-  {
+  try{
     $username = trim($wsRequest->requireNotNullOrEmpty('username'));
     $password = trim($wsRequest->requireNotNullOrEmpty('password'));
 
@@ -21,9 +20,7 @@ function login($wsRequest)
 
     $wsResponse = new WSResponseOk();
     $wsResponse->addElement('account', $account);
-  }
-  catch(InvalidParameterException $ex)
-  {
+  }catch(InvalidParameterException $ex){
     $wsResponse = new WSResponseError($ex->getMessage());
   }
 
@@ -39,8 +36,7 @@ function login($wsRequest)
  */
 function name($wsRequest)
 {
-  try
-  {
+  try{
     $username = trim($wsRequest->requireNotNullOrEmpty('merchant_user'));
     $apiUser = trim($wsRequest->requireNotNullOrEmpty('api_user'));
     $apiPass = trim($wsRequest->requireNotNullOrEmpty('api_pass'));
@@ -48,19 +44,16 @@ function name($wsRequest)
     $account = new Account($username);
     $account->authenticateAPI($apiUser, $apiPass);
 
-    if($account->isAuthenticated())
-    {
+    if($account->isAuthenticated()){
       $manager = new Manager($account);
       $wsResponse = $manager->receiver($wsRequest);
-    }
-    else
-    {
+    }else{
       $wsResponse = new WSResponseError("authentication failed");
     }
-  }
-  catch(InvalidParameterException $ex)
-  {
+  }catch(InvalidParameterException $ex){
     $wsResponse = new WSResponseError($ex->getMessage());
+  }catch(Exception $ex){
+    $wsResponse = new WSResponseError($ex->getMessage(), $ex->getCode());
   }
 
   return $wsResponse;
@@ -75,8 +68,7 @@ function name($wsRequest)
  */
 function sender($wsRequest)
 {
-  try
-  {
+  try{
     $username = trim($wsRequest->requireNotNullOrEmpty('merchant_user'));
     $apiUser = trim($wsRequest->requireNotNullOrEmpty('api_user'));
     $apiPass = trim($wsRequest->requireNotNullOrEmpty('api_pass'));
@@ -84,20 +76,17 @@ function sender($wsRequest)
     $account = new Account($username);
     $account->authenticateAPI($apiUser, $apiPass);
 
-    if($account->isAuthenticated())
-    {
+    if($account->isAuthenticated()){
       $manager = new Manager($account);
       $wsResponse = $manager->sender($wsRequest);
       $wsResponse->removeElement('sender');
-    }
-    else
-    {
+    }else{
       $wsResponse = new WSResponseError("authentication failed");
     }
-  }
-  catch(InvalidParameterException $ex)
-  {
+  }catch(InvalidParameterException $ex){
     $wsResponse = new WSResponseError($ex->getMessage());
+  }catch(Exception $ex){
+    $wsResponse = new WSResponseError($ex->getMessage(), $ex->getCode());
   }
 
   return $wsResponse;
@@ -112,8 +101,7 @@ function sender($wsRequest)
  */
 function confirm($wsRequest)
 {
-  try
-  {
+  try{
     $username = trim($wsRequest->requireNotNullOrEmpty('merchant_user'));
     $apiUser = trim($wsRequest->requireNotNullOrEmpty('api_user'));
     $apiPass = trim($wsRequest->requireNotNullOrEmpty('api_pass'));
@@ -121,19 +109,16 @@ function confirm($wsRequest)
     $account = new Account($username);
     $account->authenticateAPI($apiUser, $apiPass);
 
-    if($account->isAuthenticated())
-    {
+    if($account->isAuthenticated()){
       $manager = new Manager($account);
       $wsResponse = $manager->confirm($wsRequest);
-    }
-    else
-    {
+    }else{
       $wsResponse = new WSResponseError("authentication failed");
     }
-  }
-  catch(InvalidParameterException $ex)
-  {
+  }catch(InvalidParameterException $ex){
     $wsResponse = new WSResponseError($ex->getMessage());
+  }catch(Exception $ex){
+    $wsResponse = new WSResponseError($ex->getMessage(), $ex->getCode());
   }
 
   return $wsResponse;
@@ -148,8 +133,7 @@ function confirm($wsRequest)
  */
 function information($wsRequest)
 {
-  try
-  {
+  try{
     $username = trim($wsRequest->requireNotNullOrEmpty('merchant_user'));
     $apiUser = trim($wsRequest->requireNotNullOrEmpty('api_user'));
     $apiPass = trim($wsRequest->requireNotNullOrEmpty('api_pass'));
@@ -160,8 +144,7 @@ function information($wsRequest)
     $account = new Account($username);
     $account->authenticateAPI($apiUser, $apiPass);
 
-    if($account->isAuthenticated())
-    {
+    if($account->isAuthenticated()){
       $transaction = new Transaction();
       $transaction->restore($transactionId);
 
@@ -169,21 +152,18 @@ function information($wsRequest)
       $wsResponse->addElement('transaction', $transaction);
 
       // Payout (Sender) Information
-      if($transaction->getTransactionStatusId() == Transaction::STATUS_APPROVED && $transaction->getTransactionTypeId() == Transaction::TYPE_SENDER)
-      {
+      if($transaction->getTransactionStatusId() == Transaction::STATUS_APPROVED && $transaction->getTransactionTypeId() == Transaction::TYPE_SENDER){
         $person = new Person($transaction->getPersonId());
         $wsResponse->addElement('sender', $person);
       }
 
-    }
-    else
-    {
+    }else{
       $wsResponse = new WSResponseError("authentication failed");
     }
-  }
-  catch(InvalidParameterException $ex)
-  {
+  }catch(InvalidParameterException $ex){
     $wsResponse = new WSResponseError($ex->getMessage());
+  }catch(Exception $ex){
+    $wsResponse = new WSResponseError($ex->getMessage(), $ex->getCode());
   }
 
   return $wsResponse;

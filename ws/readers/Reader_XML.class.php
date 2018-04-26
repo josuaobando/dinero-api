@@ -15,19 +15,18 @@ class Reader_XML extends Reader
    *
    * @throws WSException
    */
-	public function parse($data)
-	{
-		$xmlParser = new XmlParser();
+  public function parse($data)
+  {
+    $xmlParser = new XmlParser();
     $xml = $xmlParser->loadXml($data);
-    if (!$xml)
-    {
-    	$exceptionMessage = "Xml Parser: " . $xmlParser->getErrorMsg() . " (Error code: ".$xmlParser->getErrorCode().")\n\n";
-    	$exceptionMessage .= $data . "\n";
-    	throw new WSException($exceptionMessage);
+    if(!$xml){
+      $exceptionMessage = "Xml Parser: " . $xmlParser->getErrorMsg() . " (Error code: " . $xmlParser->getErrorCode() . ")\n\n";
+      $exceptionMessage .= $data . "\n";
+      throw new WSException($exceptionMessage);
     }
-	  return $xml;
-	}
-	
+    return $xml;
+  }
+
 }
 
 ?>

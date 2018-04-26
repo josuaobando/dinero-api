@@ -6,11 +6,11 @@
 class WSException extends GeneralException
 {
 
-  public function __construct($description) 
+  public function __construct($description)
   {
     parent::__construct($description);
   }
-  
+
 }
 
 ?>

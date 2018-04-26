@@ -439,7 +439,7 @@ class Stickiness
   /**
    * The web service checks if the sender is still available for new receiver's, is already linked to a receiver or is linked to a different merchant or company.
    *
-   * @throws InvalidStateException
+   * @throws P2PException
    */
   public function register()
   {
@@ -479,20 +479,20 @@ class Stickiness
               $this->createProvider();
             }else{
               $this->rejectProvider();
-              throw new InvalidStateException("The Customer is linked to another Person.");
+              throw new P2PException("The Customer is linked to another Person.");
             }
             break;
           case self::STATUS_CODE_LINKED_OTHER_COMPANY:
-            ExceptionManager::handleException(new InvalidStateException("The Person [$this->person] is linked to another Customer [$this->customer]. "  . __FUNCTION__));
+            ExceptionManager::handleException(new P2PException("The Person [$this->person] is linked to another Customer [$this->customer]. " . __FUNCTION__));
             return false;
             break;
           case self::STATUS_CODE_LINKED_OTHER:
           case self::STATUS_CODE_LINKED_OTHER_CUSTOMER:
             $this->rejectProvider();
-            throw new InvalidStateException("The Customer is linked to another Agency (Merchant).");
+            throw new P2PException("The Customer is linked to another Agency (Merchant).");
             break;
           default:
-            ExceptionManager::handleException(new InvalidStateException("Invalid Response Code >> Code: $resultCode  Message: $resultCodeMessage : (" . __FUNCTION__ . ")"));
+            ExceptionManager::handleException(new P2PException("Invalid Response Code >> Code: $resultCode  Message: $resultCodeMessage : (" . __FUNCTION__ . ")"));
             throw new InvalidStateException("Due to external factors, we cannot give this Customer a Person.");
         }
       }else{
@@ -527,8 +527,8 @@ class Stickiness
         $agencyTypeId = $this->stickinessTransactionData['AgencyType_Id'];
         if($agencyTypeId == Transaction::AGENCY_RIA){
           $createdDate = $this->stickinessTransactionData['CreatedDate'];
-          $limitDate =  strtotime('2018-03-11 21:35:00');
-          $transactionDate =  strtotime($createdDate);
+          $limitDate = strtotime('2018-03-11 21:35:00');
+          $transactionDate = strtotime($createdDate);
           if($transactionDate < $limitDate){
             $apiURL = CoreConfig::WS_STICKINESS_URL;
           }
@@ -563,18 +563,18 @@ class Stickiness
               $this->createProvider();
             }else{
               $this->rejectProvider();
-              throw new InvalidStateException("The Customer is linked to another Person.");
+              throw new P2PException("The Customer is linked to another Person.");
             }
             break;
           case self::STATUS_CODE_LINKED_OTHER:
           case self::STATUS_CODE_LINKED_OTHER_COMPANY:
           case self::STATUS_CODE_LINKED_OTHER_CUSTOMER:
             $this->rejectProvider();
-            throw new InvalidStateException("Customer is linked with another Merchant or Person. Reject this transaction.");
+            throw new P2PException("Customer is linked with another Merchant or Person. Reject this transaction.");
             break;
           default:
-            ExceptionManager::handleException(new InvalidStateException("Invalid Response Code >> Code: $resultCode  Message: $resultCodeMessage : (" . __FUNCTION__ . ")"));
-            throw new InvalidStateException("Customer is linked with another Agency (Merchant) or Person. Reject this transaction.");
+            ExceptionManager::handleException(new P2PException("Invalid Response Code >> Code: $resultCode  Message: $resultCodeMessage : (" . __FUNCTION__ . ")"));
+            throw new P2PException("Customer is linked with another Agency (Merchant) or Person. Reject this transaction.");
         }
       }
 

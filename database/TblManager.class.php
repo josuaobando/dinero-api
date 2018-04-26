@@ -20,8 +20,7 @@ class TblManager extends Db
    */
   public static function getInstance()
   {
-    if(is_null(self::$singleton))
-    {
+    if(is_null(self::$singleton)){
       self::$singleton = new TblManager();
     }
 
@@ -29,15 +28,15 @@ class TblManager extends Db
   }
 
   /**
- * get available names
- *
- * @param int $accountId
- * @param float $amount
- * @param int $agencyTypeId
- * @param int $agencyId
- *
- * @return array
- */
+   * get available names
+   *
+   * @param int $accountId
+   * @param float $amount
+   * @param int $agencyTypeId
+   * @param int $agencyId
+   *
+   * @return array
+   */
   public function getPersonsAvailable($accountId, $amount, $agencyTypeId, $agencyId)
   {
     $sql = "CALL persons_available('{accountId}', '{amount}', '{agencyTypeId}', '{agencyId}')";

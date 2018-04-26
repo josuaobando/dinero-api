@@ -3,10 +3,17 @@
 /**
  * @author Josua
  */
-class GeneralException extends Exception
+class RequestException extends Exception
 {
 
-  protected $description = "An exception has occurred";
+  const SUCCESS = 0;
+  const ERROR_CUSTOMER = 100;
+  const ERROR_PERSON = 200;
+  const ERROR_LIMIT = 300;
+  const ERROR_P2P = 400;
+  const ERROR_API = 500;
+
+  protected $description = "Alert";
 
   /**
    * current request
@@ -30,18 +37,14 @@ class GeneralException extends Exception
   protected $serverSettings = null;
 
   /**
-   * create a new exception
+   * RequestException constructor.
    *
-   * @param string $message
-   * @param string $description
+   * @param string $errorMsg
+   * @param int $errorCode
    */
-  public function __construct($message, $description = null)
+  public function __construct($errorMsg, $errorCode = self::SUCCESS)
   {
-    parent::__construct($message, -1);
-
-    if($description){
-      $this->description = $description;
-    }
+    parent::__construct($errorMsg, $errorCode);
 
     $this->request = array_merge($_REQUEST, array());
     $this->session = is_array($_SESSION) ? array_merge($_SESSION, array()) : array();

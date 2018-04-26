@@ -5,51 +5,50 @@
  */
 class TblCustomer extends Db
 {
-	
-	/**
-	 * singleton reference for TblCustomer
-	 * 
-	 * @var TblCustomer
-	 */
-	private static $singleton = null;
-	
-	/**
-	 * get a singleton instance of TblCustomer
-	 * 
-	 * @return TblCustomer
-	 */
-	public static function getInstance()
-	{
-		if (is_null(self::$singleton))
-		{
-			self::$singleton = new TblCustomer();
-		}
-		return self::$singleton;
-	}
-	
-	/**
-	 * get customer data
-	 * 
-	 * @param string $customerId
-	 * 
-	 * @return array
-	 */
-	public function getCustomer($customerId)
-	{
-		$sql = "CALL customer('{customerId}')";
-		
-		$params = array();
-		$params['customerId'] = $customerId;
-		
-		$row = array();
-		$this->executeSingleQuery($sql, $row, $params);
-				
-		return $row;
-	}
-	
+
+  /**
+   * singleton reference for TblCustomer
+   *
+   * @var TblCustomer
+   */
+  private static $singleton = null;
+
+  /**
+   * get a singleton instance of TblCustomer
+   *
+   * @return TblCustomer
+   */
+  public static function getInstance()
+  {
+    if(is_null(self::$singleton)){
+      self::$singleton = new TblCustomer();
+    }
+    return self::$singleton;
+  }
+
+  /**
+   * get customer data
+   *
+   * @param string $customerId
+   *
+   * @return array
+   */
+  public function getCustomer($customerId)
+  {
+    $sql = "CALL customer('{customerId}')";
+
+    $params = array();
+    $params['customerId'] = $customerId;
+
+    $row = array();
+    $this->executeSingleQuery($sql, $row, $params);
+
+    return $row;
+  }
+
   /**
    * validate customer information
-   * 
+   *
    * @param int $companyId
    * @param int $accountId
    * @param int $agencyTypeId
@@ -58,29 +57,29 @@ class TblCustomer extends Db
    * @param int $countryId
    * @param int $countryStateId
    * @param string $phone
-   * 
+   *
    * @return array [CustomerId, AgencyId]
-  */
-	public function validate($companyId, $accountId, $agencyTypeId, $firstName, $lastName, $countryId, $countryStateId, $phone)
-	{
-		$sql = "CALL customer_validate('{companyId}', '{accountId}', '{agencyTypeId}', '{firstName}', '{lastName}', '{countryId}', '{countryStateId}', '{phone}', @CustomerId, @AgencyId)";
-		
-		$params = array();
-		$params['companyId'] = $companyId;
-    $params['accountId'] = $accountId;
-		$params['agencyTypeId'] = $agencyTypeId;
-		$params['firstName'] = $firstName;
-		$params['lastName'] = $lastName;
-		$params['countryId'] = $countryId;
-		$params['countryStateId'] = $countryStateId;
-		$params['phone'] = $phone;
-		
-		$this->setOutputParams(array('CustomerId', 'AgencyId'));
-		$this->executeUpdate($sql, $params);
-		$output = $this->getOutputResults();
+   */
+  public function validate($companyId, $accountId, $agencyTypeId, $firstName, $lastName, $countryId, $countryStateId, $phone)
+  {
+    $sql = "CALL customer_validate('{companyId}', '{accountId}', '{agencyTypeId}', '{firstName}', '{lastName}', '{countryId}', '{countryStateId}', '{phone}', @CustomerId, @AgencyId)";
 
-		return $output;
-	}
+    $params = array();
+    $params['companyId'] = $companyId;
+    $params['accountId'] = $accountId;
+    $params['agencyTypeId'] = $agencyTypeId;
+    $params['firstName'] = $firstName;
+    $params['lastName'] = $lastName;
+    $params['countryId'] = $countryId;
+    $params['countryStateId'] = $countryStateId;
+    $params['phone'] = $phone;
+
+    $this->setOutputParams(array('CustomerId', 'AgencyId'));
+    $this->executeUpdate($sql, $params);
+    $output = $this->getOutputResults();
+
+    return $output;
+  }
 
   /**
    * @param $companyId
@@ -142,29 +141,29 @@ class TblCustomer extends Db
 
     return $rows;
   }
-	
-	/**
-	 * Validate if customer [firstname + lastname] is blocked by the Network
-	 *
-	 * @param int $customer
+
+  /**
+   * Validate if customer [firstname + lastname] is blocked by the Network
+   *
+   * @param int $customer
    * @param $agencyTypeId
-	 *
-	 * @return int
-	 */
-	public function getIsBlacklisted($customer, $agencyTypeId)
-	{
-	  $sql = "CALL spCustomer_CheckBlocked('{customer}', '{agencyTypeId}', @isBlocked)";
-	
-	  $params = array();
-	  $params['customer'] = $customer;
+   *
+   * @return int
+   */
+  public function getIsBlacklisted($customer, $agencyTypeId)
+  {
+    $sql = "CALL spCustomer_CheckBlocked('{customer}', '{agencyTypeId}', @isBlocked)";
+
+    $params = array();
+    $params['customer'] = $customer;
     $params['agencyTypeId'] = $agencyTypeId;
-	   
-	  $this->setOutputParams(array('isBlocked'));
-	  $this->executeUpdate($sql, $params);
-	  $result = $this->getOutputResults();
-	
-	  return $result['isBlocked'];
-	}
+
+    $this->setOutputParams(array('isBlocked'));
+    $this->executeUpdate($sql, $params);
+    $result = $this->getOutputResults();
+
+    return $result['isBlocked'];
+  }
 
   /**
    * @param $customer
@@ -183,28 +182,29 @@ class TblCustomer extends Db
 
     return $this->executeUpdate($sql, $params);
   }
-	
-	/**
-	 * get stats
-	 *
-	 * @param int $customerId
+
+  /**
+   * get stats
+   *
+   * @param int $customerId
    * @param int $transactionTypeId
-	 *
-	 * @return array
-	 */
-	public function getStats($customerId, $transactionTypeId)
-	{
-	  $sql = "CALL customer_getStats('{customerId}', '{transactionTypeId}')";
-	
-		$params = array();
+   *
+   * @return array
+   */
+  public function getStats($customerId, $transactionTypeId)
+  {
+    $sql = "CALL customer_getStats('{customerId}', '{transactionTypeId}')";
+
+    $params = array();
     $params['customerId'] = $customerId;
     $params['transactionTypeId'] = $transactionTypeId;
-	
-	  $rows = array();
-	  $this->executeSingleQuery($sql, $rows, $params);
-	
-	  return $rows;
-	}
-	
+
+    $rows = array();
+    $this->executeSingleQuery($sql, $rows, $params);
+
+    return $rows;
+  }
+
 }
+
 ?>

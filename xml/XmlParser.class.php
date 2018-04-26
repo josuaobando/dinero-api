@@ -21,7 +21,7 @@ class XmlParser
 
   /**
    * this contains all the sub elements
-   * 
+   *
    * @var array
    */
   private $elementStack = array();
@@ -32,17 +32,17 @@ class XmlParser
    * @var XmlElement
    */
   private $root;
-  
+
   /**
    * error code of the last parse
-   * 
+   *
    * @var int
    */
   private $errorCode = 0;
-  
+
   /**
    * error message of the last parse
-   * 
+   *
    * @var string
    */
   private $errorMsg = 'Ok';
@@ -52,44 +52,39 @@ class XmlParser
    */
   public function __destruct()
   {
-  	if (is_resource($this->xmlParser))
-		{
-    	xml_parser_free($this->xmlParser);
-		}
+    if(is_resource($this->xmlParser)){
+      xml_parser_free($this->xmlParser);
+    }
   }
 
   /**
    * callback when an element is found
-   * 
+   *
    * @param XmlParser $parser
    * @param string $element
    * @param array $attrs
    */
   private function startElement($parser, $element, $attrs)
   {
-    if (!$this->root)
-    {
+    if(!$this->root){
       $this->root = new XmlElement($element);
       array_push($this->elementStack, $this->root);
       $this->currentXmlElement = $this->root;
-    }
-    else
-    {
+    }else{
       $newElement = new XmlElement($element);
       $this->currentXmlElement->addElement($newElement);
       array_push($this->elementStack, $newElement);
       $this->currentXmlElement = $newElement;
     }
 
-    foreach ($attrs as $key=>$attr)
-    {
+    foreach($attrs as $key => $attr){
       $this->currentXmlElement->addAttr($key, $attr);
     }
   }
 
   /**
    * callback when an element needs to be closed
-   * 
+   *
    * @param XmlParser $parser
    * @param string $element
    */
@@ -102,7 +97,7 @@ class XmlParser
 
   /**
    * callback when an element has a text value
-   * 
+   *
    * @param XmlParser $parser
    * @param string $data
    */
@@ -110,34 +105,33 @@ class XmlParser
   {
     $this->currentXmlElement->addValue($data);
   }
-  
-	/**
-	 * @return int
-	 */
-	public function getErrorCode()
-	{
-		return $this->errorCode;
-	}
 
-	/**
-	 * @return string
-	 */
-	public function getErrorMsg()
-	{
-		return $this->errorMsg;
-	}
-	
-	/**
-	 * prepare the class for the parsing process
-	 */
-	private function setup()
-	{
-		if (is_resource($this->xmlParser))
-		{
-			xml_parser_free($this->xmlParser);
-		}
-		
-		$this->xmlParser = xml_parser_create();
+  /**
+   * @return int
+   */
+  public function getErrorCode()
+  {
+    return $this->errorCode;
+  }
+
+  /**
+   * @return string
+   */
+  public function getErrorMsg()
+  {
+    return $this->errorMsg;
+  }
+
+  /**
+   * prepare the class for the parsing process
+   */
+  private function setup()
+  {
+    if(is_resource($this->xmlParser)){
+      xml_parser_free($this->xmlParser);
+    }
+
+    $this->xmlParser = xml_parser_create();
 
     xml_set_object($this->xmlParser, $this);
     xml_set_element_handler($this->xmlParser, "startElement", "endElement");
@@ -148,7 +142,7 @@ class XmlParser
     xml_parser_set_option($this->xmlParser, XML_OPTION_TARGET_ENCODING, "UTF-8");
 
     $this->root = null;
-	}
+  }
 
   /**
    * Parse a xml string<br/>
@@ -156,26 +150,25 @@ class XmlParser
    *
    * @param string $data
    * @param bool $addWrapper
-   * 
+   *
    * @return XmlElement
    */
   public function loadXml($data, $addWrapper = false)
   {
-  	if ($addWrapper)
-  	{
-  		$data = "<xml>$data</xml>";
-  	}
-  	
-  	$this->setup();
-  	
+    if($addWrapper){
+      $data = "<xml>$data</xml>";
+    }
+
+    $this->setup();
+
     xml_parse($this->xmlParser, $data);
-		
-		$this->errorCode = xml_get_error_code($this->xmlParser);
-		$this->errorMsg = xml_error_string($this->errorCode);
-		
-		return $this->root;
+
+    $this->errorCode = xml_get_error_code($this->xmlParser);
+    $this->errorMsg = xml_error_string($this->errorCode);
+
+    return $this->root;
   }
-  
+
 }
 
 ?>

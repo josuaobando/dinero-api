@@ -49,12 +49,9 @@ class MailManager
     $array = array();
     $emails = '';
 
-    if(substr($string, -1) == ',')
-    {
+    if(substr($string, -1) == ','){
       $emails = substr($string, 0, -1);
-    }
-    else
-    {
+    }else{
       $emails = $string;
     }
     $array = explode(',', $emails);
@@ -74,46 +71,36 @@ class MailManager
    */
   public static function sendAdvancedEmail($recipients, $subject, $body, $attachments = false, $from = null)
   {
-    if(!CoreConfig::MAIL_SEND_ACTIVE)
-    {
+    if(!CoreConfig::MAIL_SEND_ACTIVE){
       return true;
     }
 
     $to = "";
     $cc = "";
     $bcc = "";
-    if(is_array($recipients))
-    {
+    if(is_array($recipients)){
       $to = $recipients['To'];
       $cc = $recipients['Cc'];
       $bcc = $recipients['Bcc'];
-    }
-    else
-    {
+    }else{
       $to = $recipients;
     }
 
-    if(Util::isDEV())
-    {
+    if(Util::isDEV()){
       $to = CoreConfig::MAIL_DEV;
     }
 
     $mailer = new PHPMailerManager();
-    if(MailManager::$htmlFormat)
-    {
+    if(MailManager::$htmlFormat){
       $mailer->isHTML(true);
       $mailer->Body = $body;
-    }
-    else
-    {
+    }else{
       $mailer->Body = $body;
     }
 
-    if($attachments && is_array($attachments))
-    {
+    if($attachments && is_array($attachments)){
       //Attach multiple files one by one
-      foreach($attachments as $att)
-      {
+      foreach($attachments as $att){
         $mailer->addAttachment($att);
       }
     }
@@ -122,25 +109,20 @@ class MailManager
     $mailer->Subject = $subject;
 
     $arrayTo = self::getArrayToSendEmail($to);
-    foreach($arrayTo as $t)
-    {
+    foreach($arrayTo as $t){
       $mailer->addAddress($t);
     }
 
-    if($cc)
-    {
+    if($cc){
       $arrayCC = self::getArrayToSendEmail($cc);
-      foreach($arrayCC as $c)
-      {
+      foreach($arrayCC as $c){
         $mailer->addCC($c);
       }
     }
 
-    if($bcc)
-    {
+    if($bcc){
       $arrayBCC = self::getArrayToSendEmail($bcc);
-      foreach($arrayBCC as $b)
-      {
+      foreach($arrayBCC as $b){
         $mailer->addCC($b);
       }
     }
@@ -153,9 +135,8 @@ class MailManager
     $mailer->Password = MailManager::$password;
     $mailer->SMTPSecure = "tls";
 
-    if(!$mailer->send())
-    {
-      MailManager::$lastError = 'Email was not sent: '.$mailer->ErrorInfo;
+    if(!$mailer->send()){
+      MailManager::$lastError = 'Email was not sent: ' . $mailer->ErrorInfo;
       return false;
     }
 
@@ -174,22 +155,17 @@ class MailManager
    */
   private static function sendStandardEmailNoAttachments($to, $subject, $body)
   {
-    $headers = 'MIME-Version: 1.0'."\r\n";
-    if(MailManager::$htmlFormat)
-    {
-      $headers .= 'Content-type: text/html; charset=iso-8859-1'."\r\n";
+    $headers = 'MIME-Version: 1.0' . "\r\n";
+    if(MailManager::$htmlFormat){
+      $headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+    }else{
+      $headers .= 'Content-type: text/plain; charset=iso-8859-2' . "\r\n";
     }
-    else
-    {
-      $headers .= 'Content-type: text/plain; charset=iso-8859-2'."\r\n";
-    }
-    $headers .= 'From: '.MailManager::$from."\r\n";
-    if(Util::isDEV())
-    {
+    $headers .= 'From: ' . MailManager::$from . "\r\n";
+    if(Util::isDEV()){
       $to = CoreConfig::MAIL_DEV;
     }
-    if(@mail($to, $subject, $body, $headers, "-f".MailManager::$return))
-    {
+    if(@mail($to, $subject, $body, $headers, "-f" . MailManager::$return)){
       return true;
     }
 
@@ -210,8 +186,7 @@ class MailManager
    */
   private static function sendStandardEmail($to, $subject, $message, $files = false)
   {
-    if(!CoreConfig::MAIL_SEND_ACTIVE)
-    {
+    if(!CoreConfig::MAIL_SEND_ACTIVE){
       return true;
     }
 
@@ -219,13 +194,11 @@ class MailManager
     ini_set('SMTP', CoreConfig::MAIL_HOST);
     ini_set('smtp_port', CoreConfig::MAIL_PORT);
 
-    if(!$files)
-    {
+    if(!$files){
       return MailManager::sendStandardEmailNoAttachments($to, $subject, $message);
     }
 
-    if(Util::isDEV())
-    {
+    if(Util::isDEV()){
       $to = CoreConfig::MAIL_DEV;
     }
 
@@ -233,8 +206,8 @@ class MailManager
     $htmlMessage = nl2br($message);
     $fromEmail = strip_tags(MailManager::$from);
 
-    $boundary1 = rand(0, 9)."-".rand(10000000000, 9999999999)."-".rand(10000000000, 9999999999)."=:".rand(10000, 99999);
-    $boundary2 = rand(0, 9)."-".rand(10000000000, 9999999999)."-".rand(10000000000, 9999999999)."=:".rand(10000, 99999);
+    $boundary1 = rand(0, 9) . "-" . rand(10000000000, 9999999999) . "-" . rand(10000000000, 9999999999) . "=:" . rand(10000, 99999);
+    $boundary2 = rand(0, 9) . "-" . rand(10000000000, 9999999999) . "-" . rand(10000000000, 9999999999) . "=:" . rand(10000, 99999);
 
     //Email without Attachment
     //set headers
@@ -281,20 +254,16 @@ Content-Type: multipart/mixed;
     boundary="$boundary1"
 AKAM;
 
-    for($count = 0; $count < count($files); $count++)
-    {
+    for($count = 0; $count < count($files); $count++){
       $file = $files[$count];
       $file_size = filesize($file);
       $handle = fopen($file, "r");
       $content = fread($handle, $file_size);
       fclose($handle);
       $fileAttachment = chunk_split(base64_encode($content));
-      if(!function_exists('mime_content_type'))
-      {
+      if(!function_exists('mime_content_type')){
         $fileType = MailManager::getContentTypeFromFile($file);
-      }
-      else
-      {
+      }else{
         $fileType = mime_content_type($file);
       }
       $fileName = basename($file);
@@ -357,31 +326,23 @@ AKAM;
    */
   public static function sendEmail($recipients, $subject, $body, $attachments = false)
   {
-    if(!CoreConfig::MAIL_SEND_ACTIVE)
-    {
+    if(!CoreConfig::MAIL_SEND_ACTIVE){
       return true;
     }
-    if(is_array($recipients))
-    {
+    if(is_array($recipients)){
       $to = "";
-      foreach($recipients as $email)
-      {
+      foreach($recipients as $email){
         $to .= "$email,";
       }
-    }
-    else
-    {
+    }else{
       $to = "$recipients";
     }
 
     MailManager::$lastError = null;
 
-    if(CoreConfig::MAIL_STANDARD)
-    {
+    if(CoreConfig::MAIL_STANDARD){
       $result = MailManager::sendStandardEmail($to, $subject, $body, $attachments);
-    }
-    else
-    {
+    }else{
       $result = MailManager::sendAdvancedEmail($to, $subject, $body, $attachments);
     }
 
@@ -405,16 +366,13 @@ AKAM;
   public static function sendEmailReport($pTo, $pCC, $pBCC, $subject, $body, $attachments = false)
   {
     $recipients = array();
-    if($pTo)
-    {
+    if($pTo){
       $recipients["To"] = $pTo;
     }
-    if($pCC)
-    {
+    if($pCC){
       $recipients["Cc"] = $pCC;
     }
-    if($pBCC)
-    {
+    if($pBCC){
       $recipients["Bcc"] = $pBCC;
     }
 
@@ -437,8 +395,7 @@ AKAM;
   public static function getRecipients($emailGroups = array('Programmers'))
   {
     $recipients = array();
-    if(count($recipients) == 0)
-    {
+    if(count($recipients) == 0){
       array_push($recipients, CoreConfig::MAIL_DEV); //default
     }
 
@@ -501,28 +458,23 @@ AKAM;
    */
   public static function getEmailTemplate($name, $params = array(), $lang = null)
   {
-    if(!$lang)
-    {
+    if(!$lang){
       $lang = Language::getLanguageCode();
       $lang = strtoupper($lang);
     }
 
-    $templatePath = CoreConfig::TEMPLATE_PATH.$name.$lang.CoreConfig::TEMPLATE_FILE_EXTENSION;
-    if(!Util::file_exists($templatePath))
-    {
-      $templatePath = CoreConfig::TEMPLATE_PATH.$name.CoreConfig::TEMPLATE_FILE_EXTENSION;
-      if(!Util::file_exists($templatePath))
-      {
+    $templatePath = CoreConfig::TEMPLATE_PATH . $name . $lang . CoreConfig::TEMPLATE_FILE_EXTENSION;
+    if(!Util::file_exists($templatePath)){
+      $templatePath = CoreConfig::TEMPLATE_PATH . $name . CoreConfig::TEMPLATE_FILE_EXTENSION;
+      if(!Util::file_exists($templatePath)){
         return "";
       }
     }
 
     $template = file_get_contents($templatePath, FILE_USE_INCLUDE_PATH);
-    if(count($params) > 0)
-    {
-      foreach($params as $key => $value)
-      {
-        $template = str_replace("{".$key."}", $value, $template);
+    if(count($params) > 0){
+      foreach($params as $key => $value){
+        $template = str_replace("{" . $key . "}", $value, $template);
       }
     }
 
@@ -540,10 +492,8 @@ AKAM;
    */
   public static function getEmailTemplateAndSubject($name, $params = array(), $lang = null)
   {
-    if($lang)
-    {
-      if(strpos($lang, "-"))
-      {
+    if($lang){
+      if(strpos($lang, "-")){
         //remove the dialect
         $lang = trim($lang);
         $lang = substr($lang, 0, strpos($lang, "-"));
@@ -623,18 +573,14 @@ AKAM;
     );
 
     $ext = strtolower(array_pop(explode('.', $file)));
-    if(array_key_exists($ext, $mime_types))
-    {
+    if(array_key_exists($ext, $mime_types)){
       return $mime_types[$ext];
-    }
-    elseif(function_exists('finfo_open'))
-    {
+    }elseif(function_exists('finfo_open')){
       $finfo = finfo_open(FILEINFO_MIME);
       $mimetype = finfo_file($finfo, $file);
       finfo_close($finfo);
       return $mimetype;
-    }
-    else {
+    }else{
       return 'application/octet-stream';
     }
   }

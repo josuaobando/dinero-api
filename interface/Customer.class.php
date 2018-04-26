@@ -48,7 +48,7 @@ class Customer
    * @param WSRequest $wsRequest
    *
    * @throws InvalidParameterException
-   * @throws InvalidStateException
+   * @throws CustomerException
    */
   public function validateFromRequest($account, $wsRequest)
   {
@@ -75,10 +75,10 @@ class Customer
 
     $this->validate($account->getCompanyId(), $account->getAccountId());
     if(!$this->customerId){
-      throw new InvalidStateException("invalid customer information");
+      throw new CustomerException("invalid customer information");
     }
     if(!$this->agencyId){
-      throw new InvalidStateException("The agency is not available");
+      throw new CustomerException("The agency is not available");
     }
 
   }
@@ -89,7 +89,7 @@ class Customer
    * @param int $companyId
    * @param int $accountId
    *
-   * @throws InvalidStateException
+   * @throws CustomerException
    */
   private function validate($companyId, $accountId)
   {
@@ -141,7 +141,7 @@ class Customer
    *
    * @param $customerName [optional]
    *
-   * @throws InvalidStateException
+   * @throws CustomerException
    */
   public function isBlacklisted($customerName = null)
   {
@@ -162,7 +162,7 @@ class Customer
           }elseif($agencyType == Transaction::AGENCY_RIA){
             $agencyType = 'RIA';
           }
-          throw new InvalidStateException("The Customer has been blacklisted by $agencyType International");
+          throw new CustomerException("The Customer has been blacklisted by $agencyType International");
 
         }
       }

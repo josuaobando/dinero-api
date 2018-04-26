@@ -18,8 +18,7 @@ class WSRequest extends Request
   public function requireNumeric($key)
   {
     $value = $this->getParam($key);
-    if(!is_numeric($value))
-    {
+    if(!is_numeric($value)){
       throw new InvalidParameterException($key, $value, __FUNCTION__);
     }
 
@@ -38,8 +37,7 @@ class WSRequest extends Request
   public function requireNumericAndPositive($key)
   {
     $value = $this->getParam($key);
-    if(!is_numeric($value) || $value <= 0)
-    {
+    if(!is_numeric($value) || $value <= 0){
       throw new InvalidParameterException($key, $value, __FUNCTION__);
     }
 
@@ -60,8 +58,7 @@ class WSRequest extends Request
   {
 
     $value = $this->getParam($key);
-    if(is_null($value) || (is_string($value) && trim($value) == ''))
-    {
+    if(is_null($value) || (is_string($value) && trim($value) == '')){
       throw new InvalidParameterException($key, $value, __FUNCTION__);
     }
 
@@ -80,8 +77,7 @@ class WSRequest extends Request
   public function requireNotNull($key)
   {
     $value = $this->getParam($key);
-    if(is_null($value))
-    {
+    if(is_null($value)){
       throw new InvalidParameterException($key, $value, __FUNCTION__);
     }
 
@@ -100,8 +96,7 @@ class WSRequest extends Request
   public function requireRange($key, $min, $max)
   {
     $value = $this->getParam($key);
-    if(!is_numeric($value) || $value < $min || $value > $max)
-    {
+    if(!is_numeric($value) || $value < $min || $value > $max){
       throw new InvalidParameterException($key, $value, __FUNCTION__);
     }
 
@@ -121,14 +116,12 @@ class WSRequest extends Request
   {
 
     $value = trim($this->getParam($key));
-    if(empty($value) && $allowEmpty)
-    {
+    if(empty($value) && $allowEmpty){
       return trim($value);
     }
 
     $unixTimeStamp = strtotime($value);
-    if(!$unixTimeStamp)
-    {
+    if(!$unixTimeStamp){
       throw new InvalidParameterException($key, $value, __FUNCTION__);
     }
 
@@ -149,14 +142,12 @@ class WSRequest extends Request
   {
 
     $value = trim($this->getParam($key));
-    if(empty($value) && $allowEmpty)
-    {
+    if(empty($value) && $allowEmpty){
       return trim($value);
     }
 
     $unixTimeStamp = strtotime($value);
-    if(!$unixTimeStamp)
-    {
+    if(!$unixTimeStamp){
       throw new InvalidParameterException($key, $value, __FUNCTION__);
     }
 
@@ -175,8 +166,7 @@ class WSRequest extends Request
 
     $value = trim($this->getParam($key));
     $unixTimeStamp = strtotime($value);
-    if(!$unixTimeStamp)
-    {
+    if(!$unixTimeStamp){
       return "";
     }
 

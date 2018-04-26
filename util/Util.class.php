@@ -49,12 +49,9 @@ class Util
    */
   public static function getProjectName()
   {
-    if(self::isCli())
-    {
+    if(self::isCli()){
       $project = 'script';
-    }
-    else
-    {
+    }else{
       $project = $_SERVER['SERVER_NAME'];
     }
 
@@ -82,12 +79,11 @@ class Util
    */
   public static function generateStrList($array, $empty = '-1')
   {
-    if(!is_array($array) || count($array) == 0)
-    {
+    if(!is_array($array) || count($array) == 0){
       return $empty;
     }
 
-    $result = "'".implode("','", $array)."'";
+    $result = "'" . implode("','", $array) . "'";
 
     return $result;
   }
@@ -103,8 +99,7 @@ class Util
    */
   public static function generateList($array, $empty = '-1')
   {
-    if(!is_array($array) || count($array) == 0)
-    {
+    if(!is_array($array) || count($array) == 0){
       return $empty;
     }
 
@@ -124,8 +119,7 @@ class Util
   public static function getRowToArray($rows, $key)
   {
     $array = array();
-    foreach($rows as $row)
-    {
+    foreach($rows as $row){
       array_push($array, $row [$key]);
     }
 
@@ -143,8 +137,7 @@ class Util
   public static function rowsToIndexedArray($rows, $key)
   {
     $array = array();
-    foreach($rows as $row)
-    {
+    foreach($rows as $row){
       $array [$row [$key]] = $row;
     }
 
@@ -163,8 +156,7 @@ class Util
   public static function rowsToAssocArray($rows, $keyName, $keyValue)
   {
     $array = array();
-    foreach($rows as $row)
-    {
+    foreach($rows as $row){
       $array[$row[$keyName]] = $row[$keyValue];
     }
 
@@ -184,10 +176,8 @@ class Util
   public static function rowsToXmlList($rows, $title, $subTitle, $config = null)
   {
     $xmlList = new XmlElement($title);
-    if(is_array($rows))
-    {
-      foreach($rows as $row)
-      {
+    if(is_array($rows)){
+      foreach($rows as $row){
         $newElement = Util::rowToXml($row, $subTitle, $config);
         $xmlList->addElement($newElement);
       }
@@ -208,10 +198,8 @@ class Util
   {
     $xmlList = new XmlElement($title);
 
-    if($row && is_array($row))
-    {
-      foreach($row as $key => $value)
-      {
+    if($row && is_array($row)){
+      foreach($row as $key => $value){
         $newElement = new XmlElement($key);
         $newElement->addAttr('value', $value);
         $xmlList->addElement($newElement);
@@ -234,39 +222,28 @@ class Util
   {
     $escape = $config ['escape'];
     $xml = new XmlElement($name);
-    if(!is_array($row))
-    {
+    if(!is_array($row)){
       return $xml;
     }
-    foreach($row as $field => $value)
-    {
+    foreach($row as $field => $value){
       $fieldName = $field;
-      if($config && is_array($config ['exclude']) && array_intersect(array($field), $config ['exclude']))
-      {
+      if($config && is_array($config ['exclude']) && array_intersect(array($field), $config ['exclude'])){
         continue;
       }
-      if($config && is_array($config ['rename']) && array_intersect_key(array($field => $value), $config ['rename']))
-      {
+      if($config && is_array($config ['rename']) && array_intersect_key(array($field => $value), $config ['rename'])){
         $fieldName = $config ['rename'] [$field];
       }
-      if($config && (is_array($config ['values']) && array_intersect(array($field), $config ['values'])) || $config ['values-all'])
-      {
-        if(is_array($value))
-        {
+      if($config && (is_array($config ['values']) && array_intersect(array($field), $config ['values'])) || $config ['values-all']){
+        if(is_array($value)){
           $newRow = Util::rowToXml($value, $fieldName, $config);
           $xml->addElement($newRow);
-        }
-        else
-        {
+        }else{
           $newValue = new XmlElement($fieldName);
           $newValue->setValue(Util::escapeText($value));
           $xml->addElement($newValue);
         }
-      }
-      else
-      {
-        if($escape)
-        {
+      }else{
+        if($escape){
           $value = Util::escapeText($value);
         }
         $xml->addAttr($fieldName, is_array($value) ? '' : $value);
@@ -285,11 +262,9 @@ class Util
    */
   public static function validParameters()
   {
-    for($i = 0; $i < func_num_args(); $i++)
-    {
+    for($i = 0; $i < func_num_args(); $i++){
       $param = func_get_arg($i);
-      if(is_null($param) or ($param == ""))
-      {
+      if(is_null($param) or ($param == "")){
         return false;
       }
     }
@@ -304,11 +279,9 @@ class Util
    */
   public static function validParametersAny()
   {
-    for($i = 0; $i < func_num_args(); $i++)
-    {
+    for($i = 0; $i < func_num_args(); $i++){
       $param = func_get_arg($i);
-      if(!is_null($param) or ($param != ''))
-      {
+      if(!is_null($param) or ($param != '')){
         return true;
       }
     }
@@ -386,22 +359,19 @@ class Util
    */
   public static function timeForDisplay($time)
   {
-    if($time < 60)
-    {
-      return number_format($time, 2)." seconds";
+    if($time < 60){
+      return number_format($time, 2) . " seconds";
     }
     $time = $time / 60;
-    if($time < 60)
-    {
-      return number_format($time, 2)." minutes";
+    if($time < 60){
+      return number_format($time, 2) . " minutes";
     }
     $time = $time / 60;
-    if($time < 60)
-    {
-      return number_format($time, 2)." hours";
+    if($time < 60){
+      return number_format($time, 2) . " hours";
     }
 
-    return number_format($time, 2)." [no scale]";
+    return number_format($time, 2) . " [no scale]";
   }
 
   /**
@@ -423,7 +393,7 @@ class Util
     $hours = intval(intval($sec) / 3600);
 
     // add hours to $hms (with a leading 0 if asked for)
-    $hms .= ($padHours) ? str_pad($hours, 2, "0", STR_PAD_LEFT).":" : $hours.":";
+    $hms .= ($padHours) ? str_pad($hours, 2, "0", STR_PAD_LEFT) . ":" : $hours . ":";
 
     // dividing the total seconds by 60 will give us the number of minutes
     // in total, but we're interested in *minutes past the hour* and to get
@@ -431,7 +401,7 @@ class Util
     $minutes = intval(($sec / 60) % 60);
 
     // add minutes to $hms (with a leading 0 if needed)
-    $hms .= str_pad($minutes, 2, "0", STR_PAD_LEFT).":";
+    $hms .= str_pad($minutes, 2, "0", STR_PAD_LEFT) . ":";
 
     // seconds past the minute are found by dividing the total number of seconds
     // by 60 and using the remainder
@@ -453,32 +423,27 @@ class Util
    */
   public static function getMemoryDisplay($mem = -1)
   {
-    if($mem == -1)
-    {
+    if($mem == -1){
       $mem = memory_get_usage();
     }
 
-    if($mem < 1024)
-    {
-      return number_format($mem, 2)." bytes";
+    if($mem < 1024){
+      return number_format($mem, 2) . " bytes";
     }
     $mem = $mem / 1024;
-    if($mem < 1024)
-    {
-      return number_format($mem, 2)." kb";
+    if($mem < 1024){
+      return number_format($mem, 2) . " kb";
     }
     $mem = $mem / 1024;
-    if($mem < 1024)
-    {
-      return number_format($mem, 2)." mb";
+    if($mem < 1024){
+      return number_format($mem, 2) . " mb";
     }
     $mem = $mem / 1024;
-    if($mem < 1024)
-    {
-      return number_format($mem, 2)." gb";
+    if($mem < 1024){
+      return number_format($mem, 2) . " gb";
     }
 
-    return number_format($mem, 2)." [no scale]";
+    return number_format($mem, 2) . " [no scale]";
   }
 
   /**
@@ -492,17 +457,12 @@ class Util
   public static function encodeRows($rows, $fields)
   {
     $encodedRows = array();
-    foreach($rows as $row)
-    {
+    foreach($rows as $row){
       $newRow = array();
-      foreach($row as $key => $value)
-      {
-        if(array_intersect(array($key), $fields))
-        {
+      foreach($row as $key => $value){
+        if(array_intersect(array($key), $fields)){
           $newRow [$key] = base64_encode($value);
-        }
-        else
-        {
+        }else{
           $newRow [$key] = $value;
         }
       }
@@ -522,16 +482,13 @@ class Util
    */
   public static function compareArrays($arrayA, $arrayB)
   {
-    if(count($arrayA) != count($arrayB))
-    {
+    if(count($arrayA) != count($arrayB)){
       return false;
     }
 
     $size = count($arrayA);
-    for($i = 0; $i < $size; $i++)
-    {
-      if($arrayA [$i] != $arrayB [$i])
-      {
+    for($i = 0; $i < $size; $i++){
+      if($arrayA [$i] != $arrayB [$i]){
         return false;
       }
     }
@@ -551,25 +508,20 @@ class Util
    */
   public static function arrayAssocToString($array, $equal = '=', $separator = '&', $valueId = null)
   {
-    if(!is_array($array))
-    {
+    if(!is_array($array)){
       return "";
     }
 
     $result = "";
-    foreach($array as $key => $element)
-    {
+    foreach($array as $key => $element){
       $value = ($valueId ? $element [$valueId] : $element);
-      if(is_array($value))
-      {
+      if(is_array($value)){
         $value = self::arrayToString($value, $separator);
-      }
-      else if(is_object($value))
-      {
+      }else if(is_object($value)){
         $value = self::objToStr($value);
       }
 
-      $result .= $key.$equal.$value.$separator;
+      $result .= $key . $equal . $value . $separator;
     }
 
     return $result;
@@ -585,30 +537,23 @@ class Util
    */
   public static function arrayToString($array, $separator = ',')
   {
-    if(!is_array($array))
-    {
+    if(!is_array($array)){
       return "";
     }
 
-    if(self::array_is_assoc($array))
-    {
+    if(self::array_is_assoc($array)){
       return self::arrayAssocToString($array, '=', $separator);
     }
 
     $result = "";
-    foreach($array as $element)
-    {
-      if(is_object($element))
-      {
-        $result .= self::objToStr($element).$separator;
-      }
-      else
-      {
-        $result .= $element.$separator;
+    foreach($array as $element){
+      if(is_object($element)){
+        $result .= self::objToStr($element) . $separator;
+      }else{
+        $result .= $element . $separator;
       }
     }
-    if(substr($result, -1) == $separator)
-    {
+    if(substr($result, -1) == $separator){
       $result = substr($result, 0, -1);
     }
 
@@ -624,28 +569,17 @@ class Util
    */
   public static function toString($data)
   {
-    if(is_string($data))
-    {
+    if(is_string($data)){
       return $data;
-    }
-    else
-    {
-      if(is_object($data) && method_exists($data, '__toString'))
-      {
+    }else{
+      if(is_object($data) && method_exists($data, '__toString')){
         return $data->__toString();
-      }
-      else
-      {
-        if(is_object($data))
-        {
+      }else{
+        if(is_object($data)){
           return Util::objToStr($data);
-        }
-        else if(is_array($data))
-        {
+        }else if(is_array($data)){
           return Util::arrayToString($data, "\n");
-        }
-        else
-        {
+        }else{
           return "";
         }
       }
@@ -664,28 +598,20 @@ class Util
   public static function implodeAssoc($arrayAssoc, $keyGlue = "=", $elementGlue = "\n")
   {
     $str = "";
-    foreach($arrayAssoc as $key => $value)
-    {
-      if(is_array($value))
-      {
+    foreach($arrayAssoc as $key => $value){
+      if(is_array($value)){
         $isAssoc = Util::array_is_assoc($value);
         $arrayData = '';
-        foreach($value as $k => $v)
-        {
-          if($isAssoc)
-          {
-            $arrayData .= $key."[$k]".$keyGlue.$v.$elementGlue;
-          }
-          else
-          {
-            $arrayData .= $key."[]".$keyGlue.$v.$elementGlue;
+        foreach($value as $k => $v){
+          if($isAssoc){
+            $arrayData .= $key . "[$k]" . $keyGlue . $v . $elementGlue;
+          }else{
+            $arrayData .= $key . "[]" . $keyGlue . $v . $elementGlue;
           }
         }
         $str .= $arrayData;
-      }
-      else
-      {
-        $str .= $key.$keyGlue.$value.$elementGlue;
+      }else{
+        $str .= $key . $keyGlue . $value . $elementGlue;
       }
     }
     $str = substr($str, 0, -1);
@@ -706,8 +632,7 @@ class Util
   {
     $elements = explode($elementGlue, $str);
     $arrayAssoc = array();
-    foreach($elements as $element)
-    {
+    foreach($elements as $element){
       $newElement = explode($keyGlue, $element, 2);
       $arrayAssoc [trim($newElement [0])] = trim($newElement [1]);
     }
@@ -729,26 +654,20 @@ class Util
   public static function arrayAssocToSelect($array, $id = null, $valueId = null, $format = null, $default = null)
   {
     $data = array();
-    if($default && is_array($default))
-    {
+    if($default && is_array($default)){
       array_push($data, $default);
     }
-    foreach($array as $k => $v)
-    {
+    foreach($array as $k => $v){
       $newValue = array();
       $newValue ['id'] = $id ? $v [$id] : $k;
 
-      if(is_array($valueId) && $format)
-      {
+      if(is_array($valueId) && $format){
         $value = $format;
-        foreach($valueId as $valueIdK)
-        {
+        foreach($valueId as $valueIdK){
           $valueIdV = $v[$valueIdK];
-          $value = str_replace("{".$valueIdK."}", $valueIdV, $value);
+          $value = str_replace("{" . $valueIdK . "}", $valueIdV, $value);
         }
-      }
-      else
-      {
+      }else{
         $value = $valueId ? $v [$valueId] : $v;
       }
 
@@ -769,8 +688,7 @@ class Util
    */
   public static function escapeText($s)
   {
-    if(!is_string($s))
-    {
+    if(!is_string($s)){
       $s .= '';
     }
 
@@ -800,36 +718,25 @@ class Util
 
     $result = '';
     $len = strlen($s);
-    for($i = 0; $i < $len; $i++)
-    {
-      if($characters [$s{$i}])
-      {
+    for($i = 0; $i < $len; $i++){
+      if($characters [$s{$i}]){
         $result .= $characters [$s{$i}];
-      }
-      else if(ord($s{$i}) > 127)
-      {
+      }else if(ord($s{$i}) > 127){
         // skipping UTF-8 escape sequences requires a bit of work
-        if((ord($s{$i}) & 0xf0) == 0xf0)
-        {
+        if((ord($s{$i}) & 0xf0) == 0xf0){
           $result .= $s{$i++};
           $result .= $s{$i++};
           $result .= $s{$i++};
           $result .= $s{$i};
-        }
-        else if((ord($s{$i}) & 0xe0) == 0xe0)
-        {
+        }else if((ord($s{$i}) & 0xe0) == 0xe0){
           $result .= $s{$i++};
           $result .= $s{$i++};
           $result .= $s{$i};
-        }
-        else if((ord($s{$i}) & 0xc0) == 0xc0)
-        {
+        }else if((ord($s{$i}) & 0xc0) == 0xc0){
           $result .= $s{$i++};
           $result .= $s{$i};
         }
-      }
-      else
-      {
+      }else{
         $result .= $s{$i};
       }
     }
@@ -848,21 +755,17 @@ class Util
   function xmlElementsToAttr($xml, $callBack = 0)
   {
     $result = new XmlElement($xml->getName());
-    if($xml)
-    {
+    if($xml){
       $elements = $xml->getElements();
-      foreach($elements as $element)
-      {
+      foreach($elements as $element){
         $elems = $element->getElements();
         $newElement = new XmlElement($element->getName());
-        foreach($elems as $elem)
-        {
+        foreach($elems as $elem){
           $name = $elem->getName();
           $value = $elem->getValue();
           $newElement->addAttr($name, $value);
         }
-        if($callBack)
-        {
+        if($callBack){
           call_user_func($callBack, $newElement);
         }
         $result->addElement($newElement);
@@ -882,23 +785,19 @@ class Util
   {
     $encoding = (trim($encoding) == '') ? CoreConfig::SYS_ENCODING : $encoding;
 
-    if(trim($format) == '')
-    {
+    if(trim($format) == ''){
       $format = 'xml';
     }
 
     header('Expires: Wed, 23 Dec 1980 00:30:00 GMT');
-    header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
+    header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
     header('Cache-Control: no-cache, must-revalidate');
     header('Pragma: no-cache');
-    header('Content-Type: application/'.$format);
+    header('Content-Type: application/' . $format);
 
-    if($format == 'xml')
-    {
+    if($format == 'xml'){
       echo "<?xml version=\"1.0\" encoding=\"$encoding\"?>";
-    }
-    else if($format == 'json')
-    {
+    }else if($format == 'json'){
       header("HTTP/1.1 200 OK");
       header('Access-Control-Allow-Origin: *');
       header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
@@ -916,15 +815,12 @@ class Util
   public static function file_exists($file)
   {
     $ps = explode(PATH_SEPARATOR, ini_get('include_path'));
-    foreach($ps as $path)
-    {
-      if(file_exists($path.'/'.$file))
-      {
-        return $path.'/'.$file;
+    foreach($ps as $path){
+      if(file_exists($path . '/' . $file)){
+        return $path . '/' . $file;
       }
     }
-    if(file_exists($file))
-    {
+    if(file_exists($file)){
       return $file;
     }
 
@@ -942,10 +838,8 @@ class Util
   public static function writeToFile($path, $content)
   {
     $f = @fopen($path, 'w');
-    if($f)
-    {
-      if(@flock($f, LOCK_EX))
-      {
+    if($f){
+      if(@flock($f, LOCK_EX)){
         $w = @fwrite($f, $content);
         @flock($f, LOCK_UN);
       }
@@ -965,10 +859,8 @@ class Util
   public static function readFromFile($path)
   {
     $f = @fopen($path, 'r');
-    if($f)
-    {
-      if(@flock($f, LOCK_EX))
-      {
+    if($f){
+      if(@flock($f, LOCK_EX)){
         $content = @fread($f, filesize($path));
         @flock($f, LOCK_UN);
       }
@@ -999,8 +891,7 @@ class Util
    */
   public static function array_insert(&$array, $position, $element)
   {
-    if(is_array($array))
-    {
+    if(is_array($array)){
       $first_array = array_splice($array, 0, $position);
       $element = is_array($element) ? $element : array($element);
       $array = array_merge($first_array, $element, $array);
@@ -1017,8 +908,7 @@ class Util
   public static function array_insert_after_key(&$array, $key, $element)
   {
     $position = is_null($key) ? 0 : count($array);
-    if(is_array($array) && array_key_exists($key, $array))
-    {
+    if(is_array($array) && array_key_exists($key, $array)){
       $position = array_search($key, array_keys($array)) + 1;
     }
 
@@ -1051,15 +941,13 @@ class Util
   public static function getDirectories($dir, $directories = array())
   {
     $items = scandir($dir);
-    foreach($items as $item)
-    {
-      $path = $dir.DIRECTORY_SEPARATOR.$item;
+    foreach($items as $item){
+      $path = $dir . DIRECTORY_SEPARATOR . $item;
       if(!is_dir($path) || //not a directory
         $item == '.' || //current directory
         $item == '..' || //parent directory
         substr($item, 0, 1) == '.' //hidden directory
-      )
-      {
+      ){
         continue;
       }
       array_push($directories, $path);
@@ -1130,20 +1018,16 @@ class Util
   {
     $days = array();
     $d = 1;
-    if(!$daysM)
-    {
-      if($year == null)
-      {
+    if(!$daysM){
+      if($year == null){
         $year = date('Y');
       }
-      if($month == null)
-      {
+      if($month == null){
         $month = intval(date("m", time()));
       }
       $daysM = Util::getMonthDays($month, $year);
     }
-    while($d <= $daysM)
-    {
+    while($d <= $daysM){
       $dValue = ($d < 10) ? "0$d" : "$d";
       $days [$dValue] = $dValue;
       $d += 1;
@@ -1162,19 +1046,13 @@ class Util
    */
   public static function getMonthDays($month, $year)
   {
-    if($month != null and $year != null)
-    {
-      if(is_callable("cal_days_in_month"))
-      {
+    if($month != null and $year != null){
+      if(is_callable("cal_days_in_month")){
         return cal_days_in_month(CAL_GREGORIAN, $month, $year);
-      }
-      else
-      {
+      }else{
         return date("d", mktime(0, 0, 0, $month + 1, 0, $year));
       }
-    }
-    else
-    {
+    }else{
       return 31;
     }
   }
@@ -1191,17 +1069,12 @@ class Util
   public static function generateYearList($min = 2000, $max = 2020, $revert = false)
   {
     $years = array();
-    if($revert)
-    {
-      for($i = $max; $i >= $min; $i--)
-      {
+    if($revert){
+      for($i = $max; $i >= $min; $i--){
         $years [$i] = $i;
       }
-    }
-    else
-    {
-      for($i = $min; $i <= $max; $i++)
-      {
+    }else{
+      for($i = $min; $i <= $max; $i++){
         $years [$i] = $i;
       }
     }
@@ -1220,12 +1093,9 @@ class Util
   public static function truncate($amount, $decimals = 2)
   {
     $pow = pow(10, $decimals);
-    if($amount > 0)
-    {
+    if($amount > 0){
       return floor($amount * $pow) / $pow;
-    }
-    else
-    {
+    }else{
       return ceil($amount * $pow) / $pow;
     }
   }
@@ -1240,16 +1110,14 @@ class Util
    */
   public static function scratch($value, $digits = -1)
   {
-    if($digits < 0)
-    {
+    if($digits < 0){
       $digits = 0;
     }
     $scratchedLength = strlen($value) - $digits;
-    if($scratchedLength < 0)
-    {
+    if($scratchedLength < 0){
       $scratchedLength = 0;
     }
-    $scratchedValue = str_repeat("*", $scratchedLength).substr($value, $scratchedLength, $digits);
+    $scratchedValue = str_repeat("*", $scratchedLength) . substr($value, $scratchedLength, $digits);
 
     return $scratchedValue;
   }
@@ -1263,8 +1131,7 @@ class Util
    */
   public static function objToStr($obj)
   {
-    if(is_object($obj) && method_exists($obj, '__toString'))
-    {
+    if(is_object($obj) && method_exists($obj, '__toString')){
       return $obj->__toString();
     }
 
@@ -1288,13 +1155,11 @@ class Util
     $sorter = array();
     $ret = array();
     reset($array);
-    foreach($array as $ii => $va)
-    {
+    foreach($array as $ii => $va){
       $sorter [$ii] = $va [$key];
     }
     asort($sorter, $mode);
-    foreach($sorter as $ii => $va)
-    {
+    foreach($sorter as $ii => $va){
       $ret [$ii] = $array [$ii];
     }
     $array = $ret;
@@ -1310,8 +1175,7 @@ class Util
   public static function manageArrayList(&$rows, $config = null)
   {
     $result = array();
-    foreach($rows as $key => $row)
-    {
+    foreach($rows as $key => $row){
       $result [$key] = Util::manageArray($row, $config);
     }
     $rows = $result;
@@ -1330,32 +1194,25 @@ class Util
     $escape = $config ['escape'];
 
     $result = array();
-    if(!is_array($row))
-    {
+    if(!is_array($row)){
       return null;
     }
 
-    foreach($row as $field => $value)
-    {
+    foreach($row as $field => $value){
       $fieldName = $field;
-      if($config && is_array($config ['exclude']) && array_intersect(array($field), $config ['exclude']))
-      {
+      if($config && is_array($config ['exclude']) && array_intersect(array($field), $config ['exclude'])){
         continue;
       }
-      if($config && is_array($config ['rename']) && array_intersect_key(array($field => $value), $config ['rename']))
-      {
+      if($config && is_array($config ['rename']) && array_intersect_key(array($field => $value), $config ['rename'])){
         $fieldName = $config ['rename'] [$field];
       }
-      if($escape)
-      {
+      if($escape){
         $value = Util::escapeText($value);
       }
-      if($config && is_array($config ['prefix']) && array_intersect_key(array($field => $value), $config ['prefix']))
-      {
-        $value = $config ['prefix'] [$field].$value;
+      if($config && is_array($config ['prefix']) && array_intersect_key(array($field => $value), $config ['prefix'])){
+        $value = $config ['prefix'] [$field] . $value;
       }
-      if($config && is_array($config ['replace']) && array_intersect_key(array($field => $value), $config ['replace']))
-      {
+      if($config && is_array($config ['replace']) && array_intersect_key(array($field => $value), $config ['replace'])){
         $value = $config ['replace'][$field];
       }
       $result [$fieldName] = $value;
@@ -1392,23 +1249,18 @@ class Util
   {
     $randomString = "";
     $source = 'abcdefghijklmnopqrstuvwxyz';
-    if($uc == 1)
-    {
+    if($uc == 1){
       $source .= 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     }
-    if($n == 1)
-    {
+    if($n == 1){
       $source .= '1234567890';
     }
-    if($sc == 1)
-    {
+    if($sc == 1){
       $source .= '|@#~$%()=^*+[]{}-_';
     }
-    if($length > 0)
-    {
+    if($length > 0){
       $source = str_split($source, 1);
-      for($i = 1; $i <= $length; $i++)
-      {
+      for($i = 1; $i <= $length; $i++){
         mt_srand(( double )microtime() * 1000000);
         $num = mt_rand(1, count($source));
         $randomString .= $source [$num - 1];
@@ -1427,11 +1279,9 @@ class Util
    */
   public static function quitColumns(&$array, $columns)
   {
-    foreach($array as $key => $value)
-    {
+    foreach($array as $key => $value){
       $element = array();
-      foreach($columns as $column)
-      {
+      foreach($columns as $column){
         $element [$column] = $value [$column];
       }
       $array [$key] = $element;
@@ -1449,23 +1299,18 @@ class Util
    */
   public static function verifiesStateWSResponse($wsResponse)
   {
-    if($wsResponse)
-    {
+    if($wsResponse){
       $state = $wsResponse->getElementValue('state');
-      if($state == 'ok')
-      {
+      if($state == 'ok'){
         return true;
       }
       $message = $wsResponse->getElementValue('userMessage');
 
-      if($message == 'InvalidStateException')
-      {
+      if($message == 'InvalidStateException'){
         throw new GeneralException('Error: Session has expired. You should start a new session.');
       }
       throw new GeneralException($message);
-    }
-    else
-    {
+    }else{
       throw new GeneralException('Error Loading Information');
     }
 
@@ -1481,35 +1326,26 @@ class Util
    */
   public static function setParameters($paramsConfig, $recordId = null)
   {
-    try
-    {
+    try{
 
       $parameters = array();
 
-      foreach($paramsConfig as $key => $element)
-      {
+      foreach($paramsConfig as $key => $element){
         $type = $element ['type'];
         $otherType = $element ['otherType'];
         $value = Util::getParameter($type, $key, $element, $recordId);
 
-        if($value != '')
-        {
+        if($value != ''){
           $parameters [$key] = $value;
-        }
-        else if($otherType)
-        {
+        }else if($otherType){
           $value = Util::getParameter($otherType, $key, $element, $recordId);
           $parameters [$key] = $value;
-        }
-        else
-        {
+        }else{
           $parameters [$key] = $value;
         }
 
       }
-    }
-    catch(GeneralException $ex)
-    {
+    }catch(GeneralException $ex){
       return $ex->getMessage();
     }
 
@@ -1528,8 +1364,7 @@ class Util
    */
   public static function getParameter($type, $key, $element, $recordId)
   {
-    switch($type)
-    {
+    switch($type){
       case 'id' :
         return $recordId;
       case 'value' :
@@ -1571,16 +1406,12 @@ class Util
     // ##### Strip all Non-Numeric Characters
     $phone = preg_replace('/[^0-9]+/', '', $phone);
     $areaCode = '';
-    switch($countrySmallCode)
-    {
+    switch($countrySmallCode){
       case "US":
       case "CA":
-        if(strlen($phone) == 11 && $phone[0] == '1')
-        {
+        if(strlen($phone) == 11 && $phone[0] == '1'){
           $areaCode = substr($phone, 1, 3);
-        }
-        elseif(strlen($phone) == 10)
-        {
+        }elseif(strlen($phone) == 10){
           $areaCode = substr($phone, 0, 3);
         }
         break;
@@ -1599,12 +1430,9 @@ class Util
    */
   public static function getConstants($name = null)
   {
-    if(!$name)
-    {
+    if(!$name){
       return get_defined_constants();
-    }
-    else
-    {
+    }else{
       $constants = get_defined_constants();
 
       return $constants [$name];
@@ -1623,20 +1451,16 @@ class Util
   public static function arrayToQueryString($data, $includeEmpty = false, $encodeFields = true)
   {
     $returnValue = '';
-    if(is_array($data))
-    {
-      foreach($data as $k => $v)
-      {
+    if(is_array($data)){
+      foreach($data as $k => $v){
         $skip = false;
 
-        if(($k == "") || ($v == ""))
-        {
+        if(($k == "") || ($v == "")){
           $skip = !$includeEmpty;
         }
 
-        if(!$skip)
-        {
-          $returnValue .= (($encodeFields) ? urlencode($k) : $k)."=".(($encodeFields) ? urlencode($v) : $v)."&";
+        if(!$skip){
+          $returnValue .= (($encodeFields) ? urlencode($k) : $k) . "=" . (($encodeFields) ? urlencode($v) : $v) . "&";
         }
       }
       $returnValue = substr($returnValue, 0, -1);
@@ -1657,20 +1481,17 @@ class Util
    */
   public static function getTimeDifferenceByInterval($interval, $dateStart, $dateEnd, $relative = false)
   {
-    if(is_string($dateStart))
-    {
+    if(is_string($dateStart)){
       $dateTimeStart = date_create($dateStart);
     }
 
-    if(is_string($dateEnd))
-    {
+    if(is_string($dateEnd)){
       $dateTimeEnd = date_create($dateEnd);
     }
 
     $diff = date_diff($dateTimeStart, $dateTimeEnd, !$relative);
 
-    switch($interval)
-    {
+    switch($interval){
       case "y":
         $total = $diff->y + $diff->m / 12 + $diff->d / 365.25;
         break;
@@ -1691,12 +1512,9 @@ class Util
         break;
     }
 
-    if($diff->invert)
-    {
+    if($diff->invert){
       return -1 * $total;
-    }
-    else
-    {
+    }else{
       return $total;
     }
   }
@@ -1727,15 +1545,13 @@ class Util
    */
   public static function getStringBetween($string, $start, $end)
   {
-    if(!is_string($string))
-    {
+    if(!is_string($string)){
       return "";
     }
 
-    $string = " ".$string;
+    $string = " " . $string;
     $ini = strpos($string, $start);
-    if($ini == 0)
-    {
+    if($ini == 0){
       return "";
     }
 
@@ -1757,12 +1573,10 @@ class Util
   public static function dateToGMT($date, $offset = 0, $timezone = null)
   {
     $time = strtotime(trim($date));
-    if(!$time || $time <= 0)
-    {
+    if(!$time || $time <= 0){
       return '';
     }
-    if(!$timezone)
-    {
+    if(!$timezone){
       //if not timezone given, we use the timezone used by the system
       $timezone = CoreConfig::TIMEZONE_APP;
     }
@@ -1775,7 +1589,7 @@ class Util
     $gmtTime = strtotime($date->format('Y-m-d H:i:s'));
 
     //generate new date using offset
-    $newDate = date('Y-m-d H:i:s', strtotime($offset." hours", $gmtTime));
+    $newDate = date('Y-m-d H:i:s', strtotime($offset . " hours", $gmtTime));
 
     return $newDate;
   }
