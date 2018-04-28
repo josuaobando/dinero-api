@@ -209,8 +209,6 @@ class Manager
       }else{
         throw $ex;
       }
-    }catch(Exception $ex){
-      throw $ex;
     }
   }
 
