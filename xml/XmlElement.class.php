@@ -77,8 +77,8 @@ class XmlElement
   /**
    * Get an element using the name
    *
-   * @param string $name
-   * @return XmlElement
+   * @param $name
+   * @return int|mixed
    */
   public function getElement($name)
   {
@@ -87,6 +87,25 @@ class XmlElement
       if($currName == $name){
         return $element;
       }
+    }
+    return 0;
+  }
+
+  /**
+   * Locates an element using the name. Should be used only when only one instance of name exists.
+   * It will return the first occurrence.
+   *
+   * @param $name
+   * @return int|mixed
+   */
+  public function locateElement($name)
+  {
+    $locatedElement = $this->getElement($name);
+    if($locatedElement) return $locatedElement;
+
+    foreach($this->elements as $element){
+      $locatedElement = $element->locateElement($name);
+      if($locatedElement) return $locatedElement;
     }
     return 0;
   }
@@ -102,9 +121,30 @@ class XmlElement
   }
 
   /**
+   * get a XmlElement with a sub set of elements
+   *
+   * @param string $filterId
+   * @param string $filterValue
+   *
+   * @return XmlElement
+   */
+  public function getFilteredXml($filterId, $filterValue)
+  {
+    $newXml = new XmlElement($this->name);
+    foreach($this->elements as $xmlElement){
+      $xmlElement instanceof XmlElement;
+      $value = $xmlElement->getAttr($filterId);
+      if($value == $filterValue){
+        $newXml->addElement($xmlElement);
+      }
+    }
+    return $newXml;
+  }
+
+  /**
    * Add an attribute
    *
-   * @param string $key
+   * @param string $name
    * @param string $value
    */
   public function addAttr($name, $value)
@@ -142,8 +182,8 @@ class XmlElement
   /**
    * Set the text value of an element
    *
-   * @param string $value
-   * @parma bool $isCDATA
+   * @param $value
+   * @param bool $isCDATA
    */
   public function setValue($value, $isCDATA = false)
   {
@@ -191,9 +231,9 @@ class XmlElement
   /**
    * get element's value
    *
-   * @param string $name
-   * @param value $default
-   * @return value
+   * @param $name
+   * @param string $default
+   * @return string
    */
   public function getElementValue($name, $default = '')
   {
@@ -296,7 +336,6 @@ class XmlElement
    *   </key>
    * </xml>
    *
-   * @param string $key
    * @return array
    */
   public function xmlToArray()
@@ -369,30 +408,30 @@ class XmlElement
           $newElement = new XmlElement($elementName);
           $newElement->loadArray($value);
           $this->addElement($newElement);
-        }else
-          if($value && is_object($value)){
-            $newElement = new XmlElement($elementName);
-            if(method_exists($value, 'toArray')){
-              $data = call_user_func(array($value, 'toArray'));
-              $newElement->loadArray($data);
-            }else
-              if(method_exists($value, 'toCDATA')){
-                $data = call_user_func(array($value, 'toCDATA'));
-                $newElement->loadArray($data);
-                $newElement->setValue($data, true);
-              }else{
-                $newElement->addAttr('class', get_class($value));
-              }
-            $this->addElement($newElement);
+        }else if($value && is_object($value)){
+          $newElement = new XmlElement($elementName);
+          if(method_exists($value, 'toArray')){
+            $data = call_user_func(array($value, 'toArray'));
+            $newElement->loadArray($data);
+          }else if(method_exists($value, 'toCDATA')){
+            $data = call_user_func(array($value, 'toCDATA'));
+            $newElement->loadArray($data);
+            $newElement->setValue($data, true);
+          }else if($value instanceof XmlElement){
+            $newElement = $value;
           }else{
-            if($isSequential){
-              $valueElement = new XmlElement($elementName);
-              $valueElement->setValue($value);
-              $this->addElement($valueElement);
-            }else{
-              $this->addAttr($elementName, $value);
-            }
+            $newElement->addAttr('class', get_class($value));
           }
+          $this->addElement($newElement);
+        }else{
+          if($isSequential){
+            $valueElement = new XmlElement($elementName);
+            $valueElement->setValue($value);
+            $this->addElement($valueElement);
+          }else{
+            $this->addAttr($elementName, $value);
+          }
+        }
       }
     }
   }
@@ -406,22 +445,80 @@ class XmlElement
   {
     $text = "<$this->name";
     foreach($this->attributes as $key => $value){
+      //TODO: fix me
+      $value = str_replace("\"", "&quot;", $value);
+      //TODO: fix me
+      $value = str_replace("&", "&amp;", $value);
+
       $text .= " $key=\"" . $value . '"';
     }
     $text .= ">";
-    if($this->value){
-      if($this->isCDATA){
-        $text .= "<![CDATA[" . $this->value . "]]>";
-      }else{
-        $text .= $this->value;
-      }
+
+    if($this->isCDATA){
+      $text .= "<![CDATA[" . $this->value . "]]>";
+    }else{
+      $text .= $this->value;
     }
+
     foreach($this->elements as $element){
       $text .= $element;
     }
     $text .= "</$this->name>";
 
     return $text;
+  }
+
+  /**
+   * creates or add values to a sequential array
+   *
+   * @param string $key
+   * @param array $row
+   * @param mixed $value
+   *
+   * @return array
+   */
+  private function addToSequentialArray($key, $row, $value)
+  {
+    $temp = $row [$key];
+
+    if(!is_array($temp) || Util::array_is_assoc($temp))
+      $result = array($temp, $value);
+    else{
+      $result = $temp;
+      array_push($result, $value);
+    }
+
+    return $result;
+
+  }
+
+  /**
+   * Object representation of the XmlElement
+   *
+   * @param null $target
+   * @return null|stdClass
+   */
+  public function toObject($target = null)
+  {
+    if(!$target){
+      $target = new stdClass;
+    }
+
+    foreach($this->attributes as $key => $value){
+      $target->$key = $value;
+    }
+
+    foreach($this->elements as $element){
+      $element instanceof XmlElement;
+      $name = $element->getName();
+      $value = $element->getValue();
+      $target->$name = $value;
+      if(count($element->getElements()) > 0){
+        $element->toObject($target);
+      }
+    }
+
+    return $target;
   }
 
 }

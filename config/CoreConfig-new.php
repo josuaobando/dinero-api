@@ -192,6 +192,11 @@ class CoreConfig
    */
   const CUSTOMER_SIMILAR_PERCENT_ACTIVE = true;
   const CUSTOMER_SIMILAR_PERCENT = 90;
+
+  /**
+   * Saturno API
+   */
+  const SATURNO_ACTIVE = false;
 }
 
 ?>

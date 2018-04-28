@@ -81,11 +81,11 @@ class Manager
     $transactionStatus = ($transactionType == Transaction::TYPE_RECEIVER) ? Transaction::STATUS_REQUESTED : Transaction::STATUS_SUBMITTED;
 
     //create customer object
-    $customer = new Customer();
+    $customer = Session::getCustomer();
     $customer->validateFromRequest($this->account, $wsRequest);
 
     //create transaction object
-    $transaction = new Transaction();
+    $transaction = Session::getTransaction();
     $transaction->setAccountId($this->account->getAccountId());
     $transaction->setAgencyTypeId($customer->getAgencyTypeId());
     $transaction->setAgencyId($customer->getAgencyId());
@@ -176,15 +176,42 @@ class Manager
   }
 
   /**
-   * get a new receiver
+   * start and create a new API transaction
    *
    * @param WSRequest $wsRequest
+   * @param $transactionType
+   *
+   * @return \WSResponseOk
+   * @throws \InvalidParameterException
+   * @throws \InvalidStateException
+   */
+  public function startAPITransaction($wsRequest, $transactionType)
+  {
+    throw new InvalidStateException("No implement!");
+  }
+
+  /**
+   * get a new receiver
+   *
+   * @param $wsRequest
    *
    * @return WSResponse
+   *
+   * @throws Exception
    */
   public function receiver($wsRequest)
   {
-    return $this->startTransaction($wsRequest, Transaction::TYPE_RECEIVER);
+    try{
+      return $this->startTransaction($wsRequest, Transaction::TYPE_RECEIVER);
+    }catch(P2PException $ex){
+      if(CoreConfig::SATURNO_ACTIVE){
+        return $this->startAPITransaction($wsRequest, Transaction::TYPE_RECEIVER);
+      }else{
+        throw $ex;
+      }
+    }catch(Exception $ex){
+      throw $ex;
+    }
   }
 
   /**

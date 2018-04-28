@@ -9,6 +9,9 @@ class Session
   const SID_ACCOUNT = 'account';
   const SID_COUNTRIES = 'countries';
   const SID_AGENCIES = 'agencies';
+  const SID_TRANSACTION = 'transaction';
+  const SID_CUSTOMER = 'customer';
+  const SID_PERSON = 'person';
 
   /**
    * get sid generated
@@ -135,6 +138,42 @@ class Session
     }
 
     return $agencies;
+  }
+
+  /**
+   * get transaction
+   *
+   * @return Transaction
+   */
+  public static function getTransaction()
+  {
+    $transactionSession = self::getSessionObject(self::SID_TRANSACTION);
+    if(!$transactionSession){
+      $transaction = new Transaction();
+      self::storeSessionObject(self::SID_TRANSACTION, $transaction, true);
+    }else{
+      $transaction = $transactionSession;
+    }
+
+    return $transaction;
+  }
+
+  /**
+   * get customer
+   *
+   * @return Customer
+   */
+  public static function getCustomer()
+  {
+    $customerSession = self::getSessionObject(self::SID_CUSTOMER);
+    if(!$customerSession){
+      $customer = new Customer();
+      self::storeSessionObject(self::SID_CUSTOMER, $customer, true);
+    }else{
+      $customer = $customerSession;
+    }
+
+    return $customer;
   }
 
 }
