@@ -187,7 +187,60 @@ class Manager
    */
   public function startAPITransaction($wsRequest, $transactionType)
   {
-    throw new InvalidStateException("No implement!");
+    $amount = $wsRequest->requireNumericAndPositive('amount');
+    $username = trim($wsRequest->requireNotNullOrEmpty('uid'));
+    $reference = trim($wsRequest->getParam('reference'));
+
+    $transactionStatus = ($transactionType == Transaction::TYPE_RECEIVER) ? Transaction::STATUS_REQUESTED : Transaction::STATUS_SUBMITTED;
+
+    //create customer object
+    $customer = Session::getCustomer();
+    $customer->validateFromRequest($this->account, $wsRequest);
+
+    //create transaction object
+    $transaction = Session::getTransactionAPI();
+    $transaction->setAccountId($this->account->getAccountId());
+    $transaction->setAgencyTypeId($customer->getAgencyTypeId());
+    $transaction->setAgencyId($customer->getAgencyId());
+    $transaction->setCustomerId($customer->getCustomerId());
+    $transaction->setTransactionTypeId($transactionType);
+    $transaction->setTransactionStatusId($transactionStatus);
+    $transaction->setReference($reference);
+    $transaction->setUsername($username);
+    $transaction->setAmount($amount);
+    $transaction->setFee(0);
+
+    //evaluate limits
+    $limit = new Limit($transaction, $customer);
+    $limit->evaluate();
+
+    $transaction->getName();
+
+    //------------------begin validation
+    $person = new Person();
+
+    //------------------end validation
+
+    //sets personId
+    $transaction->setPersonId($person->getPersonId());
+
+    //create transaction after the validation of the data
+    $transaction->create();
+    if($transaction->getTransactionId()){
+      $wsResponse = new WSResponseOk();
+      $wsResponse->addElement('transaction', $transaction);
+      if($transactionType == Transaction::TYPE_RECEIVER){
+        $wsResponse->addElement('sender', $customer);
+        $wsResponse->addElement('receiver', $person);
+      }else{
+        $wsResponse->addElement('sender', $person);
+        $wsResponse->addElement('receiver', $customer);
+      }
+    }else{
+      throw new InvalidStateException("The Transaction not has been created. Please, try later!");
+    }
+
+    return $wsResponse;
   }
 
   /**
@@ -242,7 +295,7 @@ class Manager
     $fee = $wsRequest->getParam('fee');
 
     //restore and load transaction information
-    $transaction = new Transaction();
+    $transaction = Session::getTransaction();
     $transaction->restore($transactionId);
     if(!$transaction->getTransactionId()){
       throw new InvalidStateException("this transaction not exist or not can be loaded: " . $transactionId);
@@ -280,7 +333,9 @@ class Manager
    *
    * @param WSRequest $wsRequest
    *
-   * @return bool
+   * @return int
+   *
+   * @throws InvalidStateException+
    */
   public function transactionUpdate($wsRequest)
   {
@@ -300,8 +355,11 @@ class Manager
     }
 
     //restore and load transaction information
-    $transaction = new Transaction();
+    $transaction = Session::getTransaction();
     $transaction->restore($transactionId);
+    if(!$transaction->getTransactionId()){
+      throw new InvalidStateException("The transaction [$transactionId] has not been restored, please check!");
+    }
 
     //get current status
     $currentStatusId = $transaction->getTransactionStatusId();

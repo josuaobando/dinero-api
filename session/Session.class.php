@@ -159,6 +159,24 @@ class Session
   }
 
   /**
+   * get transaction
+   *
+   * @return TransactionAPI
+   */
+  public static function getTransactionAPI()
+  {
+    $transactionSession = self::getSessionObject(self::SID_TRANSACTION);
+    if(!$transactionSession){
+      $transaction = new TransactionAPI();
+      self::storeSessionObject(self::SID_TRANSACTION, $transaction, true);
+    }else{
+      $transaction = $transactionSession;
+    }
+
+    return $transaction;
+  }
+
+  /**
    * get customer
    *
    * @return Customer

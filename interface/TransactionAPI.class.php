@@ -6,6 +6,12 @@
 class TransactionAPI extends Transaction
 {
 
+  const STATUS_API_REQUESTED = 'requested';
+  const STATUS_API_PENDING = 'pending';
+  const STATUS_API_APPROVED = 'approved';
+  const STATUS_API_REJECTED = 'rejected';
+  const STATUS_API_ERROR = 'error';
+
   /**
    * @var Customer
    */

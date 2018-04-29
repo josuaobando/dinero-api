@@ -29,6 +29,7 @@ class Person
   private $gender;
   private $profession;
   private $phone;
+  private $nameId;
 
   /**
    * TblPerson reference
@@ -208,6 +209,206 @@ class Person
   }
 
   /**
+   * @return int
+   */
+  public function getNameId()
+  {
+    return $this->nameId;
+  }
+
+  /**
+   * @return boolean
+   */
+  public function getIsAPI()
+  {
+    return $this->nameId > 0;
+  }
+
+  /**
+   * @param int|null $personId
+   */
+  public function setPersonId($personId)
+  {
+    $this->personId = $personId;
+  }
+
+  /**
+   * @param mixed $country
+   */
+  public function setCountry($country)
+  {
+    $this->country = $country;
+  }
+
+  /**
+   * @param mixed $countryId
+   */
+  public function setCountryId($countryId)
+  {
+    $this->countryId = $countryId;
+  }
+
+  /**
+   * @param mixed $countryName
+   */
+  public function setCountryName($countryName)
+  {
+    $this->countryName = $countryName;
+  }
+
+  /**
+   * @param mixed $state
+   */
+  public function setState($state)
+  {
+    $this->state = $state;
+  }
+
+  /**
+   * @param mixed $stateId
+   */
+  public function setStateId($stateId)
+  {
+    $this->stateId = $stateId;
+  }
+
+  /**
+   * @param mixed $stateName
+   */
+  public function setStateName($stateName)
+  {
+    $this->stateName = $stateName;
+  }
+
+  /**
+   * @param mixed $available
+   */
+  public function setAvailable($available)
+  {
+    $this->available = $available;
+  }
+
+  /**
+   * @param mixed $isActive
+   */
+  public function setIsActive($isActive)
+  {
+    $this->isActive = $isActive;
+  }
+
+  /**
+   * @param mixed $name
+   */
+  public function setName($name)
+  {
+    $this->name = $name;
+  }
+
+  /**
+   * @param mixed $firstName
+   */
+  public function setFirstName($firstName)
+  {
+    $this->firstName = $firstName;
+  }
+
+  /**
+   * @param mixed $lastName
+   */
+  public function setLastName($lastName)
+  {
+    $this->lastName = $lastName;
+  }
+
+  /**
+   * @param mixed $personalId
+   */
+  public function setPersonalId($personalId)
+  {
+    $this->personalId = $personalId;
+  }
+
+  /**
+   * @param mixed $typeId
+   */
+  public function setTypeId($typeId)
+  {
+    $this->typeId = $typeId;
+  }
+
+  /**
+   * @param mixed $expirationDateId
+   */
+  public function setExpirationDateId($expirationDateId)
+  {
+    $this->expirationDateId = $expirationDateId;
+  }
+
+  /**
+   * @param mixed $address
+   */
+  public function setAddress($address)
+  {
+    $this->address = $address;
+  }
+
+  /**
+   * @param mixed $city
+   */
+  public function setCity($city)
+  {
+    $this->city = $city;
+  }
+
+  /**
+   * @param mixed $birthDate
+   */
+  public function setBirthDate($birthDate)
+  {
+    $this->birthDate = $birthDate;
+  }
+
+  /**
+   * @param mixed $maritalStatus
+   */
+  public function setMaritalStatus($maritalStatus)
+  {
+    $this->maritalStatus = $maritalStatus;
+  }
+
+  /**
+   * @param mixed $gender
+   */
+  public function setGender($gender)
+  {
+    $this->gender = $gender;
+  }
+
+  /**
+   * @param mixed $profession
+   */
+  public function setProfession($profession)
+  {
+    $this->profession = $profession;
+  }
+
+  /**
+   * @param mixed $phone
+   */
+  public function setPhone($phone)
+  {
+    $this->phone = $phone;
+  }
+
+  /**
+   * @param mixed $nameId
+   */
+  public function setNameId($nameId)
+  {
+    $this->nameId = $nameId;
+  }
+
+  /**
    * new instance of receiver
    *
    * @param int $personId
@@ -243,6 +444,11 @@ class Person
       $this->profession = $personData['Profession'];
       $this->phone = $personData['Phone'];
     }
+  }
+
+  public function validate(){
+
+    return true;
   }
 
   /**
