@@ -279,6 +279,76 @@ class WS
    * @param $wsdl
    * @param $method
    * @param $params
+   *
+   * @return object
+   *
+   * @throws WSException
+   */
+  public function execSoapSimple($wsdl, $method, $params)
+  {
+    $connector = new Connector();
+
+    // Set values in the connector
+    $connector->setUsernamePassword($this->username, $this->password);
+
+    //connect timeout
+    $timeoutOnConnect = (!is_null($this->timeoutOnConnect)) ? $this->timeoutOnConnect : CoreConfig::WS_TIMEOUT_ON_CONNECT;
+    $connector->setTimeoutOnConnect($timeoutOnConnect);
+
+    //execution timeout
+    $timeout = (!is_null($this->timeout)) ? $this->timeout : CoreConfig::WS_TIMEOUT;
+    $connector->setTimeout($timeout);
+
+    //request
+    $obj = $connector->execSoapSimple($wsdl, $method, $params);
+
+    $this->lastRequest = $connector->__toString();
+    $this->lastStats = $connector->getLastStats();
+
+    if(defined('CoreConfig::TRACK_WS_STATS_ACTIVE') &&  //tracking for webservices is defined
+      CoreConfig::TRACK_WS_STATS_ACTIVE &&             //tracking is enabled
+
+      defined('CoreConfig::TRACK_WS_STATS_TIME') &&    //execution time to track defined
+      CoreConfig::TRACK_WS_STATS_TIME <= $this->lastStats['total_time'] && //normal execution time exceed
+
+      defined('CoreConfig::TRACK_WS_STATS_PATTERN') &&  //valid search pattern
+      (is_null(CoreConfig::TRACK_WS_STATS_PATTERN) ||    //search pattern is set to match everything
+        preg_match(CoreConfig::TRACK_WS_STATS_PATTERN, $wsdl) > 0 //webservice matches the pattern
+      )
+    ){
+      $data = array();
+      $data['request'] = $this->lastRequest;
+      $data['response'] = Util::objToStr($obj);
+      $data['namelookup'] = $this->lastStats['namelookup_time'];
+      $data['connect'] = $this->lastStats['connect_time'];
+      $data['execute'] = $this->lastStats['total_time'];
+      $data['error'] = $connector->getLastError();
+      $data['webservice'] = $wsdl;
+      MQueue::push(MQueue::TYPE_STATS_WS, $data);
+    }
+
+    if(!$obj){
+      $this->lastError = $connector->getLastError();
+      $this->lastErrorCode = $connector->getLastErrorCode();
+
+      throw new WSException($connector->__toString(), $data);
+    }else{
+      if(count($obj) == 1){
+        foreach($obj as $prop) {
+          return $prop;
+        }
+      }
+    }
+
+    return $obj;
+  }
+
+  /**
+   * execute a soap call
+   *
+   * @param $wsdl
+   * @param $method
+   * @param $params
    * @param null $headers
    * @param null $options
    * @param null $setup

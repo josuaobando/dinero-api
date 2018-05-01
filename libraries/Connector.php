@@ -355,6 +355,84 @@ class Connector
   }
 
   /**
+   * execute a simple soap call
+   *
+   * @param string $wsdl
+   * @param string $method
+   * @param array $params
+   *
+   * @return null|object
+   *
+   * @throws WSException
+   */
+  public function execSoapSimple($wsdl, $method, $params)
+  {
+
+    //stats for the soap call
+    $this->lastStats = array();
+    $this->lastStats['namelookup_time'] = 0;
+    $this->lastStats['connect_time'] = 0;
+    $this->lastStats['total_time'] = 0;
+
+    $soapOptions = array();
+    $soapOptions['trace'] = 1;
+    $soapOptions['soap_version'] = SOAP_1_1;
+    $soapOptions['compression'] = SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP;
+
+    if($this->username && $this->password)
+    {
+      $soapOptions['login'] = $this->username;
+      $soapOptions['password'] = $this->password;
+    }
+
+    /**
+     * we set the connection timeout
+     */
+    $soapOptions['connection_timeout'] = $this->timeoutOnConnect;
+    /**
+     * for soap calls, the execution timeout is controlled by the default_socket_timeout in the php.ini
+     * normally set in 60 secs
+     */
+    $previousTimeout = ini_set('default_socket_timeout', $this->timeout);
+
+    //defaults
+    $location = null;
+
+    $this->lastError = 'Ok';
+    //TODO get the real http code after execute the calls
+    $this->lastErrorCode = 200;
+    try
+    {
+      $connectStartTime = Util::getStartTime();
+      $client = new SoapClient($wsdl, $soapOptions);
+      $this->lastStats['connect_time'] = Util::calculateProcessTime($connectStartTime);
+
+      $client->__setLocation($location);
+      $execStartTime = Util::getStartTime();
+
+      $this->lastContent = $client->$method($params);
+    }
+    catch(SoapFault $ex)
+    {
+      $this->lastError = $ex->getMessage();
+      $this->lastContent = null;
+      $this->lastErrorCode = 0;
+    }
+    $this->lastStats['total_time'] = Util::calculateProcessTime($execStartTime);
+
+    // If the timeout was overwritten before, restore it.
+    if($previousTimeout !== false && $previousTimeout != $this->timeout)
+    {
+      ini_set('default_socket_timeout', $previousTimeout);
+    }
+
+    $this->lastUrl = $wsdl." ($method)";
+    $this->postParams = $params;
+
+    return $this->lastContent;
+  }
+
+  /**
    * execute a soap call
    *
    * @param string $wsdl
