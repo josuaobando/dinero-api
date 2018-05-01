@@ -30,6 +30,26 @@ class TblSystem extends Db
   /**
    * get agencies
    *
+   * @param int $agencyId
+   *
+   * @return array
+   */
+  public function getAgency($agencyId)
+  {
+    $sql = "CALL spAgency('{agencyId}')";
+
+    $params = array();
+    $params['agencyId'] = $agencyId;
+
+    $rows = array();
+    $this->executeQuery($sql, $rows, $params);
+
+    return $rows;
+  }
+
+  /**
+   * get agencies
+   *
    * @return array
    */
   public function getAgencies()
@@ -38,7 +58,7 @@ class TblSystem extends Db
 
     $params = array();
     $rows = array();
-    $this->executeQuery($sql, $rows, $params);
+    $this->executeSingleQuery($sql, $rows, $params);
 
     return $rows;
   }

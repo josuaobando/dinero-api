@@ -82,6 +82,37 @@ class TblCustomer extends Db
   }
 
   /**
+   * update customer information
+   *
+   * @param $agencyId
+   * @param $customerId
+   * @param $firstName
+   * @param $lastName
+   * @param $countryId
+   * @param $countryStateId
+   * @param $phone
+   * @param int $isAPI
+   *
+   * @return int
+   */
+  public function update($agencyId, $customerId, $firstName, $lastName, $countryId, $countryStateId, $phone, $isAPI = 0)
+  {
+    $sql = "CALL spCustomer_Update('{agencyId}', '{customerId}', '{firstName}', '{lastName}', '{countryId}', '{countryStateId}', '{phone}', '{isAPI}')";
+
+    $params = array();
+    $params['agencyId'] = $agencyId;
+    $params['customerId'] = $customerId;
+    $params['firstName'] = $firstName;
+    $params['lastName'] = $lastName;
+    $params['countryId'] = $countryId;
+    $params['countryStateId'] = $countryStateId;
+    $params['phone'] = $phone;
+    $params['isAPI'] = $isAPI;
+
+    return $this->executeUpdate($sql, $params);
+  }
+
+  /**
    * @param $companyId
    * @param $agencyTypeId
    * @param $firstName

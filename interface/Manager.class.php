@@ -62,6 +62,7 @@ class Manager
     return $availableList[$selectedId];
   }
 
+
   /**
    * start and create a new transaction
    *
@@ -179,11 +180,10 @@ class Manager
    * start and create a new API transaction
    *
    * @param WSRequest $wsRequest
-   * @param $transactionType
+   * @param int $transactionType
    *
-   * @return \WSResponseOk
-   * @throws \InvalidParameterException
-   * @throws \InvalidStateException
+   * @return WSResponse
+   * @throws InvalidStateException|P2PException
    */
   public function startAPITransaction($wsRequest, $transactionType)
   {
@@ -198,10 +198,10 @@ class Manager
     $customer->validateFromRequest($this->account, $wsRequest);
 
     //create transaction object
-    $transaction = Session::getTransactionAPI();
+    $transaction = Session::getTransaction();
     $transaction->setAccountId($this->account->getAccountId());
     $transaction->setAgencyTypeId($customer->getAgencyTypeId());
-    $transaction->setAgencyId($customer->getAgencyId());
+    $transaction->setAgencyId(CoreConfig::AGENCY_ID_SATURNO);
     $transaction->setCustomerId($customer->getCustomerId());
     $transaction->setTransactionTypeId($transactionType);
     $transaction->setTransactionStatusId($transactionStatus);
@@ -214,19 +214,25 @@ class Manager
     $limit = new Limit($transaction, $customer);
     $limit->evaluate();
 
-    $transaction->getName();
+    $transactionAPI = Session::getTransactionAPI();
+    $person = $transactionAPI->getName();
+    if(!$person || !$person->getPersonId()){
+      throw new P2PException("The Customer is linked to another Agency (Merchant)");
+    }
 
-    //------------------begin validation
-    $person = new Person();
+    $customer->setAgencyId(CoreConfig::AGENCY_ID_SATURNO);
+    $customer->setIsAPI(1);
+    $customer->update();
 
-    //------------------end validation
-
+    //block person
+    $person->block();
     //sets personId
     $transaction->setPersonId($person->getPersonId());
 
     //create transaction after the validation of the data
     $transaction->create();
     if($transaction->getTransactionId()){
+
       $wsResponse = new WSResponseOk();
       $wsResponse->addElement('transaction', $transaction);
       if($transactionType == Transaction::TYPE_RECEIVER){
@@ -236,6 +242,7 @@ class Manager
         $wsResponse->addElement('sender', $person);
         $wsResponse->addElement('receiver', $customer);
       }
+
     }else{
       throw new InvalidStateException("The Transaction not has been created. Please, try later!");
     }
@@ -298,7 +305,7 @@ class Manager
     $transaction = Session::getTransaction();
     $transaction->restore($transactionId);
     if(!$transaction->getTransactionId()){
-      throw new InvalidStateException("this transaction not exist or not can be loaded: " . $transactionId);
+      throw new InvalidStateException("this transaction not exist or not can be loaded: ".$transactionId);
     }
 
     $wsRequest->putParam('type', $transaction->getAgencyTypeId());
@@ -308,7 +315,7 @@ class Manager
     //$customer->validateFromRequest($this->account, $wsRequest);
 
     if($transaction->getTransactionStatusId() != Transaction::STATUS_REQUESTED && $transaction->getTransactionStatusId() != Transaction::STATUS_REJECTED){
-      throw new InvalidStateException("this transaction cannot be confirmed since the current status is: " . $transaction->getTransactionStatus());
+      throw new InvalidStateException("this transaction cannot be confirmed since the current status is: ".$transaction->getTransactionStatus());
     }
 
     //set new values

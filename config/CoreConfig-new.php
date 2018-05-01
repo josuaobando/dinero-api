@@ -197,6 +197,13 @@ class CoreConfig
    * Saturno API
    */
   const SATURNO_ACTIVE = false;
+
+  /**
+   * Agencies
+   */
+  const AGENCY_ID_SATURNO = 100;
+
+
 }
 
 ?>

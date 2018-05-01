@@ -186,6 +186,14 @@ class Transaction
   }
 
   /**
+   * @return string
+   */
+  public function getUsername()
+  {
+    return $this->username;
+  }
+
+  /**
    * @return int
    */
   public function getAmount()

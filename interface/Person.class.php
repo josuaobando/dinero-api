@@ -31,6 +31,8 @@ class Person
   private $phone;
   private $nameId;
 
+  private $personListId;
+
   /**
    * TblPerson reference
    *
@@ -163,7 +165,7 @@ class Person
    */
   public function getFullName()
   {
-    return $this->firstName . ' ' . $this->lastName;
+    return $this->firstName.' '.$this->lastName;
   }
 
   /**
@@ -173,7 +175,7 @@ class Person
    */
   public function getFrom()
   {
-    return $this->countryName . ", " . $this->stateName;
+    return $this->countryName.", ".$this->stateName;
   }
 
   /**
@@ -409,6 +411,14 @@ class Person
   }
 
   /**
+   * @param mixed $personListId
+   */
+  public function setPersonLisId($personListId)
+  {
+    $this->personListId = $personListId;
+  }
+
+  /**
    * new instance of receiver
    *
    * @param int $personId
@@ -446,9 +456,13 @@ class Person
     }
   }
 
-  public function validate(){
-
-    return true;
+  /**
+   * @return bool
+   */
+  public function add()
+  {
+    $this->personId = $this->tblPerson->add($this->personListId, $this->nameId, $this->personalId, $this->typeId, $this->expirationDateId, $this->name, $this->lastName, $this->countryId, $this->stateId, $this->address, $this->city, $this->birthDate, $this->maritalStatus, $this->gender, $this->profession, $this->phone);
+    return $this->personId > 0;
   }
 
   /**

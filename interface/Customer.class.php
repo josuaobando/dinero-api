@@ -5,18 +5,6 @@
  */
 class Customer
 {
-  private $customerId;
-  private $agencyId;
-  private $agencyTypeId;
-  private $firstName;
-  private $lastName;
-  private $country;
-  private $countryId;
-  private $countryName;
-  private $state;
-  private $stateId;
-  private $stateName;
-  private $phone;
 
   /**
    * TblCustomer reference
@@ -31,6 +19,248 @@ class Customer
    * @var TblUtil
    */
   private $tblUtil;
+
+  private $customerId;
+  private $agencyId;
+  private $agencyTypeId;
+  private $firstName;
+  private $lastName;
+  private $country;
+  private $countryId;
+  private $countryName;
+  private $state;
+  private $stateId;
+  private $stateName;
+  private $phone;
+  private $isAPI;
+
+  /**
+   * @return int
+   */
+  public function getCustomerId()
+  {
+    return $this->customerId;
+  }
+
+  /**
+   * @return int
+   */
+  public function getAgencyId()
+  {
+    return $this->agencyId;
+  }
+
+  /**
+   * @return int
+   */
+  public function getAgencyTypeId()
+  {
+    return $this->agencyTypeId;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getFirstName()
+  {
+    return $this->firstName;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getLastName()
+  {
+    return $this->lastName;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getCountry()
+  {
+    return $this->country;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getCountryId()
+  {
+    return $this->countryId;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getCountryName()
+  {
+    return $this->countryName;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getState()
+  {
+    return $this->state;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getStateId()
+  {
+    return $this->stateId;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getStateName()
+  {
+    return $this->stateName;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getPhone()
+  {
+    return $this->phone;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getIsAPI()
+  {
+    return $this->isAPI;
+  }
+
+  /**
+   * get the customer
+   *
+   * @return string
+   */
+  public function getCustomer()
+  {
+    return $this->firstName." ".$this->lastName;
+  }
+
+  /**
+   * get the from representation
+   *
+   * @return string
+   */
+  public function getFrom()
+  {
+    return $this->countryName.", ".$this->stateName;
+  }
+
+  /**
+   * @param mixed $customerId
+   */
+  public function setCustomerId($customerId)
+  {
+    $this->customerId = $customerId;
+  }
+
+  /**
+   * @param mixed $agencyId
+   */
+  public function setAgencyId($agencyId)
+  {
+    $this->agencyId = $agencyId;
+  }
+
+  /**
+   * @param mixed $agencyTypeId
+   */
+  public function setAgencyTypeId($agencyTypeId)
+  {
+    $this->agencyTypeId = $agencyTypeId;
+  }
+
+  /**
+   * @param mixed $firstName
+   */
+  public function setFirstName($firstName)
+  {
+    $this->firstName = $firstName;
+  }
+
+  /**
+   * @param mixed $lastName
+   */
+  public function setLastName($lastName)
+  {
+    $this->lastName = $lastName;
+  }
+
+  /**
+   * @param mixed $country
+   */
+  public function setCountry($country)
+  {
+    $this->country = $country;
+  }
+
+  /**
+   * @param mixed $countryId
+   */
+  public function setCountryId($countryId)
+  {
+    $this->countryId = $countryId;
+  }
+
+  /**
+   * @param mixed $countryName
+   */
+  public function setCountryName($countryName)
+  {
+    $this->countryName = $countryName;
+  }
+
+  /**
+   * @param mixed $state
+   */
+  public function setState($state)
+  {
+    $this->state = $state;
+  }
+
+  /**
+   * @param mixed $stateId
+   */
+  public function setStateId($stateId)
+  {
+    $this->stateId = $stateId;
+  }
+
+  /**
+   * @param mixed $stateName
+   */
+  public function setStateName($stateName)
+  {
+    $this->stateName = $stateName;
+  }
+
+  /**
+   * @param mixed $phone
+   */
+  public function setPhone($phone)
+  {
+    $this->phone = $phone;
+  }
+
+  /**
+   * @param mixed $isAPI
+   */
+  public function setIsAPI($isAPI)
+  {
+    $this->isAPI = $isAPI;
+  }
 
   /**
    * new instance of person
@@ -122,7 +352,6 @@ class Customer
       }
     }
 
-
     if($this->customerId){
       //add log if customer has similar name
       Log::custom('Similar', "Request: $customerNameRequest Register: $customerNameSimilar Percent: $maxPercent");
@@ -134,6 +363,16 @@ class Customer
       $this->agencyId = $customerData['AgencyId'];
     }
 
+  }
+
+  /**
+   * update the customer
+   *
+   * @return int
+   */
+  public function update()
+  {
+    return $this->tblCustomer->update($this->agencyId, $this->customerId, $this->firstName, $this->lastName, $this->countryId, $this->stateId, $this->phone, $this->isAPI);
   }
 
   /**
@@ -168,50 +407,6 @@ class Customer
       }
     }
 
-  }
-
-  /**
-   * @return int
-   */
-  public function getCustomerId()
-  {
-    return $this->customerId;
-  }
-
-  /**
-   * @return int
-   */
-  public function getAgencyId()
-  {
-    return $this->agencyId;
-  }
-
-  /**
-   * @return int
-   */
-  public function getAgencyTypeId()
-  {
-    return $this->agencyTypeId;
-  }
-
-  /**
-   * get the customer
-   *
-   * @return string
-   */
-  public function getCustomer()
-  {
-    return $this->firstName . " " . $this->lastName;
-  }
-
-  /**
-   * get the from representation
-   *
-   * @return string
-   */
-  public function getFrom()
-  {
-    return $this->countryName . ", " . $this->stateName;
   }
 
   /**
