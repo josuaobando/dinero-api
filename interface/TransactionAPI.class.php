@@ -17,7 +17,52 @@ class TransactionAPI extends WS
    */
   private $agency;
 
-  public $apiTransactionId;
+  /**
+   * @var int
+   */
+  private $apiTransactionId;
+
+  /**
+   * @var string
+   */
+  private $apiMessage;
+
+  /**
+   * @var string
+   */
+  private $apiStatus;
+
+  /**
+   * @return int
+   */
+  public function getApiTransactionId()
+  {
+    return $this->apiTransactionId;
+  }
+
+  /**
+   * @param int $apiTransactionId
+   */
+  public function setApiTransactionId($apiTransactionId)
+  {
+    $this->apiTransactionId = $apiTransactionId;
+  }
+
+  /**
+   * @return string
+   */
+  public function getApiMessage()
+  {
+    return $this->apiMessage;
+  }
+
+  /**
+   * @return string
+   */
+  public function getApiStatus()
+  {
+    return $this->apiStatus;
+  }
 
   /**
    * new Transaction instance
@@ -50,11 +95,11 @@ class TransactionAPI extends WS
       $params['amount'] = $transaction->getAmount();
 
       $url = $this->agency['Setting_URL'];
-      $response = $this->execSoapSimple($url, 'ObtenerNombre', $params);
+      $response = $this->execSoapSimple($url, 'ObtenerNombre', $params, array('uri' => 'http://WS/', 'soapaction' => ''));
       if($response && $response instanceof stdClass){
 
-        $status = $response->status;
-        if($status == self::STATUS_API_REQUESTED){
+        $this->apiStatus = strtolower($response->status);
+        if($this->apiStatus == self::STATUS_API_REQUESTED){
 
           $name = $response->recibe;
           $nameId = $response->nameId;
@@ -62,7 +107,7 @@ class TransactionAPI extends WS
           $person = new Person();
           $person->setCountry('CR');
           $person->setCountryId(52);
-          $person->setCountryName('Costa Rica ');
+          $person->setCountryName('Costa Rica');
           $person->setState('SJ');
           $person->setStateId(877);
           $person->setStateName('San José');
@@ -86,19 +131,20 @@ class TransactionAPI extends WS
 
           $this->apiTransactionId = $response->trans;
           return $person;
-        }elseif($status == self::STATUS_API_ERROR){
+        }elseif($this->apiStatus == self::STATUS_API_ERROR){
           try{
-            $message = $response->comentario;
-            if(strpos(strtolower($message), 'no names available')){
+            $this->apiMessage = $response->comentario;
+            if(strpos(strtolower($this->apiMessage), 'no names available')){
               $subject = "There are not names available";
               $body = "There are not names available in agency Saturno";
               MailManager::sendEmail(MailManager::getRecipients(), $subject, $body);
             }
-            Log::custom('Saturno', $message);
           }catch(WSException $ex){
             ExceptionManager::handleException($ex);
           }
         }
+
+        Log::custom('Saturno', $this->apiMessage . "\n" . $this->getLastRequest());
       }
 
     }catch(Exception $ex){

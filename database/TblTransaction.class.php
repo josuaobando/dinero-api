@@ -40,12 +40,13 @@ class TblTransaction extends Db
    * @param int $agencyId
    * @param int $accountId
    * @param string $reference
+   * @param int $apiTransactionId
    *
    * @return int
    */
-  public function insert($transactionTypeId, $transactionStatusId, $agencyTypeId, $customerId, $personId, $username, $amount, $fee, $agencyId, $accountId, $reference)
+  public function insert($transactionTypeId, $transactionStatusId, $agencyTypeId, $customerId, $personId, $username, $amount, $fee, $agencyId, $accountId, $reference, $apiTransactionId)
   {
-    $sql = "CALL transaction_insert('{transactionTypeId}', '{transactionStatusId}', '{agencyTypeId}', '{agencyId}', '{customerId}', '{personId}', '{username}', '{amount}', '{fee}', '{accountId}', '{reference}', @TransactionId)";
+    $sql = "CALL spTransaction_Insert('{transactionTypeId}', '{transactionStatusId}', '{agencyTypeId}', '{agencyId}', '{customerId}', '{personId}', '{username}', '{amount}', '{fee}', '{accountId}', '{reference}', '{apiTransactionId}', @TransactionId)";
 
     $params = array();
     $params['transactionTypeId'] = $transactionTypeId;
@@ -59,6 +60,7 @@ class TblTransaction extends Db
     $params['fee'] = $fee;
     $params['accountId'] = $accountId;
     $params['reference'] = $reference;
+    $params['apiTransactionId'] = $apiTransactionId;
 
     $this->setOutputParams(array('TransactionId'));
     $this->executeUpdate($sql, $params);
@@ -85,9 +87,9 @@ class TblTransaction extends Db
    *
    * @return int
    */
-  public function update($transactionId, $transactionStatusId, $customerId, $personId, $amount, $fee, $agencyId, $accountId, $controlNumber, $reason, $note)
+  public function update($transactionId, $transactionStatusId, $customerId, $personId, $amount, $fee, $agencyId, $accountId, $controlNumber, $reason, $note, $apiTransactionId)
   {
-    $sql = "CALL transaction_update('{transactionId}', '{transactionStatusId}', '{customerId}', '{personId}', '{amount}', '{fee}', '{agencyId}', '{accountId}', '{controlNumber}', '{reason}', '{note}')";
+    $sql = "CALL spTransaction_Update('{transactionId}', '{transactionStatusId}', '{customerId}', '{personId}', '{amount}', '{fee}', '{agencyId}', '{accountId}', '{controlNumber}', '{reason}', '{note}', '{apiTransactionId}')";
 
     $params = array();
     $params['transactionId'] = $transactionId;
@@ -101,6 +103,7 @@ class TblTransaction extends Db
     $params['controlNumber'] = $controlNumber;
     $params['reason'] = $reason;
     $params['note'] = $note;
+    $params['apiTransactionId'] = $apiTransactionId;
 
     return $this->executeUpdate($sql, $params);
   }

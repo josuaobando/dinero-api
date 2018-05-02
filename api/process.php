@@ -67,7 +67,6 @@ function name($wsRequest)
  * @return WSResponse
  */
 function sender($wsRequest)
-
 {
   try{
     $username = trim($wsRequest->requireNotNullOrEmpty('merchant_user'));

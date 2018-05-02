@@ -493,7 +493,7 @@ class Stickiness
             break;
           default:
             ExceptionManager::handleException(new P2PException("Invalid Response Code >> Code: $resultCode  Message: $resultCodeMessage : (" . __FUNCTION__ . ")"));
-            throw new InvalidStateException("Due to external factors, we cannot give this Customer a Person.");
+            throw new InvalidStateException("Due to external factors, we cannot give this Customer a Name.");
         }
       }else{
         throw new InvalidStateException("The Customer cannot be verify.");

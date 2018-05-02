@@ -62,7 +62,7 @@ class TblCustomer extends Db
    */
   public function validate($companyId, $accountId, $agencyTypeId, $firstName, $lastName, $countryId, $countryStateId, $phone)
   {
-    $sql = "CALL customer_validate('{companyId}', '{accountId}', '{agencyTypeId}', '{firstName}', '{lastName}', '{countryId}', '{countryStateId}', '{phone}', @CustomerId, @AgencyId)";
+    $sql = "CALL spCustomer_Validate('{companyId}', '{accountId}', '{agencyTypeId}', '{firstName}', '{lastName}', '{countryId}', '{countryStateId}', '{phone}', @CustomerId, @AgencyId)";
 
     $params = array();
     $params['companyId'] = $companyId;

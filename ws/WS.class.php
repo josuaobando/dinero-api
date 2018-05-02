@@ -284,7 +284,7 @@ class WS
    *
    * @throws WSException
    */
-  public function execSoapSimple($wsdl, $method, $params)
+  public function execSoapSimple($wsdl, $method, $params, $options = null)
   {
     $connector = new Connector();
 
@@ -300,7 +300,7 @@ class WS
     $connector->setTimeout($timeout);
 
     //request
-    $obj = $connector->execSoapSimple($wsdl, $method, $params);
+    $obj = $connector->execSoapSimple($wsdl, $method, $params, $options);
 
     $this->lastRequest = $connector->__toString();
     $this->lastStats = $connector->getLastStats();

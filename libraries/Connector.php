@@ -365,7 +365,7 @@ class Connector
    *
    * @throws WSException
    */
-  public function execSoapSimple($wsdl, $method, $params)
+  public function execSoapSimple($wsdl, $method, $params, $options = null)
   {
 
     //stats for the soap call
@@ -383,6 +383,14 @@ class Connector
     {
       $soapOptions['login'] = $this->username;
       $soapOptions['password'] = $this->password;
+    }
+
+    if($options && is_array($options))
+    {
+      foreach($options as $opKey => $op)
+      {
+        $soapOptions[$opKey] = $op;
+      }
     }
 
     /**

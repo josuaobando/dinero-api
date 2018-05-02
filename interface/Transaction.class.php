@@ -87,6 +87,11 @@ class Transaction
   private $reference;
 
   /**
+   * @var string
+   */
+  private $apiTransactionId;
+
+  /**
    * Transaction Type
    */
   const TYPE_RECEIVER = 1;
@@ -218,6 +223,14 @@ class Transaction
   }
 
   /**
+   * @return int
+   */
+  public function getApiTransactionId()
+  {
+    return $this->apiTransactionId;
+  }
+
+  /**
    * @param int $transactionTypeId
    *
    * @see Transaction::TYPE_RECEIVER, Transaction::TYPE_SENDER
@@ -344,11 +357,19 @@ class Transaction
   }
 
   /**
+   * @param string $apiTransactionId
+   */
+  public function setApiTransactionId($apiTransactionId)
+  {
+    $this->apiTransactionId = $apiTransactionId;
+  }
+
+  /**
    * create new transaction and load the Transaction ID
    */
   public function create()
   {
-    $this->transactionId = $this->tblTransaction->insert($this->transactionTypeId, $this->transactionStatusId, $this->agencyTypeId, $this->customerId, $this->personId, $this->username, $this->amount, $this->fee, $this->agencyId, $this->accountId, $this->reference);
+    $this->transactionId = $this->tblTransaction->insert($this->transactionTypeId, $this->transactionStatusId, $this->agencyTypeId, $this->customerId, $this->personId, $this->username, $this->amount, $this->fee, $this->agencyId, $this->accountId, $this->reference, $this->apiTransactionId);
   }
 
   /**
@@ -383,6 +404,7 @@ class Transaction
     $this->reason = $transactionData['Reason'];
     $this->note = $transactionData['Note'];
     $this->reference = $transactionData['Reference'];
+    $this->apiTransactionId = $transactionData['ApiTransactionId'];
   }
 
   /**

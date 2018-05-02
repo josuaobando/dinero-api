@@ -104,41 +104,26 @@ class Manager
 
     //------------------begin validation
     //check stickiness
-    $isRegister = true;
-    $person = new Person();
     $stickiness = new Stickiness();
-    for($i = 1; $i <= 2; $i++){
-      $stickiness->restoreByCustomerId($customer->getCustomerId());
+    $stickiness->restoreByCustomerId($customer->getCustomerId());
 
-      //get person id from stickiness
-      $personId = $stickiness->getPersonId();
-      if(!$personId || !$isRegister){
-        //select and block the person for following transactions
-        $personSelected = $this->getPersonAvailable($amount, $customer->getAgencyTypeId(), $customer->getAgencyId());
-        $personId = $personSelected['Person_Id'];
-      }
-
-      //create person object
-      $person = new Person($personId);
-      //Check to API Controller and Register Stickiness
-      $stickiness->setCustomerId($customer->getCustomerId());
-      $stickiness->setCustomer($customer->getCustomer());
-      $stickiness->setPersonId($person->getPersonId());
-      $stickiness->setPersonalId($person->getPersonalId());
-      $stickiness->setPerson($person->getName());
-      $isRegister = $stickiness->register();
-
-      //if can no register, block data and try again
-      if(!$isRegister){
-        $person->inactive();
-      }else{
-        break;
-      }
+    //get person id from stickiness
+    $personId = $stickiness->getPersonId();
+    if(!$personId){
+      //select and block the person for following transactions
+      $personSelected = $this->getPersonAvailable($amount, $customer->getAgencyTypeId(), $customer->getAgencyId());
+      $personId = $personSelected['Person_Id'];
     }
 
-    if(!$isRegister){
-      throw new InvalidStateException("Due to external factors, we cannot give this Customer a Person.");
-    }
+    //create person object
+    $person = new Person($personId);
+    //Check to API Controller and Register Stickiness
+    $stickiness->setCustomerId($customer->getCustomerId());
+    $stickiness->setCustomer($customer->getCustomer());
+    $stickiness->setPersonId($person->getPersonId());
+    $stickiness->setPersonalId($person->getPersonalId());
+    $stickiness->setPerson($person->getName());
+    $stickiness->register();
     //------------------end validation
 
     //block person
@@ -193,31 +178,33 @@ class Manager
 
     $transactionStatus = ($transactionType == Transaction::TYPE_RECEIVER) ? Transaction::STATUS_REQUESTED : Transaction::STATUS_SUBMITTED;
 
-    //create customer object
-    $customer = Session::getCustomer();
-    $customer->validateFromRequest($this->account, $wsRequest);
-
     //create transaction object
     $transaction = Session::getTransaction();
-    $transaction->setAccountId($this->account->getAccountId());
-    $transaction->setAgencyTypeId($customer->getAgencyTypeId());
-    $transaction->setAgencyId(CoreConfig::AGENCY_ID_SATURNO);
-    $transaction->setCustomerId($customer->getCustomerId());
-    $transaction->setTransactionTypeId($transactionType);
-    $transaction->setTransactionStatusId($transactionStatus);
-    $transaction->setReference($reference);
-    $transaction->setUsername($username);
-    $transaction->setAmount($amount);
-    $transaction->setFee(0);
+    //create customer object
+    $customer = Session::getCustomer();
+    if(!$customer->getCustomerId()){
+      $customer->validateFromRequest($this->account, $wsRequest);
 
-    //evaluate limits
-    $limit = new Limit($transaction, $customer);
-    $limit->evaluate();
+      $transaction->setAccountId($this->account->getAccountId());
+      $transaction->setAgencyTypeId($customer->getAgencyTypeId());
+      $transaction->setAgencyId(CoreConfig::AGENCY_ID_SATURNO);
+      $transaction->setCustomerId($customer->getCustomerId());
+      $transaction->setTransactionTypeId($transactionType);
+      $transaction->setTransactionStatusId($transactionStatus);
+      $transaction->setReference($reference);
+      $transaction->setUsername($username);
+      $transaction->setAmount($amount);
+      $transaction->setFee(0);
 
-    $transactionAPI = Session::getTransactionAPI();
+      //evaluate limits
+      $limit = new Limit($transaction, $customer);
+      $limit->evaluate();
+    }
+
+    $transactionAPI = new TransactionAPI();
     $person = $transactionAPI->getName();
     if(!$person || !$person->getPersonId()){
-      throw new P2PException("The Customer is linked to another Agency (Merchant)");
+      throw new P2PException("Due to external factors, we cannot give this Customer a name.");
     }
 
     $customer->setAgencyId(CoreConfig::AGENCY_ID_SATURNO);
@@ -228,6 +215,7 @@ class Manager
     $person->block();
     //sets personId
     $transaction->setPersonId($person->getPersonId());
+    $transaction->setApiTransactionId($transactionAPI->getApiTransactionId());
 
     //create transaction after the validation of the data
     $transaction->create();

@@ -42,7 +42,7 @@ class TblSystem extends Db
     $params['agencyId'] = $agencyId;
 
     $rows = array();
-    $this->executeQuery($sql, $rows, $params);
+    $this->executeSingleQuery($sql, $rows, $params);
 
     return $rows;
   }
@@ -58,7 +58,7 @@ class TblSystem extends Db
 
     $params = array();
     $rows = array();
-    $this->executeSingleQuery($sql, $rows, $params);
+    $this->executeQuery($sql, $rows, $params);
 
     return $rows;
   }
