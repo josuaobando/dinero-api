@@ -47,7 +47,8 @@ class TblPerson extends Db
    *
    * @return mixed
    */
-  public function add($personListId, $nameId, $personalId, $typeId, $expirationDateId, $name, $surnames, $countryId, $countryStateId, $address, $city, $birthDate, $maritalStatus, $gender, $profession, $phone){
+  public function add($personListId, $nameId, $personalId, $typeId, $expirationDateId, $name, $surnames, $countryId, $countryStateId, $address, $city, $birthDate, $maritalStatus, $gender, $profession, $phone)
+  {
     $sql = "CALL spPerson_Add('{personListId}', '{nameId}', '{personalId}', '{typeId}', '{expirationDateId}', '{name}', '{surnames}', '{countryId}', '{countryStateId}', '{address}', '{city}', '{birthDate}', '{maritalStatus}', '{gender}', '{profession}', '{phone}', @PersonId)";
 
     $params = array();

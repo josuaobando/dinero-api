@@ -305,7 +305,7 @@ class Manager
     $transaction = Session::getTransaction();
     $transaction->restore($transactionId);
     if(!$transaction->getTransactionId()){
-      throw new InvalidStateException("this transaction not exist or not can be loaded: ".$transactionId);
+      throw new InvalidStateException("this transaction not exist or not can be loaded: " . $transactionId);
     }
 
     $wsRequest->putParam('type', $transaction->getAgencyTypeId());
@@ -315,7 +315,7 @@ class Manager
     //$customer->validateFromRequest($this->account, $wsRequest);
 
     if($transaction->getTransactionStatusId() != Transaction::STATUS_REQUESTED && $transaction->getTransactionStatusId() != Transaction::STATUS_REJECTED){
-      throw new InvalidStateException("this transaction cannot be confirmed since the current status is: ".$transaction->getTransactionStatus());
+      throw new InvalidStateException("this transaction cannot be confirmed since the current status is: " . $transaction->getTransactionStatus());
     }
 
     //set new values

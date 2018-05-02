@@ -334,7 +334,7 @@ class WS
       throw new WSException($connector->__toString(), $data);
     }else{
       if(count($obj) == 1){
-        foreach($obj as $prop) {
+        foreach($obj as $prop){
           return $prop;
         }
       }

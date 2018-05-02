@@ -165,7 +165,7 @@ class Person
    */
   public function getFullName()
   {
-    return $this->firstName.' '.$this->lastName;
+    return $this->firstName . ' ' . $this->lastName;
   }
 
   /**
@@ -175,7 +175,7 @@ class Person
    */
   public function getFrom()
   {
-    return $this->countryName.", ".$this->stateName;
+    return $this->countryName . ", " . $this->stateName;
   }
 
   /**

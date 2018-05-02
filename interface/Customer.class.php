@@ -145,7 +145,7 @@ class Customer
    */
   public function getCustomer()
   {
-    return $this->firstName." ".$this->lastName;
+    return $this->firstName . " " . $this->lastName;
   }
 
   /**
@@ -155,7 +155,7 @@ class Customer
    */
   public function getFrom()
   {
-    return $this->countryName.", ".$this->stateName;
+    return $this->countryName . ", " . $this->stateName;
   }
 
   /**
