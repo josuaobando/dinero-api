@@ -105,6 +105,7 @@ class TransactionAPI extends WS
           $nameId = $response->nameId;
 
           $person = new Person();
+          $person->setPersonLisId(100);
           $person->setCountry('CR');
           $person->setCountryId(52);
           $person->setCountryName('Costa Rica');

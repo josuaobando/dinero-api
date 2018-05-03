@@ -425,10 +425,11 @@ class Person
    */
   public function __construct($personId = null)
   {
+    $this->tblPerson = TblPerson::getInstance();
+
     if($personId){
       $this->personId = $personId;
 
-      $this->tblPerson = TblPerson::getInstance();
       $personData = $this->tblPerson->getPerson($personId);
 
       $this->country = $personData['Country'];
