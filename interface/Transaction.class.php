@@ -183,6 +183,14 @@ class Transaction
   }
 
   /**
+   * @return string
+   */
+  public function getControlNumber()
+  {
+    return $this->controlNumber;
+  }
+
+  /**
    * @return int
    */
   public function getPersonId()
@@ -378,7 +386,7 @@ class Transaction
   public function update()
   {
     $this->validateControlNumber();
-    return $this->tblTransaction->update($this->transactionId, $this->transactionStatusId, $this->customerId, $this->personId, $this->amount, $this->fee, $this->agencyId, $this->accountId, $this->controlNumber, $this->reason, $this->note);
+    return $this->tblTransaction->update($this->transactionId, $this->transactionStatusId, $this->customerId, $this->personId, $this->amount, $this->fee, $this->agencyId, $this->accountId, $this->controlNumber, $this->reason, $this->note, $this->apiTransactionId);
   }
 
   /**

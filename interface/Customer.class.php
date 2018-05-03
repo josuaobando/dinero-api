@@ -263,12 +263,35 @@ class Customer
   }
 
   /**
-   * new instance of person
+   * new instance of customer
+   *
+   * Customer constructor.
+   *
+   * @param null $customerId
    */
-  public function __construct()
+  public function __construct($customerId = null)
   {
     $this->tblCustomer = TblCustomer::getInstance();
     $this->tblUtil = TblUtil::getInstance();
+
+    if($customerId){
+      $this->customerId = $customerId;
+
+      $personData = $this->tblCustomer->getCustomer($customerId);
+
+      $this->agencyId = $personData['Agency_Id'];
+      $this->agencyTypeId = $personData['AgencyType_Id'];
+      $this->firstName = $personData['FirstName'];
+      $this->lastName = $personData['LastName'];
+      $this->country = $personData['countryCode'];
+      $this->countryId = $personData['Country_Id'];
+      $this->countryName = $personData['countryName'];
+      $this->state = $personData['stateCode'];
+      $this->stateId = $personData['CountryState_Id'];
+      $this->stateName = $personData['stateName'];
+      $this->phone = $personData['Phone'];
+      $this->isAPI = $personData['IsAPI'];
+    }
   }
 
   /**

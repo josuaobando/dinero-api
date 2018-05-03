@@ -157,12 +157,107 @@ class TransactionAPI extends WS
 
   public function confirm()
   {
+    try{
 
+      $person = Session::getPerson();
+      $customer = Session::getCustomer();
+      $transaction = Session::getTransaction();
+
+      $params = array();
+      //credentials
+      $params['user'] = $this->agency['Setting_User'];
+      $params['password'] = $this->agency['Setting_Password'];
+      //transaction
+      $params['nameid'] = $person->getNameId();
+      $params['amount'] = $transaction->getAmount();
+      $params['controlnumber'] = $transaction->getControlNumber();
+      //customer
+      $params['sendername'] = $customer->getCustomer();
+      $params['sendercity'] = $customer->getState();
+      $params['senderstate'] = $customer->getState();
+      $params['sendercountry'] = $customer->getCountry();
+
+      $url = $this->agency['Setting_URL'];
+      $response = $this->execSoapSimple($url, 'SubmitDeposito', $params, array('uri' => 'http://WS/', 'soapaction' => ''));
+      if($response && $response instanceof stdClass){
+
+        $this->apiStatus = strtolower($response->status);
+        if($this->apiStatus == self::STATUS_API_PENDING){
+          $this->apiTransactionId = $response->trackId;
+          return true;
+        }elseif($this->apiStatus == self::STATUS_API_ERROR){
+          try{
+            $this->apiMessage = $response->comentario;
+            $subject = "Problem confirm Saturno transaction";
+            $body = $this->apiMessage . "\n\n" . $this->getLastRequest();
+            MailManager::sendEmail(MailManager::getRecipients(), $subject, $body);
+          }catch(WSException $ex){
+            ExceptionManager::handleException($ex);
+          }
+        }
+
+        Log::custom('Saturno', $this->apiMessage . "\n" . $this->getLastRequest());
+      }
+
+    }catch(Exception $ex){
+      ExceptionManager::handleException($ex);
+    }
+
+    return false;
   }
 
   public function getStatus()
   {
+    try{
 
+      //get transaction object
+      $transaction = Session::getTransaction();
+
+      $params = array();
+      //credentials
+      $params['user'] = $this->agency['Setting_User'];
+      $params['password'] = $this->agency['Setting_Password'];
+      //transaction
+      $params['trackid'] = $transaction->getApiTransactionId();
+
+      $url = $this->agency['Setting_URL'];
+      $response = $this->execSoapSimple($url, 'GetDeposito', $params, array('uri' => 'http://WS/', 'soapaction' => ''));
+      if($response && $response instanceof stdClass){
+
+        $this->apiStatus = strtolower($response->status);
+        switch($this->apiStatus){
+          case self::STATUS_API_APPROVED:
+            $transaction->setTransactionStatusId(Transaction::STATUS_APPROVED);
+            $transaction->setAmount($response->monto);
+            $transaction->setFee($response->cargo);
+            break;
+          case self::STATUS_API_REJECTED:
+            $transaction->setTransactionStatusId(Transaction::STATUS_REJECTED);
+            $transaction->setReason($response->comentario);
+            break;
+          case self::STATUS_API_PENDING:
+            $transaction->setTransactionStatusId(Transaction::STATUS_SUBMITTED);
+            break;
+          case self::STATUS_API_REQUESTED:
+            $transaction->setTransactionStatusId(Transaction::STATUS_REQUESTED);
+            break;
+          default:
+            return false;
+        }
+
+        //update transaction
+        if($transaction->getTransactionStatusId() == Transaction::STATUS_APPROVED || $transaction->getTransactionStatusId() == Transaction::STATUS_REJECTED){
+          $transaction->update();
+        }
+
+        Log::custom('Saturno', $this->apiMessage . "\n" . $this->getLastRequest());
+      }
+
+    }catch(Exception $ex){
+      ExceptionManager::handleException($ex);
+    }
+
+    return false;
   }
 
 }

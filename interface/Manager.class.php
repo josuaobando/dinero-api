@@ -187,7 +187,6 @@ class Manager
 
       $transaction->setAccountId($this->account->getAccountId());
       $transaction->setAgencyTypeId($customer->getAgencyTypeId());
-      $transaction->setAgencyId(CoreConfig::AGENCY_ID_SATURNO);
       $transaction->setCustomerId($customer->getCustomerId());
       $transaction->setTransactionTypeId($transactionType);
       $transaction->setTransactionStatusId($transactionStatus);
@@ -215,7 +214,7 @@ class Manager
     $person->block();
     //sets personId
     $transaction->setPersonId($person->getPersonId());
-    $transaction->setApiTransactionId($transactionAPI->getApiTransactionId());
+    $transaction->setAgencyId(CoreConfig::AGENCY_ID_SATURNO);
 
     //create transaction after the validation of the data
     $transaction->create();
@@ -303,7 +302,7 @@ class Manager
     //$customer->validateFromRequest($this->account, $wsRequest);
 
     if($transaction->getTransactionStatusId() != Transaction::STATUS_REQUESTED && $transaction->getTransactionStatusId() != Transaction::STATUS_REJECTED){
-      throw new InvalidStateException("this transaction cannot be confirmed since the current status is: " . $transaction->getTransactionStatus());
+      throw new InvalidStateException("Transaction cannot be confirmed since the current status is: " . $transaction->getTransactionStatus());
     }
 
     //set new values
@@ -314,11 +313,59 @@ class Manager
     $transaction->setTransactionStatusId(Transaction::STATUS_SUBMITTED);
     $transaction->setAccountId($this->account->getAccountId());
 
+    //confirm in Saturno
+    if($transaction->getAgencyId() == CoreConfig::AGENCY_ID_SATURNO){
+      Session::getCustomer($transaction->getCustomerId());
+      Session::getPerson($transaction->getPersonId());
+      $transactionAPI = new TransactionAPI();
+      $confirm = $transactionAPI->confirm();
+      if($confirm){
+        $transaction->setApiTransactionId($transactionAPI->getApiTransactionId());
+      }else{
+        throw new InvalidStateException("Transaction cannot be confirmed. Contact the administrator!");
+      }
+    }
+
     //update transaction after the validation of the data
     $transaction->update();
 
     $wsResponse = new WSResponseOk();
     $wsResponse->addElement('transaction', $transaction);
+
+    return $wsResponse;
+  }
+
+  /**
+   * get transaction information
+   *
+   * @param WSRequest $wsRequest
+   *
+   * @return WSResponseOk
+   *
+   * @throws InvalidStateException
+   */
+  public function information($wsRequest)
+  {
+    //transaction id
+    $transactionId = $wsRequest->requireNumericAndPositive('transaction_id');
+
+    $transaction = Session::getTransaction();
+    $transaction->restore($transactionId);
+
+    //get transaction status from Saturno
+    if($transaction->getAgencyId() == CoreConfig::AGENCY_ID_SATURNO){
+      $transactionAPI = new TransactionAPI();
+      $transactionAPI->getStatus();
+    }
+
+    $wsResponse = new WSResponseOk();
+    $wsResponse->addElement('transaction', $transaction);
+
+    // Payout (Sender) Information
+    if($transaction->getTransactionStatusId() == Transaction::STATUS_APPROVED && $transaction->getTransactionTypeId() == Transaction::TYPE_SENDER){
+      $person = new Person($transaction->getPersonId());
+      $wsResponse->addElement('sender', $person);
+    }
 
     return $wsResponse;
   }
@@ -354,6 +401,11 @@ class Manager
     $transaction->restore($transactionId);
     if(!$transaction->getTransactionId()){
       throw new InvalidStateException("The transaction [$transactionId] has not been restored, please check!");
+    }
+
+    //validation to Saturno transaction
+    if($transaction->getAgencyId() == CoreConfig::AGENCY_ID_SATURNO){
+      throw new InvalidStateException("Transaction cannot be Modify. Saturno Transaction!");
     }
 
     //get current status
@@ -419,6 +471,11 @@ class Manager
     $transaction->restore($transactionId);
     if(!$transaction->getTransactionId()){
       throw new InvalidStateException("The transaction [$transactionId] has not been restored, please check!");
+    }
+
+    //validation to Saturno transaction
+    if($transaction->getAgencyId() == CoreConfig::AGENCY_ID_SATURNO){
+      throw new InvalidStateException("Transaction cannot be Modify. Saturno Transaction!");
     }
 
     //select new person

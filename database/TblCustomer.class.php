@@ -35,7 +35,7 @@ class TblCustomer extends Db
    */
   public function getCustomer($customerId)
   {
-    $sql = "CALL customer('{customerId}')";
+    $sql = "CALL spCustomer('{customerId}')";
 
     $params = array();
     $params['customerId'] = $customerId;

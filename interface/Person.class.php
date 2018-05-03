@@ -441,6 +441,7 @@ class Person
       $this->available = $personData['Available'];
       $this->isActive = $personData['IsActive'];
       $this->name = $personData['Name'];
+      $this->nameId = $personData['Name_Id'];
       $this->firstName = $personData['Name'];
       $this->lastName = $personData['Surnames'];
 

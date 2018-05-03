@@ -125,7 +125,7 @@ function confirm($wsRequest)
 }
 
 /**
- * get a new name
+ * get transaction information
  *
  * @param WSRequest $wsRequest
  *
@@ -138,24 +138,12 @@ function information($wsRequest)
     $apiUser = trim($wsRequest->requireNotNullOrEmpty('api_user'));
     $apiPass = trim($wsRequest->requireNotNullOrEmpty('api_pass'));
 
-    //transaction id
-    $transactionId = $wsRequest->requireNumericAndPositive('transaction_id');
-
     $account = new Account($username);
     $account->authenticateAPI($apiUser, $apiPass);
-
     if($account->isAuthenticated()){
-      $transaction = new Transaction();
-      $transaction->restore($transactionId);
 
-      $wsResponse = new WSResponseOk();
-      $wsResponse->addElement('transaction', $transaction);
-
-      // Payout (Sender) Information
-      if($transaction->getTransactionStatusId() == Transaction::STATUS_APPROVED && $transaction->getTransactionTypeId() == Transaction::TYPE_SENDER){
-        $person = new Person($transaction->getPersonId());
-        $wsResponse->addElement('sender', $person);
-      }
+      $manager = new Manager($account);
+      $wsResponse = $manager->information($wsRequest);
 
     }else{
       $wsResponse = new WSResponseError("authentication failed");

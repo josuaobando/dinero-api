@@ -84,6 +84,7 @@ class TblTransaction extends Db
    * @param string $controlNumber
    * @param string $reason
    * @param string $note
+   * @param int $apiTransactionId
    *
    * @return int
    */

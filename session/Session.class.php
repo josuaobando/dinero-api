@@ -161,19 +161,41 @@ class Session
   /**
    * get customer
    *
+   * @param null $customerId
+   *
    * @return Customer
    */
-  public static function getCustomer()
+  public static function getCustomer($customerId = null)
   {
     $customerSession = self::getSessionObject(self::SID_CUSTOMER);
     if(!$customerSession){
-      $customer = new Customer();
+      $customer = new Customer($customerId);
       self::storeSessionObject(self::SID_CUSTOMER, $customer, true);
     }else{
       $customer = $customerSession;
     }
 
     return $customer;
+  }
+
+  /**
+   * get person
+   *
+   * @param null $personId
+   *
+   * @return Person
+   */
+  public static function getPerson($personId = null)
+  {
+    $personSession = self::getSessionObject(self::SID_PERSON);
+    if(!$personSession){
+      $person = new Person($personId);
+      self::storeSessionObject(self::SID_PERSON, $person, true);
+    }else{
+      $person = $personSession;
+    }
+
+    return $person;
   }
 
 }

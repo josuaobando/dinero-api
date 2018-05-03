@@ -85,7 +85,7 @@ class TblPerson extends Db
    */
   public function getPerson($personId)
   {
-    $sql = "CALL person('{personId}')";
+    $sql = "CALL spPerson('{personId}')";
 
     $params = array();
     $params['personId'] = $personId;
