@@ -3,9 +3,13 @@
 require_once('system/Startup.class.php');
 
 if(CoreConfig::CRON_JOBS_ACTIVE){
-  // Start the Cron job
-  $connector = new Connector();
-  $response = $connector->loadContent(CoreConfig::CRON_JOB_SERVICES);
+  //Start the Cron job
+  //$connector = new Connector();
+  //$response = $connector->loadContent(CoreConfig::CRON_JOB_SERVICES);
+
+  $subject = "Cron job running";
+  $body = 'Tet';
+  MailManager::sendEmail(MailManager::getRecipients(), $subject, $body);
 
   Log::custom('Job', 'Jobs has finish');
 }else{
