@@ -1,21 +1,32 @@
 <?php
 
-require_once('system/Startup.class.php');
+/**
+ * customer function for logging
+ *
+ * @param string $file
+ * @param string $message
+ * @param array $args
+ */
+function custom($file, $message, $args = null)
+{
+  $datetime = date('Y-m-d H:i:s');
 
-Log::custom('Job', 'Jobs has init');
+  //replace variables if there is any
+  if($args && is_array($args)){
+    foreach($args as $key => $value){
+      $message = str_replace("{" . $key . "}", $value, $message);
+    }
+  }
 
-if(CoreConfig::CRON_JOBS_ACTIVE){
-  //Start the Cron job
-  //$connector = new Connector();
-  //$response = $connector->loadContent(CoreConfig::CRON_JOB_SERVICES);
+  $content = $format = "[%{datetime}] %{message} \n";
+  $content = str_replace("%{datetime}", $datetime, $content);
+  $content = str_replace("%{message}", $message, $content);
 
-  $subject = "Cron job running";
-  $body = 'Tet';
-  MailManager::sendEmail(MailManager::getRecipients(), $subject, $body);
+  $logFile = "/log-" . $file . '.log';
 
-  Log::custom('Job', 'Jobs has finish');
-}else{
-  Log::custom('Job', 'Jobs are turned off!');
+  @file_put_contents('/var/www/api.test.dinerosegurohf.com/http/logs' . $logFile, $content, FILE_APPEND);
 }
+
+custom('cronjob', 'Jobs has running');
 
 ?>
