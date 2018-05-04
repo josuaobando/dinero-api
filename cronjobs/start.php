@@ -2,6 +2,8 @@
 
 require_once('system/Startup.class.php');
 
+Log::custom('Job', 'Jobs has init');
+
 if(CoreConfig::CRON_JOBS_ACTIVE){
   //Start the Cron job
   //$connector = new Connector();
