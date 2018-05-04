@@ -74,9 +74,9 @@ class TransactionAPI extends WS
   }
 
   /**
-   * @return Person
+   * get name for the customer
    *
-   * @throws InvalidStateException
+   * @return Person
    */
   public function getName()
   {
@@ -130,7 +130,6 @@ class TransactionAPI extends WS
           $person->setNameId($nameId);
           $person->add();
 
-          $this->apiTransactionId = $response->trans;
           return $person;
         }elseif($this->apiStatus == self::STATUS_API_ERROR){
           try{
@@ -155,20 +154,30 @@ class TransactionAPI extends WS
     return null;
   }
 
+  /**
+   * Submit o Re-Submit transaction
+   *
+   * @return bool
+   */
   public function confirm()
   {
     try{
 
-      $person = Session::getPerson();
-      $customer = Session::getCustomer();
       $transaction = Session::getTransaction();
+      $person = Session::getPerson($transaction->getPersonId());
+      $customer = Session::getCustomer($transaction->getCustomerId());
+      $apiTransactionId = $transaction->getApiTransactionId();
 
       $params = array();
       //credentials
       $params['user'] = $this->agency['Setting_User'];
       $params['password'] = $this->agency['Setting_Password'];
       //transaction
-      $params['nameid'] = $person->getNameId();
+      if($apiTransactionId){
+        $params['trackid'] = $apiTransactionId;
+      }else{
+        $params['nameid'] = $person->getNameId();
+      }
       $params['amount'] = $transaction->getAmount();
       $params['controlnumber'] = $transaction->getControlNumber();
       //customer
@@ -177,8 +186,9 @@ class TransactionAPI extends WS
       $params['senderstate'] = $customer->getState();
       $params['sendercountry'] = $customer->getCountry();
 
+      $method = ($apiTransactionId) ? 'EditarDeposito' : 'SubmitDeposito';
       $url = $this->agency['Setting_URL'];
-      $response = $this->execSoapSimple($url, 'SubmitDeposito', $params, array('uri' => 'http://WS/', 'soapaction' => ''));
+      $response = $this->execSoapSimple($url, $method, $params, array('uri' => 'http://WS/', 'soapaction' => ''));
       if($response && $response instanceof stdClass){
 
         $this->apiStatus = strtolower($response->status);
@@ -188,7 +198,11 @@ class TransactionAPI extends WS
         }elseif($this->apiStatus == self::STATUS_API_ERROR){
           try{
             $this->apiMessage = $response->comentario;
-            $subject = "Problem confirm Saturno transaction";
+            if($apiTransactionId){
+              $subject = "Problem re-submit transaction";
+            }else{
+              $subject = "Problem submit transaction";
+            }
             $body = $this->apiMessage . "\n\n" . $this->getLastRequest();
             MailManager::sendEmail(MailManager::getRecipients(), $subject, $body);
           }catch(WSException $ex){
@@ -212,6 +226,7 @@ class TransactionAPI extends WS
 
       //get transaction object
       $transaction = Session::getTransaction();
+      $currentTransactionStatusId = $transaction->getTransactionStatusId();
 
       $params = array();
       //credentials
@@ -242,22 +257,23 @@ class TransactionAPI extends WS
             $transaction->setTransactionStatusId(Transaction::STATUS_REQUESTED);
             break;
           default:
+            Log::custom('Saturno', $this->apiMessage . "\n" . $this->getLastRequest());
             return false;
         }
 
         //update transaction
-        if($transaction->getTransactionStatusId() == Transaction::STATUS_APPROVED || $transaction->getTransactionStatusId() == Transaction::STATUS_REJECTED){
-          $transaction->update();
+        if($currentTransactionStatusId != $transaction->getTransactionStatusId()){
+          if($transaction->getTransactionStatusId() == Transaction::STATUS_APPROVED || $transaction->getTransactionStatusId() == Transaction::STATUS_REJECTED){
+            $transaction->update();
+          }
         }
 
-        Log::custom('Saturno', $this->apiMessage . "\n" . $this->getLastRequest());
       }
 
     }catch(Exception $ex){
       ExceptionManager::handleException($ex);
     }
 
-    return false;
   }
 
 }

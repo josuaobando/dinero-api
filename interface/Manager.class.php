@@ -315,8 +315,6 @@ class Manager
 
     //confirm in Saturno
     if($transaction->getAgencyId() == CoreConfig::AGENCY_ID_SATURNO){
-      Session::getCustomer($transaction->getCustomerId());
-      Session::getPerson($transaction->getPersonId());
       $transactionAPI = new TransactionAPI();
       $confirm = $transactionAPI->confirm();
       if($confirm){
@@ -327,6 +325,8 @@ class Manager
     }
 
     //update transaction after the validation of the data
+    $transaction->setNote('');
+    $transaction->setReason('');
     $transaction->update();
 
     $wsResponse = new WSResponseOk();
