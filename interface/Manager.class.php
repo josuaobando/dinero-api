@@ -98,14 +98,14 @@ class Manager
     $transaction->setAmount($amount);
     $transaction->setFee(0);
 
-    //evaluate limits
-    $limit = new Limit($transaction, $customer);
-    $limit->evaluate();
-
     //Sent to API
     if($customer->getAgencyId() == CoreConfig::AGENCY_ID_SATURNO){
       return $this->startAPITransaction($wsRequest, $transactionType);
     }
+
+    //evaluate limits
+    $limit = new Limit($transaction, $customer);
+    $limit->evaluate();
 
     //------------------begin validation
     //check stickiness
