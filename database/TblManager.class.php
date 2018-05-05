@@ -39,7 +39,7 @@ class TblManager extends Db
    */
   public function getPersonsAvailable($accountId, $amount, $agencyTypeId, $agencyId)
   {
-    $sql = "CALL persons_available('{accountId}', '{amount}', '{agencyTypeId}', '{agencyId}')";
+    $sql = "CALL spPerson_AvailableNames('{accountId}', '{amount}', '{agencyTypeId}', '{agencyId}')";
 
     $params = array();
     $params['accountId'] = $accountId;
