@@ -6,3 +6,4 @@ logs
 /.htaccess
 /dev/
 /cronjobs/cron.sh
+/cronjobs/start.php
