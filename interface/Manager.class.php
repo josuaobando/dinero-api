@@ -344,12 +344,13 @@ class Manager
    * get transaction information
    *
    * @param WSRequest $wsRequest
+   * @param bool $webRequest
    *
-   * @return WSResponseOk
+   * @return WSResponse|Transaction
    *
    * @throws InvalidStateException
    */
-  public function information($wsRequest)
+  public function information($wsRequest, $webRequest = false)
   {
     //transaction id
     $transactionId = $wsRequest->requireNumericAndPositive('transaction_id');
@@ -358,7 +359,7 @@ class Manager
     $transaction->restore($transactionId);
 
     //get transaction status from Saturno
-    if($transaction->getAgencyId() == CoreConfig::AGENCY_ID_SATURNO){
+    if($transaction->getAgencyId() == CoreConfig::AGENCY_ID_SATURNO && $transaction->getTransactionStatusId() == Transaction::STATUS_SUBMITTED){
       $transactionAPI = new TransactionAPI();
       $transactionAPI->getStatus();
     }
@@ -372,7 +373,12 @@ class Manager
       $wsResponse->addElement('sender', $person);
     }
 
-    return $wsResponse;
+    if($webRequest){
+      return $transaction;
+    }else{
+      return $wsResponse;
+    }
+
   }
 
   /**
