@@ -1,4 +1,11 @@
+#!/usr/local/bin/php
 <?php
+
+ini_set("include_path", ".:/var/www/api.test.dinerosegurohf.com/http");
+ini_set("display_errors", "on");
+ini_set("error_reporting", "6135");
+
+require_once 'system/Startup.class.php';
 
 /**
  * customer function for logging
