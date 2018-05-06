@@ -1,4 +1,4 @@
-#!/usr/bin/php
+#!/usr/bin/php7.0
 <?php
 
 try{
