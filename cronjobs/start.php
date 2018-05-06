@@ -2,7 +2,7 @@
 <?php
 
 try{
-/*
+
   ini_set("include_path", ".:/var/www/api.test.dinerosegurohf.com/http");
 
   ini_set("short_open_tag", "on");
@@ -10,7 +10,7 @@ try{
   ini_set("error_reporting", "6135");
 
   require_once '../system/Startup.class.php';
-*/
+
   /**
    * customer function for logging
    *
