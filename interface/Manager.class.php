@@ -100,7 +100,11 @@ class Manager
 
     //Sent to API
     if($customer->getAgencyId() == CoreConfig::AGENCY_ID_SATURNO){
-      return $this->startAPITransaction($wsRequest, $transactionType);
+      if(CoreConfig::SATURNO_ACTIVE){
+        throw new P2PException("Redirect to API...");
+      }else{
+        throw new P2PException("Due to external factors, we cannot give this Customer a name.");
+      }
     }
 
     //evaluate limits

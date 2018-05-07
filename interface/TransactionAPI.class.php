@@ -115,7 +115,7 @@ class TransactionAPI extends WS
           $person->setAvailable(1);
           $person->setIsActive(1);
           $person->setName($name);
-          $person->setFirstName($name);
+          $person->setFirstName('');
           $person->setLastName('');
           $person->setPersonalId($nameId);
           $person->setTypeId('ID');
