@@ -9,7 +9,7 @@ try{
   ini_set("display_errors", "on");
   ini_set("error_reporting", "6135");
 
-  require_once '../system/Startup.class.php';
+  require_once 'system/Startup.class.php';
 
   Log::custom('cronjob', 'Jobs has running');
 }catch(Exception $e){

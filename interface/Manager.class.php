@@ -212,7 +212,7 @@ class Manager
     $transactionAPI = new TransactionAPI();
     $person = $transactionAPI->getName();
     if(!$person || !$person->getPersonId()){
-      throw new P2PException("Due to external factors, we cannot give this Customer a name.");
+      throw new APIException("Due to external factors, we cannot give this Customer a name.");
     }
 
     $customer->setAgencyId(CoreConfig::AGENCY_ID_SATURNO);

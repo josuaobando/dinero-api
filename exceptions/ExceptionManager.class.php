@@ -27,7 +27,7 @@ class ExceptionManager
     $data['exception'] = Encrypt::pack($exception);
     $r = MQueue::push(MQueue::TYPE_EXCEPTION, $data);
 
-    Log::exception($exception);
+    //Log::exception($exception);
 
     return $r;
   }
