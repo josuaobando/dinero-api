@@ -135,7 +135,11 @@ class Person
    */
   public function getName()
   {
-    return $this->name;
+    if(!$this->lastName){
+      return $this->name;
+    }else{
+      return $this->getFullName();
+    }
   }
 
   /**
