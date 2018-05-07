@@ -71,22 +71,23 @@ class System
   /**
    * get a list of transactions report
    *
-   * @param int $statusId
-   * @param int $transactionTypeId
-   * @param int $filterAgencyType
-   * @param int $accountId
-   * @param string $beginDate
-   * @param string $endDate
-   * @param string $controlNumber
-   * @param string $customer
-   * @param int $pageStart
-   * @param int $pageSize
+   * @param $statusId
+   * @param $transactionTypeId
+   * @param $filterAgencyType
+   * @param $accountId
+   * @param $beginDate
+   * @param $endDate
+   * @param $controlNumber
+   * @param $customer
+   * @param $transactionId
+   * @param $reference
+   * @param $currentPage
    *
    * @return array
    */
-  public function transactionsReport($statusId, $transactionTypeId, $filterAgencyType, $accountId, $beginDate, $endDate, $controlNumber, $customer, $pageStart, $pageSize)
+  public function transactionsReport($statusId, $transactionTypeId, $filterAgencyType, $accountId, $beginDate, $endDate, $controlNumber, $customer, $transactionId, $reference, $currentPage)
   {
-    return $this->tblSystem->getTransactionsReport($statusId, $transactionTypeId, $filterAgencyType, $accountId, $beginDate, $endDate, $controlNumber, $customer, $pageStart, $pageSize);
+    return $this->tblSystem->getTransactionsReport($statusId, $transactionTypeId, $filterAgencyType, $accountId, $beginDate, $endDate, $controlNumber, $customer, $transactionId, $reference, $currentPage);
   }
 
 }
