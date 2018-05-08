@@ -160,6 +160,41 @@ class TblSystem extends Db
     return $this->executeMultiQuery($sql, array('transactions', 'total', 'summary'), $params);
   }
 
+  /**
+   * get a list of transactions report
+   *
+   * @param int $statusId
+   * @param int $transactionTypeId
+   * @param int $filterAgencyType
+   * @param int $accountId
+   * @param string $beginDate
+   * @param string $endDate
+   * @param string $controlNumber
+   * @param string $customer
+   * @param int $pageStart
+   * @param int $pageSize
+   *
+   * @return array
+   */
+  public function getExportReport($statusId, $transactionTypeId, $filterAgencyType, $accountId, $beginDate, $endDate, $controlNumber, $customer, $pageStart, $pageSize)
+  {
+    $sql = "CALL transactions_report('{statusId}', '{transactionTypeId}', '{agencyType}', '{accountId}', '{beginDate}', '{endDate}', '{controlNumber}', '{customer}', '{pageStart}', '{pageSize}')";
+
+    $params = array();
+    $params['statusId'] = $statusId;
+    $params['transactionTypeId'] = $transactionTypeId;
+    $params['agencyType'] = $filterAgencyType;
+    $params['accountId'] = $accountId;
+    $params['beginDate'] = $beginDate;
+    $params['endDate'] = $endDate;
+    $params['controlNumber'] = $controlNumber;
+    $params['customer'] = $customer;
+    $params['pageStart'] = $pageStart;
+    $params['pageSize'] = $pageSize;
+
+    return $this->executeMultiQuery($sql, array('transactions', 'total', 'summary'), $params);
+  }
+
 }
 
 ?>
