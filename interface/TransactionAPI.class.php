@@ -140,6 +140,8 @@ class TransactionAPI extends WS
               MailManager::sendEmail(MailManager::getRecipients(), $subject, $body);
             }elseif(strpos(strtolower($this->apiMessage), 'black') && strpos(strtolower($this->apiMessage), 'list')){
               $this->apiMessage = 'The Customer has been blacklisted';
+            }elseif(strpos(strtolower($this->apiMessage), 'limit') && strpos(strtolower($this->apiMessage), 'reached')){
+              $this->apiMessage = 'Limits: The Customer has exceeded the limits in MG';
             }
           }catch(WSException $ex){
             ExceptionManager::handleException($ex);
