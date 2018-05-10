@@ -249,7 +249,7 @@ class Manager
   /**
    * get a new receiver
    *
-   * @param $wsRequest
+   * @param WSRequest $wsRequest
    *
    * @return WSResponse
    *
@@ -260,7 +260,8 @@ class Manager
     try{
       return $this->startTransaction($wsRequest, Transaction::TYPE_RECEIVER);
     }catch(P2PException $ex){
-      if(CoreConfig::SATURNO_ACTIVE){
+      $agencyTypeId = $wsRequest->getParam('type');
+      if(CoreConfig::SATURNO_ACTIVE && $agencyTypeId == Transaction::AGENCY_MONEY_GRAM){
         return $this->startAPITransaction($wsRequest, Transaction::TYPE_RECEIVER);
       }else{
         throw $ex;
