@@ -98,6 +98,7 @@ class TransactionAPI extends WS
       $response = $this->execSoapSimple($url, 'ObtenerNombre', $params, array('uri' => 'http://WS/', 'soapaction' => ''));
       if($response && $response instanceof stdClass){
 
+        $this->apiMessage = $response->comentario;
         $this->apiStatus = strtolower($response->status);
         if($this->apiStatus == self::STATUS_API_REQUESTED){
 
@@ -133,7 +134,6 @@ class TransactionAPI extends WS
           return $person;
         }elseif($this->apiStatus == self::STATUS_API_ERROR){
           try{
-            $this->apiMessage = $response->comentario;
             if(strpos(strtolower($this->apiMessage), 'no names available')){
               $subject = "There are not names available";
               $body = "There are not names available in agency Saturno";
