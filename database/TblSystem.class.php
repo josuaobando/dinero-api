@@ -110,7 +110,7 @@ class TblSystem extends Db
    */
   public function getTransactions($statusId, $accountId)
   {
-    $sql = "CALL transactions('{statusId}','{accountId}')";
+    $sql = "CALL spTransactions('{statusId}','{accountId}')";
 
     $params = array();
     $params['statusId'] = $statusId;

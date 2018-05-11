@@ -196,13 +196,13 @@ class TransactionAPI extends WS
       $response = $this->execSoapSimple($url, $method, $params, array('uri' => 'http://WS/', 'soapaction' => ''));
       if($response && $response instanceof stdClass){
 
+        $this->apiMessage = $response->comentario;
         $this->apiStatus = strtolower($response->status);
         if($this->apiStatus == self::STATUS_API_PENDING){
           $this->apiTransactionId = $response->trackId;
           return true;
         }elseif($this->apiStatus == self::STATUS_API_ERROR){
           try{
-            $this->apiMessage = $response->comentario;
             if($apiTransactionId){
               $subject = "Problem re-submit transaction";
             }else{
@@ -244,16 +244,18 @@ class TransactionAPI extends WS
       $response = $this->execSoapSimple($url, 'GetDeposito', $params, array('uri' => 'http://WS/', 'soapaction' => ''));
       if($response && $response instanceof stdClass){
 
+        $this->apiMessage = $response->comentario;
         $this->apiStatus = strtolower($response->status);
         switch($this->apiStatus){
           case self::STATUS_API_APPROVED:
             $transaction->setTransactionStatusId(Transaction::STATUS_APPROVED);
             $transaction->setAmount($response->monto);
             $transaction->setFee($response->cargo);
+            $transaction->setReason('Ok');
             break;
           case self::STATUS_API_REJECTED:
             $transaction->setTransactionStatusId(Transaction::STATUS_REJECTED);
-            $transaction->setReason($response->comentario);
+            $transaction->setReason($this->apiMessage);
             break;
           case self::STATUS_API_PENDING:
             $transaction->setTransactionStatusId(Transaction::STATUS_SUBMITTED);
