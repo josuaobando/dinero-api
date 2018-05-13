@@ -323,7 +323,7 @@ class Manager
     $originalCustomerName = strtoupper($customerTransaction->getCustomer());
 
     $percent = Util::similarPercent($newCustomerName, $originalCustomerName);
-    if($newCustomerName != $customerTransaction && $percent >= CoreConfig::CUSTOMER_SIMILAR_PERCENT){
+    if($newCustomerName != $originalCustomerName && $percent >= CoreConfig::CUSTOMER_SIMILAR_PERCENT){
 
       $customerTransaction->setFirstName($customerRequest->getFirstName());
       $customerTransaction->setLastName($customerRequest->getLastName());
