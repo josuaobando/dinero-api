@@ -133,7 +133,7 @@ class TransactionAPI extends WS
           return $person;
         }elseif($this->apiStatus == self::STATUS_API_ERROR){
           try{
-            if(strpos(strtolower($this->apiMessage), 'no names available')){
+            if(strpos(strtolower($this->apiMessage), 'no') && strpos(strtolower($this->apiMessage), 'names') && strpos(strtolower($this->apiMessage), 'available')){
               $subject = "There are not names available";
               $body = "There are not names available in agency Saturno";
               MailManager::sendEmail(MailManager::getRecipients(), $subject, $body);
@@ -146,6 +146,8 @@ class TransactionAPI extends WS
           }catch(WSException $ex){
             ExceptionManager::handleException($ex);
           }
+        }else{
+          $this->apiMessage = 'We cannot give this Customer a name';
         }
 
         Log::custom('Saturno', $response->comentario . "\n" . $this->getLastRequest());
