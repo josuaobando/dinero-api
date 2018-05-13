@@ -297,6 +297,37 @@ class Customer
   /**
    * load object using the request
    *
+   * @param WSRequest $wsRequest
+   *
+   * @throws InvalidParameterException|CustomerException
+   */
+  public function restoreFromRequest($wsRequest)
+  {
+    $this->agencyTypeId = $wsRequest->requireNumericAndPositive('type');
+    $this->firstName = preg_replace('/\s+/', ' ', trim($wsRequest->requireNotNullOrEmpty('first_name')));
+    $this->lastName = preg_replace('/\s+/', ' ', trim($wsRequest->requireNotNullOrEmpty('last_name')));
+    $this->country = trim($wsRequest->requireNotNullOrEmpty('country'));
+    $this->state = trim($wsRequest->requireNotNullOrEmpty('state'));
+    $this->phone = trim($wsRequest->requireNotNullOrEmpty('phone'));
+
+    $countryData = $this->tblUtil->getCountry($this->country);
+    if(!$countryData){
+      //throw new InvalidParameterException('country', $this->country, 'CountryCode');
+    }
+    $this->countryId = $countryData['Country_Id'];
+    $this->countryName = $countryData['Name'];
+
+    $stateData = $this->tblUtil->getState($this->countryId, $this->state);
+    if(!$stateData){
+      //throw new InvalidParameterException('state', $this->state, 'StateCode');
+    }
+    $this->stateId = $stateData['CountryState_Id'];
+    $this->stateName = $stateData['Name'];
+  }
+
+  /**
+   * load object using the request
+   *
    * @param Account $account
    * @param WSRequest $wsRequest
    *
@@ -360,7 +391,8 @@ class Customer
       if($similarList && COUNT($similarList) > 0){
         foreach($similarList as $similar){
           $registerCustomerName = strtoupper($similar['CustomerName']);
-          similar_text($customerNameRequest, $registerCustomerName, $percent);
+          //similar_text($customerNameRequest, $registerCustomerName, $percent);
+          $percent = Util::similarPercent($customerNameRequest, $registerCustomerName);
           if($percent >= CoreConfig::CUSTOMER_SIMILAR_PERCENT && $percent > $maxPercent){
 
             $this->customerId = $similar['CustomerId'];

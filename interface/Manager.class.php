@@ -62,16 +62,15 @@ class Manager
     return $availableList[$selectedId];
   }
 
-
   /**
    * start and create a new transaction
    *
    * @param WSRequest $wsRequest
-   * @param $transactionType
+   * @param int $transactionType
    *
-   * @return \WSResponseOk
-   * @throws \InvalidParameterException
-   * @throws \InvalidStateException
+   * @return WSResponseOk
+   *
+   * @throws InvalidStateException|P2PException
    */
   public function startTransaction($wsRequest, $transactionType)
   {
@@ -177,7 +176,8 @@ class Manager
    * @param int $transactionType
    *
    * @return WSResponse
-   * @throws InvalidStateException|P2PException
+   *
+   * @throws APIException|InvalidStateException
    */
   public function startAPITransaction($wsRequest, $transactionType)
   {
@@ -296,7 +296,7 @@ class Manager
     $transactionId = $wsRequest->requireNumericAndPositive('transaction_id');
     $controlNumber = $wsRequest->requireNumericAndPositive('control_number');
     $amount = $wsRequest->requireNumericAndPositive('amount');
-    $fee = $wsRequest->getParam('fee');
+    $fee = $wsRequest->getParam('fee', 0);
 
     //restore and load transaction information
     $transaction = Session::getTransaction();
@@ -307,16 +307,28 @@ class Manager
 
     $wsRequest->putParam('type', $transaction->getAgencyTypeId());
 
-    //validate customer
-    //$customer = new Customer();
-    //$customer->validateFromRequest($this->account, $wsRequest);
-
     if($transaction->getTransactionStatusId() != Transaction::STATUS_REQUESTED && $transaction->getTransactionStatusId() != Transaction::STATUS_REJECTED){
       throw new InvalidStateException("Transaction cannot be confirmed since the current status is: " . $transaction->getTransactionStatus());
     }
 
+    //validate customer
+    $customerRequest = new Customer();
+    $customerRequest->restoreFromRequest($wsRequest);
+    $newCustomerName = strtoupper($customerRequest->getCustomer());
+    $customerTransaction = Session::getCustomer($transaction->getCustomerId());
+    $originalCustomerName = strtoupper($customerTransaction->getCustomer());
+
+    $percent = Util::similarPercent($newCustomerName, $originalCustomerName);
+    if($newCustomerName != $customerTransaction && $percent >= CoreConfig::CUSTOMER_SIMILAR_PERCENT){
+
+      $customerTransaction->setFirstName($customerRequest->getFirstName());
+      $customerTransaction->setLastName($customerRequest->getLastName());
+      $customerTransaction->update();
+
+      Log::custom('UpdateCustomer', "Customer updated | Original: $originalCustomerName New: $newCustomerName Percent: $percent%");
+    }
+
     //set new values
-    //$transaction->setCustomerId($customer->getCustomerId());
     $transaction->setAmount($amount);
     $transaction->setFee($fee);
     $transaction->setControlNumber($controlNumber);

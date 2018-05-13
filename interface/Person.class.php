@@ -16,8 +16,7 @@ class Person
   private $available;
   private $isActive;
   private $name;
-  private $firstName;
-  private $lastName;
+  private $surnames;
 
   private $personalId;
   private $typeId;
@@ -135,21 +134,11 @@ class Person
    */
   public function getName()
   {
-    if(!$this->lastName){
+    if(!$this->surnames){
       return $this->name;
     }else{
       return $this->getFullName();
     }
-  }
-
-  /**
-   * get the first name
-   *
-   * @return string
-   */
-  public function getFirstName()
-  {
-    return $this->firstName;
   }
 
   /**
@@ -159,7 +148,7 @@ class Person
    */
   public function getLastName()
   {
-    return $this->lastName;
+    return $this->surnames;
   }
 
   /**
@@ -167,9 +156,9 @@ class Person
    *
    * @return string
    */
-  public function getFullName()
+  private function getFullName()
   {
-    return $this->firstName . ' ' . $this->lastName;
+    return $this->name . ' ' . $this->surnames;
   }
 
   /**
@@ -311,19 +300,11 @@ class Person
   }
 
   /**
-   * @param mixed $firstName
-   */
-  public function setFirstName($firstName)
-  {
-    $this->firstName = $firstName;
-  }
-
-  /**
    * @param mixed $lastName
    */
   public function setLastName($lastName)
   {
-    $this->lastName = $lastName;
+    $this->surnames = $lastName;
   }
 
   /**
@@ -444,10 +425,9 @@ class Person
       $this->stateName = $personData['CountryStateName'];
       $this->available = $personData['Available'];
       $this->isActive = $personData['IsActive'];
-      $this->name = $personData['Name'];
       $this->nameId = $personData['Name_Id'];
-      $this->firstName = $personData['Name'];
-      $this->lastName = $personData['Surnames'];
+      $this->name = $personData['Name'];
+      $this->surnames = $personData['Surnames'];
 
       $this->personalId = $personData['PersonalId'];
       $this->typeId = $personData['TypeId'];
@@ -467,7 +447,7 @@ class Person
    */
   public function add()
   {
-    $this->personId = $this->tblPerson->add($this->personListId, $this->nameId, $this->personalId, $this->typeId, $this->expirationDateId, $this->name, $this->lastName, $this->countryId, $this->stateId, $this->address, $this->city, $this->birthDate, $this->maritalStatus, $this->gender, $this->profession, $this->phone);
+    $this->personId = $this->tblPerson->add($this->personListId, $this->nameId, $this->personalId, $this->typeId, $this->expirationDateId, $this->name, $this->surnames, $this->countryId, $this->stateId, $this->address, $this->city, $this->birthDate, $this->maritalStatus, $this->gender, $this->profession, $this->phone);
     return $this->personId > 0;
   }
 
@@ -504,12 +484,10 @@ class Person
   {
     $data = array();
 
-    if(!$this->lastName){
-      $data['name'] = $this->name;
-    }else{
-      $data['name'] = $this->getFullName();
-      $data['firstName'] = $this->firstName;
-      $data['lastName'] = $this->lastName;
+    $data['name'] = $this->getName();
+    if($this->surnames){
+      $data['firstName'] = $this->name;
+      $data['lastName'] = $this->surnames;
     }
 
     $data['country'] = $this->countryName;
@@ -533,12 +511,10 @@ class Person
     $data['state'] = $this->state;
     $data['stateName'] = $this->stateName;
 
-    if(!$this->lastName){
-      $data['name'] = $this->name;
-    }else{
-      $data['name'] = $this->getFullName();
-      $data['firstName'] = $this->firstName;
-      $data['lastName'] = $this->lastName;
+    $data['name'] = $this->getName();
+    if($this->surnames){
+      $data['firstName'] = $this->name;
+      $data['lastName'] = $this->surnames;
     }
 
     $data['personalId'] = $this->personalId;

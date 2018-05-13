@@ -116,7 +116,6 @@ class TransactionAPI extends WS
           $person->setAvailable(1);
           $person->setIsActive(1);
           $person->setName($name);
-          $person->setFirstName('');
           $person->setLastName('');
           $person->setPersonalId($nameId);
           $person->setTypeId('ID');
@@ -149,7 +148,7 @@ class TransactionAPI extends WS
           }
         }
 
-        Log::custom('Saturno', $this->apiMessage . "\n" . $this->getLastRequest());
+        Log::custom('Saturno', $response->comentario . "\n" . $this->getLastRequest());
       }
 
     }catch(Exception $ex){

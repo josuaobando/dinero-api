@@ -1594,6 +1594,22 @@ class Util
     return $newDate;
   }
 
+  /**
+   * calculate the similarity in percentage of two chains
+   *
+   * @param string $string1
+   * @param string $string2
+   *
+   * @return int
+   */
+  public static function similarPercent($string1, $string2){
+    $percent = 0;
+
+    $matching = similar_text($string1, $string2, $percent);
+
+    return $percent;
+  }
+
 }
 
 ?>
