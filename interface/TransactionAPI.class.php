@@ -132,25 +132,22 @@ class TransactionAPI extends WS
 
           return $person;
         }elseif($this->apiStatus == self::STATUS_API_ERROR){
-          try{
-            if(strpos(strtolower($this->apiMessage), 'no') && strpos(strtolower($this->apiMessage), 'names') && strpos(strtolower($this->apiMessage), 'available')){
-              $subject = "There are not names available";
-              $body = "There are not names available in agency Saturno";
-              MailManager::sendEmail(MailManager::getRecipients(), $subject, $body);
-              $this->apiMessage = 'We cannot give this Customer a name';
-            }elseif(strpos(strtolower($this->apiMessage), 'black') && strpos(strtolower($this->apiMessage), 'list')){
-              $this->apiMessage = 'The Customer has been blacklisted';
-            }elseif(strpos(strtolower($this->apiMessage), 'limit') && strpos(strtolower($this->apiMessage), 'reached')){
-              $this->apiMessage = 'Limits: The Customer has exceeded the limits in MG';
-            }
-          }catch(WSException $ex){
-            ExceptionManager::handleException($ex);
+          if(strpos(strtolower($this->apiMessage), 'no') && strpos(strtolower($this->apiMessage), 'names') && strpos(strtolower($this->apiMessage), 'available')){
+            $subject = "There are not names available";
+            $body = "There are not names available in agency Saturno";
+            MailManager::sendEmail(MailManager::getRecipients(), $subject, $body);
+            $this->apiMessage = 'We cannot give this Customer a name';
+          }elseif(strpos(strtolower($this->apiMessage), 'black') && strpos(strtolower($this->apiMessage), 'list')){
+            $this->apiMessage = 'The Customer has been blacklisted';
+          }elseif(strpos(strtolower($this->apiMessage), 'limit') && strpos(strtolower($this->apiMessage), 'reached')){
+            $this->apiMessage = 'Limits: The Customer has exceeded the limits in MG';
           }
+          return null;
         }else{
           $this->apiMessage = 'We cannot give this Customer a name';
         }
 
-        Log::custom('Saturno', $response->comentario . "\n" . $this->getLastRequest());
+        throw new InvalidStateException('Saturno', $response->comentario . "\n" . $this->getLastRequest());
       }
 
     }catch(Exception $ex){
