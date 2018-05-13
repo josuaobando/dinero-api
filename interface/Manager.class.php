@@ -308,7 +308,7 @@ class Manager
     $wsRequest->putParam('type', $transaction->getAgencyTypeId());
 
     if($transaction->getTransactionStatusId() != Transaction::STATUS_REQUESTED && $transaction->getTransactionStatusId() != Transaction::STATUS_REJECTED){
-      if($transaction->getTransactionStatusId() != Transaction::STATUS_CANCELED){
+      if($transaction->getTransactionStatusId() == Transaction::STATUS_CANCELED){
         throw new InvalidStateException("The transaction has expired. Valid time is 48 hours to confirm.");
       }else{
         throw new InvalidStateException("Transaction cannot be confirmed since the current status is: " . $transaction->getTransactionStatus());
