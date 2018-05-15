@@ -199,7 +199,7 @@ class TransactionAPI extends WS
         if($this->apiStatus == self::STATUS_API_PENDING){
           $this->apiTransactionId = $response->trackId;
           return true;
-        }elseif($this->apiStatus == self::STATUS_API_ERROR){
+        }elseif($this->apiStatus == self::STATUS_API_ERROR || !$this->apiStatus){
           try{
             if($apiTransactionId){
               $subject = "Problem re-submit transaction";
