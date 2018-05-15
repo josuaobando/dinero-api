@@ -145,7 +145,7 @@ class Customer
    */
   public function getCustomer()
   {
-    return $this->firstName . " " . $this->lastName;
+    return ucwords(strtolower($this->firstName . " " . $this->lastName));
   }
 
   /**

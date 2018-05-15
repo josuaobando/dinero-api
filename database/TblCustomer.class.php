@@ -68,8 +68,8 @@ class TblCustomer extends Db
     $params['companyId'] = $companyId;
     $params['accountId'] = $accountId;
     $params['agencyTypeId'] = $agencyTypeId;
-    $params['firstName'] = $firstName;
-    $params['lastName'] = $lastName;
+    $params['firstName'] = ucwords(strtolower($firstName));
+    $params['lastName'] = ucwords(strtolower($lastName));
     $params['countryId'] = $countryId;
     $params['countryStateId'] = $countryStateId;
     $params['phone'] = $phone;
@@ -102,8 +102,8 @@ class TblCustomer extends Db
     $params = array();
     $params['agencyId'] = $agencyId;
     $params['customerId'] = $customerId;
-    $params['firstName'] = $firstName;
-    $params['lastName'] = $lastName;
+    $params['firstName'] = ucwords(strtolower($firstName));
+    $params['lastName'] = ucwords(strtolower($lastName));
     $params['countryId'] = $countryId;
     $params['countryStateId'] = $countryStateId;
     $params['phone'] = $phone;
