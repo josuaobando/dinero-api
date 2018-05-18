@@ -208,7 +208,7 @@ class TransactionAPI extends WS
             }
             $body = $this->apiMessage;
             $body .= "\n\n" . $this->getLastRequest();
-            $body .= "\n\n" . $this->getLastContent();
+            $body .= "\n\n" . Util::objToStr($response);
             MailManager::sendEmail(MailManager::getRecipients(), $subject, $body);
             Log::custom('Saturno', $body);
 
@@ -219,7 +219,7 @@ class TransactionAPI extends WS
         }
       }
 
-      Log::custom('Saturno', "Invalid Object Response" . "\n" . $this->getLastRequest() . "\n" . $this->getLastContent());
+      Log::custom('Saturno', "Invalid Object Response" . "\n Request: \n\n" . $this->getLastRequest() . "\n Response: \n\n" . Util::objToStr($response));
     }catch(Exception $ex){
       ExceptionManager::handleException($ex);
     }
