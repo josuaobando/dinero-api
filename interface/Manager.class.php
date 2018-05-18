@@ -346,7 +346,7 @@ class Manager
       if($confirm){
         $transaction->setApiTransactionId($transactionAPI->getApiTransactionId());
       }else{
-        throw new InvalidStateException("Transaction cannot be confirmed. Contact the administrator!");
+        throw new InvalidStateException("Transaction cannot be confirmed. Please try again in a few minutes!");
       }
     }
 
