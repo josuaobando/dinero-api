@@ -206,16 +206,20 @@ class TransactionAPI extends WS
             }else{
               $subject = "Problem submit transaction";
             }
-            $body = $this->apiMessage . "\n\n" . $this->getLastRequest();
+            $body = $this->apiMessage;
+            $body .= "\n\n" . $this->getLastRequest();
+            $body .= "\n\n" . $this->getLastContent();
             MailManager::sendEmail(MailManager::getRecipients(), $subject, $body);
+            Log::custom('Saturno', $body);
+
+            return false;
           }catch(WSException $ex){
             ExceptionManager::handleException($ex);
           }
         }
-
-        Log::custom('Saturno', $this->apiMessage . "\n" . $this->getLastRequest());
       }
 
+      Log::custom('Saturno', "Invalid Object Response" . "\n" . $this->getLastRequest() . "\n" . $this->getLastContent());
     }catch(Exception $ex){
       ExceptionManager::handleException($ex);
     }
