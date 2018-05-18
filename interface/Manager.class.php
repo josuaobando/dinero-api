@@ -203,11 +203,11 @@ class Manager
       $transaction->setUsername($username);
       $transaction->setAmount($amount);
       $transaction->setFee(0);
-
-      //evaluate limits
-      $limit = new Limit($transaction, $customer);
-      $limit->evaluate();
     }
+
+    //evaluate limits
+    $limit = new Limit($transaction, $customer);
+    $limit->evaluate();
 
     $transactionAPI = new TransactionAPI();
     $person = $transactionAPI->getName();
@@ -215,9 +215,12 @@ class Manager
       throw new APIException($transactionAPI->getApiMessage());
     }
 
-    $customer->setAgencyId(CoreConfig::AGENCY_ID_SATURNO);
-    $customer->setIsAPI(1);
-    $customer->update();
+    //change agency to customer
+    if($customer->getAgencyId() != CoreConfig::AGENCY_ID_SATURNO){
+      $customer->setAgencyId(CoreConfig::AGENCY_ID_SATURNO);
+      $customer->setIsAPI(1);
+      $customer->update();
+    }
 
     //block person
     $person->block();
@@ -278,7 +281,7 @@ class Manager
    */
   public function sender($wsRequest)
   {
-    return $this->startTransaction($wsRequest, Transaction::TYPE_SENDER);
+    return $this->startAPITransaction($wsRequest, Transaction::TYPE_SENDER);
   }
 
   /**
