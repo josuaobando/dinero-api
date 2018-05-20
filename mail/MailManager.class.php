@@ -388,13 +388,12 @@ AKAM;
   /**
    * Get the list of email address to send the email
    *
-   * @param array $emailGroups
+   * @param array $recipients
    *
    * @return array
    */
-  public static function getRecipients($emailGroups = array('Programmers'))
+  public static function getRecipients($recipients = array())
   {
-    $recipients = array();
     if(count($recipients) == 0){
       array_push($recipients, CoreConfig::MAIL_DEV); //default
     }
@@ -451,18 +450,13 @@ AKAM;
    * get email template and replace variables
    *
    * @param string $name
-   * @param array $params [optional]
+   * @param array $tags [optional]
    * @param string $lang [optional]
    *
    * @return string
    */
-  public static function getEmailTemplate($name, $params = array(), $lang = null)
+  public static function getEmailTemplate($name, $tags = array(), $lang = null)
   {
-    if(!$lang){
-      $lang = Language::getLanguageCode();
-      $lang = strtoupper($lang);
-    }
-
     $templatePath = CoreConfig::TEMPLATE_PATH . $name . $lang . CoreConfig::TEMPLATE_FILE_EXTENSION;
     if(!Util::file_exists($templatePath)){
       $templatePath = CoreConfig::TEMPLATE_PATH . $name . CoreConfig::TEMPLATE_FILE_EXTENSION;
@@ -472,9 +466,12 @@ AKAM;
     }
 
     $template = file_get_contents($templatePath, FILE_USE_INCLUDE_PATH);
-    if(count($params) > 0){
-      foreach($params as $key => $value){
-        $template = str_replace("{" . $key . "}", $value, $template);
+    if(is_array($tags) && count($tags) > 0){
+      foreach($tags as $key => $value){
+        //If value is Empty don't replace
+        if($value){
+          $template = preg_replace("/\{"."@$key@"."\}/", $value, $template);
+        }
       }
     }
 

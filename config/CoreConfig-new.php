@@ -79,6 +79,12 @@ class CoreConfig
   const MAIL_DEV = 'dev@mail.com';
 
   /**
+   * Mail Templates
+   */
+  const TEMPLATE_PATH = '/var/www/http/mail/templates/';
+  const TEMPLATE_FILE_EXTENSION = '.html';
+
+  /**
    * URL where the message queue service is located
    */
   const MESSAGE_QUEUE_URL = 'http://api.dinerosegurohf:8080/mqueue/ws/mQueueProcessor.php';

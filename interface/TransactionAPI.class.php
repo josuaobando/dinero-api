@@ -132,16 +132,26 @@ class TransactionAPI extends WS
 
           return $person;
         }elseif($this->apiStatus == self::STATUS_API_ERROR){
-          if(strpos($this->apiMessage, 'No Names Available') != false){
-            $subject = "There are not names available";
-            $body = "There are not names available in agency Saturno";
-            MailManager::sendEmail(MailManager::getRecipients(), $subject, $body);
+
+          if(strpos($this->apiMessage, 'No Names Available') >= 0){
+
+            $subject = "No Names Available";
+            $body = "There are no names available in Saturn agency";
+            $bodyTemplate = MailManager::getEmailTemplate('default', array('body' => $body));
+            $recipients = array('To' => 'mgoficinasf0117@outlook.com', 'Cc' => CoreConfig::MAIL_DEV);
+            MailManager::sendEmail($recipients, $subject, $bodyTemplate);
+
             $this->apiMessage = 'We cannot give this Customer a name';
+            return null;
           }elseif(strpos(strtolower($this->apiMessage), 'black') && strpos(strtolower($this->apiMessage), 'list')){
             $this->apiMessage = 'The Customer has been blacklisted';
+            return null;
           }elseif(strpos(strtolower($this->apiMessage), 'limit') && strpos(strtolower($this->apiMessage), 'reached')){
             $this->apiMessage = 'Limits: The Customer has exceeded the limits in MG';
+            return null;
           }
+
+          $this->apiMessage = 'We cannot give this Customer a name';
           return null;
         }else{
           $this->apiMessage = 'We cannot give this Customer a name';
@@ -196,20 +206,30 @@ class TransactionAPI extends WS
 
         $this->apiMessage = $response->comentario;
         $this->apiStatus = strtolower($response->status);
+
         if($this->apiStatus == self::STATUS_API_PENDING){
+
           $this->apiTransactionId = $response->trackId;
           return true;
+
         }elseif($this->apiStatus == self::STATUS_API_ERROR || !$this->apiStatus){
+
           try{
             if($apiTransactionId){
-              $subject = "Problem re-submit transaction";
+              $subject = "Problem re-submit transaction $apiTransactionId";
             }else{
-              $subject = "Problem submit transaction";
+              $subject = "Problem submit transaction $apiTransactionId";
             }
-            $body = $this->apiMessage;
+
+            $body = "TrackId $apiTransactionId";
+            $body .= "\n" . "Status: $response->status";
+            $body .= "\n" . "Comentario: $response->comentario";
             $body .= "\n\n" . $this->getLastRequest();
             $body .= "\n\n" . Util::objToStr($response);
-            MailManager::sendEmail(MailManager::getRecipients(), $subject, $body);
+
+            $bodyTemplate = MailManager::getEmailTemplate('default', array('body' => $body));
+            MailManager::sendEmail(MailManager::getRecipients(), $subject, $bodyTemplate);
+
             Log::custom('Saturno', $body);
 
             return false;
