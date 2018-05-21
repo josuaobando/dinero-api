@@ -118,19 +118,19 @@ class Limit
 
           case self::LIMIT_INTERVAL_DAILY:
             $dailyAmount = $this->stats['DailyAmount'];
-            if($dailyAmount && ($dailyAmount + $transactionAmount) >= $limitValue){
+            if($dailyAmount && ($dailyAmount + $transactionAmount) > $limitValue){
               throw new LimitException("Limits: The maximum allowed amount (Daily) is: " . $limit['Value'] . " USD");
             }
             break;
           case self::LIMIT_INTERVAL_WEEKLY:
             $weeklyAmount = $this->stats['WeeklyAmount'];
-            if($weeklyAmount && ($weeklyAmount + $transactionAmount) >= $limitValue){
+            if($weeklyAmount && ($weeklyAmount + $transactionAmount) > $limitValue){
               throw new LimitException("Limits: The maximum allowed amount (Weekly) is: " . $limit['Value'] . " USD");
             }
             break;
           case self::LIMIT_INTERVAL_MONTHLY:
             $monthlyTransactions = $this->stats['MonthlyAmount'];
-            if($monthlyTransactions && ($monthlyTransactions + $transactionAmount) >= $limitValue){
+            if($monthlyTransactions && ($monthlyTransactions + $transactionAmount) > $limitValue){
               throw new LimitException("Limits: The maximum allowed amount (Monthly) is: " . $limit['Value'] . " USD");
             }
             break;
