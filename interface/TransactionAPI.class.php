@@ -133,7 +133,7 @@ class TransactionAPI extends WS
           return $person;
         }elseif($this->apiStatus == self::STATUS_API_ERROR){
 
-          if(strpos($this->apiMessage, 'No Names Available') >= 0){
+          if(strpos($this->apiMessage, 'No Names Available') != false && strpos($this->apiMessage, 'No Names Available') >= 0){
 
             $subject = "No Names Available";
             $body = "There are no names available in Saturn agency";
