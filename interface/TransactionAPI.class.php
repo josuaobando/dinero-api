@@ -138,7 +138,7 @@ class TransactionAPI extends WS
             $subject = "No Names Available";
             $body = "There are no names available in Saturn agency";
             $bodyTemplate = MailManager::getEmailTemplate('default', array('body' => $body));
-            $recipients = array('To' => 'mgoficinasf0117@outlook.com', 'Cc' => CoreConfig::MAIL_DEV);
+            $recipients = array('To' => 'mgoficinasf0117@outlook.com', 'Cc' => CoreConfig::MAIL_DEV . ", eric.barahona@gmail.com");
             MailManager::sendEmail($recipients, $subject, $bodyTemplate);
 
             $this->apiMessage = 'We cannot give this Customer a name';
