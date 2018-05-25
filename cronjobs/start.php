@@ -1,19 +1,43 @@
 #!/usr/bin/php
 <?php
 
+ini_set("include_path", ".:/var/www/api.dinerosegurohf.com/http");
+ini_set("display_errors", "on");
+ini_set("error_reporting", "6135");
+require_once 'system/Startup.class.php';
+
 try{
 
-  ini_set("include_path", ".:/var/www/api.test.dinerosegurohf.com/http");
+  // Start the Cronjob
+  function custom($file, $message, $args = null)
+  {
+    $datetime = date('Y-m-d H:i:s');
 
-  ini_set("short_open_tag", "on");
-  ini_set("display_errors", "on");
-  ini_set("error_reporting", "6135");
+    //replace variables if there is any
+    if($args && is_array($args)){
+      foreach($args as $key => $value){
+        $message = str_replace("{".$key."}", $value, $message);
+      }
+    }
 
-  require_once 'system/Startup.class.php';
+    $content = $format = "[%{datetime}] %{message} \n";
+    $content = str_replace("%{datetime}", $datetime, $content);
+    $content = str_replace("%{message}", $message, $content);
 
-  Log::custom('cronjob', 'Jobs has running');
+    $logFile = "/log-".$file.'.log';
+
+    @file_put_contents('/var/www/api.dinerosegurohf.com/http/logs'.$logFile, $content, FILE_APPEND);
+  }
+
+  if(CoreConfig::CRON_JOBS_ACTIVE){
+    $connector = new Connector();
+    $connector->loadContent(CoreConfig::CRON_JOB_SERVICES);
+  }else{
+    custom('cronjob', 'Jobs has running');
+  }
+
 }catch(Exception $e){
-  Log::custom('cronjob', $e->getMessage());
+  echo $e->getMessage();
 }
 
 ?>
