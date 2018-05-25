@@ -29,12 +29,12 @@ try{
     @file_put_contents('/var/www/api.dinerosegurohf.com/http/logs'.$logFile, $content, FILE_APPEND);
   }
 
-  custom('cronjob', 'Job initialized');
+  custom('cronjob', 'Job Start');
   if(CoreConfig::CRON_JOBS_ACTIVE){
-    custom('cronjob', 'Job initialized');
+    custom('cronjob', 'Initialized Services');
     $connector = new Connector();
     $connector->loadContent(CoreConfig::CRON_JOB_SERVICES);
-    custom('cronjob', 'Job finish');
+    custom('cronjob', 'Finish Services');
   }else{
     custom('cronjob', 'Job is turn off');
   }

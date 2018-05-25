@@ -1,8 +1,14 @@
 #!/usr/bin/php
 <?php
 
+ini_set("include_path", ".:/var/www/api/http");
+ini_set("display_errors", "on");
+ini_set("error_reporting", "6135");
+require_once 'system/Startup.class.php';
+
 try{
 
+  // Start the Cronjob
   function custom($file, $message, $args = null)
   {
     $datetime = date('Y-m-d H:i:s');
@@ -23,7 +29,16 @@ try{
     @file_put_contents('/var/www/api.dinerosegurohf.com/http/logs'.$logFile, $content, FILE_APPEND);
   }
 
-  custom('cronjob', 'Jobs has running');
+  custom('cronjob', 'Job Start');
+  if(CoreConfig::CRON_JOBS_ACTIVE){
+    custom('cronjob', 'Initialized Services');
+    $connector = new Connector();
+    $connector->loadContent(CoreConfig::CRON_JOB_SERVICES);
+    custom('cronjob', 'Finish Services');
+  }else{
+    custom('cronjob', 'Job is turn off');
+  }
+
 }catch(Exception $e){
   echo $e->getMessage();
 }
