@@ -85,17 +85,18 @@ class Session
    * get account from session
    *
    * @param null $username
+   * @param null $accountId
    *
    * @return Account
    */
-  public static function getAccount($username = null)
+  public static function getAccount($username = null, $accountId = null)
   {
     $account = new Account();
     $accountSession = self::getSessionObject(self::SID_ACCOUNT);
     if($accountSession && $accountSession instanceof Account){
       $account = $accountSession;
-    }elseif($username){
-      $account = new Account($username);
+    }elseif($username || $accountId){
+      $account = new Account($username, $accountId);
       self::storeSessionObject(self::SID_ACCOUNT, $account, true);
     }
 

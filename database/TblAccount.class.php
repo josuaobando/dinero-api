@@ -47,9 +47,29 @@ class TblAccount extends Db
   }
 
   /**
+   * get an account by username
+   *
+   * @param int $accountId
+   *
+   * @return array
+   */
+  public function getAccountById($accountId)
+  {
+    $sql = "CALL spAccount_ById('{accountId}')";
+
+    $params = array();
+    $params['accountId'] = $accountId;
+
+    $row = array();
+    $this->executeSingleQuery($sql, $row, $params);
+
+    return $row;
+  }
+
+  /**
    * get account permission
    *
-   * @param string $username
+   * @param int $accountId
    *
    * @return array
    */

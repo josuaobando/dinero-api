@@ -209,6 +209,10 @@ class CoreConfig
    */
   const AGENCY_ID_SATURNO = 100;
 
+  /**
+   * user id of system
+   */
+  const USER_SYSTEM = 100;
 
 }
 

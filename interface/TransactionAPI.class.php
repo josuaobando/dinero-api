@@ -247,6 +247,11 @@ class TransactionAPI extends WS
     return false;
   }
 
+  /**
+   * get transaction status
+   *
+   * @return bool
+   */
   public function getStatus()
   {
     try{

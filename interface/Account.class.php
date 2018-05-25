@@ -30,7 +30,7 @@ class Account
   /**
    * @var fullname
    */
-  private $fullname;
+  private $fullName;
 
   /**
    * password
@@ -78,12 +78,15 @@ class Account
    * Account constructor.
    *
    * @param null $username
+   * @param null $accountId
+   *
    */
-  public function __construct($username = null)
+  public function __construct($username = null, $accountId = null)
   {
     $this->tblAccount = TblAccount::getInstance();
-    if($username){
+    if($username || $accountId){
       $this->username = $username;
+      $this->accountId = $accountId;
       $this->loadAccount();
     }
   }
@@ -93,13 +96,20 @@ class Account
    */
   private function loadAccount()
   {
-    $accountData = $this->tblAccount->getAccount($this->username);
+    if($this->username){
+      $accountData = $this->tblAccount->getAccount($this->username);
+    }elseif($this->accountId){
+      $accountData = $this->tblAccount->getAccountById($this->accountId);
+    }else{
+      throw new InvalidStateException("No Account Information!");
+    }
 
     //set account data
     $this->companyId = $accountData['Company_Id'];
     $this->accountId = $accountData['Account_Id'];
+    $this->username = $accountData['Username'];
     $this->password = $accountData['Password'];
-    $this->fullname = $accountData['FullName'];
+    $this->fullName = $accountData['FullName'];
     $this->apiUser = $accountData['API_User'];
     $this->apiPass = $accountData['API_Pass'];
 
@@ -220,7 +230,7 @@ class Account
     $data['authenticated'] = $this->authenticated;
 
     if($this->authenticated){
-      $data['fullName'] = $this->fullname;
+      $data['fullName'] = $this->fullName;
       $data['permission'] = $this->permission;
     }
 
