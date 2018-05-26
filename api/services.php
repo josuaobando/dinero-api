@@ -10,7 +10,7 @@ require_once('system/Startup.class.php');
 
 try{
 
-  Log::custom('JobService', 'Service has started');
+  Log::custom('JobService', 'Started');
 
   //init account session
   $account = Session::getAccount(null, CoreConfig::USER_SYSTEM);
@@ -39,5 +39,5 @@ try{
 }
 
 
-Log::custom('JobService', 'Service has finish');
+Log::custom('JobService', 'Finished');
 ?>
