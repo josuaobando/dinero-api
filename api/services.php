@@ -12,6 +12,7 @@ try{
 
   Log::custom('JobService', 'Started');
 
+  Session::startSession();
   //init account session
   $account = Session::getAccount(null, CoreConfig::USER_SYSTEM);
 
