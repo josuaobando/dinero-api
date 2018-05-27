@@ -133,14 +133,15 @@ class TransactionAPI extends WS
           return $person;
         }elseif($this->apiStatus == self::STATUS_API_ERROR){
 
-          if(strpos($this->apiMessage, 'No Names Available') != false && strpos($this->apiMessage, 'No Names Available') >= 0){
+          if(strpos($this->apiMessage, 'No Names Available') !== false){
 
             $subject = "No Names Available";
             $body = "There are no names available in Saturn agency";
             $bodyTemplate = MailManager::getEmailTemplate('default', array('body' => $body));
-            $recipients = array('To' => 'mgoficinasf0117@outlook.com', 'Cc' => CoreConfig::MAIL_DEV . ", eric.barahona@gmail.com");
+            $recipients = array('To' => 'mgoficinasf0117@outlook.com', 'Cc' => CoreConfig::MAIL_DEV);
             MailManager::sendEmail($recipients, $subject, $bodyTemplate);
 
+            Log::custom('Saturno', $body);
             $this->apiMessage = 'We cannot give this Customer a name';
             return null;
           }elseif(strpos(strtolower($this->apiMessage), 'black') && strpos(strtolower($this->apiMessage), 'list')){
