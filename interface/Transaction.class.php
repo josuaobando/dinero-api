@@ -67,6 +67,11 @@ class Transaction
   private $accountId;
 
   /**
+   * @var int
+   */
+  private $modifiedBy;
+
+  /**
    * @var bool
    */
   private $API;
@@ -333,6 +338,14 @@ class Transaction
   }
 
   /**
+   * @param int $modifiedBy
+   */
+  public function setModifiedBy($modifiedBy)
+  {
+    $this->modifiedBy = $modifiedBy;
+  }
+
+  /**
    * @param boolean $API
    */
   public function setAPI($API)
@@ -386,7 +399,7 @@ class Transaction
   public function update()
   {
     $this->validateControlNumber();
-    return $this->tblTransaction->update($this->transactionId, $this->transactionStatusId, $this->customerId, $this->personId, $this->amount, $this->fee, $this->agencyId, $this->accountId, $this->controlNumber, $this->reason, $this->note, $this->apiTransactionId);
+    return $this->tblTransaction->update($this->transactionId, $this->transactionStatusId, $this->customerId, $this->personId, $this->amount, $this->fee, $this->agencyId, $this->modifiedBy, $this->controlNumber, $this->reason, $this->note, $this->apiTransactionId);
   }
 
   /**
@@ -408,6 +421,7 @@ class Transaction
     $this->agencyId = $transactionData['Agency_Id'];
     $this->controlNumber = $transactionData['ControlNumber'];
     $this->accountId = $transactionData['Account_Id'];
+    $this->modifiedBy = $transactionData['ModifiedBy'];
     $this->API = $transactionData['API'];
     $this->reason = $transactionData['Reason'];
     $this->note = $transactionData['Note'];

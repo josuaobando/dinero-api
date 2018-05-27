@@ -80,7 +80,7 @@ class TblTransaction extends Db
    * @param float $amount
    * @param float $fee
    * @param int $agencyId
-   * @param int $accountId
+   * @param int $modifiedBy
    * @param string $controlNumber
    * @param string $reason
    * @param string $note
@@ -88,9 +88,9 @@ class TblTransaction extends Db
    *
    * @return int
    */
-  public function update($transactionId, $transactionStatusId, $customerId, $personId, $amount, $fee, $agencyId, $accountId, $controlNumber, $reason, $note, $apiTransactionId)
+  public function update($transactionId, $transactionStatusId, $customerId, $personId, $amount, $fee, $agencyId, $modifiedBy, $controlNumber, $reason, $note, $apiTransactionId)
   {
-    $sql = "CALL spTransaction_Update('{transactionId}', '{transactionStatusId}', '{customerId}', '{personId}', '{amount}', '{fee}', '{agencyId}', '{accountId}', '{controlNumber}', '{reason}', '{note}', '{apiTransactionId}')";
+    $sql = "CALL spTransaction_Update('{transactionId}', '{transactionStatusId}', '{customerId}', '{personId}', '{amount}', '{fee}', '{agencyId}', '{modifiedBy}', '{controlNumber}', '{reason}', '{note}', '{apiTransactionId}')";
 
     $params = array();
     $params['transactionId'] = $transactionId;
@@ -100,7 +100,7 @@ class TblTransaction extends Db
     $params['amount'] = $amount;
     $params['fee'] = $fee;
     $params['agencyId'] = $agencyId;
-    $params['accountId'] = $accountId;
+    $params['modifiedBy'] = $modifiedBy;
     $params['controlNumber'] = $controlNumber;
     $params['reason'] = $reason;
     $params['note'] = $note;

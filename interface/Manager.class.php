@@ -340,7 +340,7 @@ class Manager
     $transaction->setFee($fee);
     $transaction->setControlNumber($controlNumber);
     $transaction->setTransactionStatusId(Transaction::STATUS_SUBMITTED);
-    $transaction->setAccountId($this->account->getAccountId());
+    $transaction->setModifiedBy($this->account->getAccountId());
 
     //confirm in Saturno
     if($transaction->getAgencyId() == CoreConfig::AGENCY_ID_SATURNO){
@@ -453,7 +453,7 @@ class Manager
     $transaction->setAmount($amount);
     $transaction->setFee($fee);
     $transaction->setControlNumber($controlNumber);
-    $transaction->setAccountId($this->account->getAccountId());
+    $transaction->setModifiedBy($this->account->getAccountId());
 
     //validate if is update transaction
     if($currentStatusId != Transaction::STATUS_APPROVED && $statusId == Transaction::STATUS_APPROVED){
@@ -528,7 +528,7 @@ class Manager
     //update transaction
     $transaction->setPersonId($newPerson->getPersonId());
     $transaction->setTransactionStatusId(Transaction::STATUS_SUBMITTED);
-    $transaction->setAccountId($this->account->getAccountId());
+    $transaction->setModifiedBy($this->account->getAccountId());
     $transaction->setReason('');
     $success = $transaction->update();
 

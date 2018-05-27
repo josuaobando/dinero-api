@@ -26,6 +26,7 @@ try{
       $transactionId = $transaction['Transaction_Id'];
       $transaction = Session::getTransaction();
       $transaction->restore($transactionId);
+      $transaction->setModifiedBy($account->getAccountId());
 
       if($transaction->getTransactionStatusId() == Transaction::STATUS_SUBMITTED){
         $transactionAPI = new TransactionAPI();
