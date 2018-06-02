@@ -182,6 +182,7 @@ class CoreConfig
    */
   const CRON_JOBS_ACTIVE = false;
   const CRON_JOB_SERVICES = 'http://api.dinerosegurohf:8080/api/services.php';
+  const CRON_JOBS_TASK_ACTIVE = false;
 
   /**
    * P2P controller to check stickiness

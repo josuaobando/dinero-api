@@ -296,7 +296,7 @@ class Person
    */
   public function setName($name)
   {
-    $this->name = $name;
+    $this->name = trim($name);
   }
 
   /**
@@ -304,7 +304,7 @@ class Person
    */
   public function setLastName($lastName)
   {
-    $this->surnames = $lastName;
+    $this->surnames = trim($lastName);
   }
 
   /**
@@ -336,7 +336,7 @@ class Person
    */
   public function setAddress($address)
   {
-    $this->address = $address;
+    $this->address = trim($address);
   }
 
   /**

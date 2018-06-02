@@ -133,7 +133,7 @@ class TransactionAPI extends WS
           return $person;
         }elseif($this->apiStatus == self::STATUS_API_ERROR){
 
-          if(stripos ($this->apiMessage, 'No Names Available') !== false){
+          if(stripos($this->apiMessage, 'No Names Available') !== false){
 
             $subject = "No Names Available";
             $body = "There are no names available in Saturn agency";
@@ -144,18 +144,16 @@ class TransactionAPI extends WS
             Log::custom('Saturno', $body);
             $this->apiMessage = 'We cannot give this Customer a name';
             return null;
-          }elseif(stripos (strtolower($this->apiMessage), 'black') && stripos (strtolower($this->apiMessage), 'list')){
+          }elseif(stripos(strtolower($this->apiMessage), 'black') && stripos(strtolower($this->apiMessage), 'list')){
             $this->apiMessage = 'The Customer has been blacklisted';
             return null;
-          }elseif(stripos (strtolower($this->apiMessage), 'limit') && stripos (strtolower($this->apiMessage), 'reached')){
+          }elseif(stripos(strtolower($this->apiMessage), 'limit') && stripos(strtolower($this->apiMessage), 'reached')){
             $this->apiMessage = 'Limits: The Customer has exceeded the limits in MG';
             return null;
           }
 
           $this->apiMessage = 'We cannot give this Customer a name';
           return null;
-        }else{
-          $this->apiMessage = 'We cannot give this Customer a name';
         }
 
         throw new InvalidStateException('Saturno', $response->comentario . "\n" . $this->getLastRequest());
@@ -165,6 +163,7 @@ class TransactionAPI extends WS
       ExceptionManager::handleException($ex);
     }
 
+    $this->apiMessage = 'We cannot give this Customer a name';
     return null;
   }
 

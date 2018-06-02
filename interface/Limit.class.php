@@ -129,8 +129,8 @@ class Limit
             }
             break;
           case self::LIMIT_INTERVAL_MONTHLY:
-            $monthlyTransactions = $this->stats['MonthlyAmount'];
-            if($monthlyTransactions && ($monthlyTransactions + $transactionAmount) > $limitValue){
+            $monthlyAmount = $this->stats['MonthlyAmount'];
+            if($monthlyAmount && ($monthlyAmount + $transactionAmount) > $limitValue){
               throw new LimitException("Limits: The maximum allowed amount (Monthly) is: " . $limit['Value'] . " USD");
             }
             break;

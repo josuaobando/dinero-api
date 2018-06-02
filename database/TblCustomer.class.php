@@ -137,24 +137,6 @@ class TblCustomer extends Db
   }
 
   /**
-   * @param $customerName
-   *
-   * @return array
-   */
-  public function getSimilarSearch($customerName)
-  {
-    $sql = "CALL spCustomer_SimilarSearch('{customerName}')";
-
-    $params = array();
-    $params['customerName'] = $customerName;
-
-    $rows = array();
-    $this->executeQuery($sql, $rows, $params);
-
-    return $rows;
-  }
-
-  /**
    * @param $agencyTypeId
    * @param $customer
    * @return array
@@ -224,7 +206,7 @@ class TblCustomer extends Db
    */
   public function getStats($customerId, $transactionTypeId)
   {
-    $sql = "CALL customer_getStats('{customerId}', '{transactionTypeId}')";
+    $sql = "CALL spCustomer_Stats('{customerId}', '{transactionTypeId}')";
 
     $params = array();
     $params['customerId'] = $customerId;
