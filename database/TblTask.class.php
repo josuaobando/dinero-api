@@ -29,17 +29,31 @@ class TblTask extends Db
   /**
    * get task to execute
    *
-   *
    * @return array
    */
   public function getTask()
   {
     $sql = "CALL spTask()";
 
-    $row = array();
+    $rows = array();
     $this->executeQuery($sql, $rows);
 
-    return $row;
+    return $rows;
+  }
+
+  /**
+   * get pending API transactions
+   *
+   * @return array
+   */
+  public function getPendingTransactions()
+  {
+    $sql = "CALL spTask_PendingTransaction()";
+
+    $rows = array();
+    $this->executeQuery($sql, $rows);
+
+    return $rows;
   }
 
 }

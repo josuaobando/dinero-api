@@ -52,23 +52,38 @@ class Task
   /**
    * @var int
    */
-  protected $value;
+  protected $day;
+
+  /**
+   * @var int
+   */
+  protected $hour;
+
+  /**
+   * @var int
+   */
+  protected $minute;
 
   /**
    * TblTask reference
    *
    * @var TblTask
    */
-  private $tblTask;
+  protected $tblTask;
 
   /**
    * Task constructor.
-   *
-   * @param array $setting
    */
-  public function __construct($setting)
+  public function __construct()
   {
     $this->tblTask = TblTask::getInstance();
+  }
+
+  /**
+   * @param $setting
+   */
+  public function init($setting)
+  {
     $this->id = $setting['Task_Id'];
     $this->name = $setting['Task'];
     $this->interval = $setting['TaskInterval'];
@@ -76,34 +91,60 @@ class Task
     $this->intervalType = $setting['TaskIntervalType'];
     $this->intervalTypeId = $setting['TaskIntervalType_Id'];
     $this->specific = $setting['Specific'];
-    $this->value = $setting['Value'];
+    $this->day = $setting['Day'];
+    $this->hour = $setting['Hour'];
+    $this->minute = $setting['Minute'];
   }
 
   /**
+   * check if the task have to run
+   *
    * @return bool
+   *
+   * @throws InvalidStateException
    */
-  protected function init()
+  public function check()
   {
-    $datetime = date('Y-m-d H:i:s');
+    //we get the current day
+    $currentDateTime = getdate(time());
+    $currentMinutes = $currentDateTime['minutes'];
+    $currentHour = $currentDateTime['hours'];
 
-    switch($this->intervalId){
+    switch($this->intervalTypeId){
       case self::INTERVAL_TYPE_MINUTE:
-        return true;
-        break;
+
+        if($this->specific){
+          return $currentMinutes == $this->minute;
+        }
+        return $this->minute == 0 || ($currentMinutes % $this->minute) == 0;
+
       case self::INTERVAL_TYPE_HOURLY:
-        break;
+
+        if($this->hour > 0){
+          if($this->specific){
+            return ($currentHour == $this->hour) && $currentMinutes == 0;
+          }
+          return ($currentHour % $this->hour) == 0 && $currentMinutes == 0;
+        }
+
+        return $currentMinutes == 0;
       case self::INTERVAL_TYPE_DAILY:
-        break;
-      case self::INTERVAL_TYPE_WEEKLY:
-        break;
+        //return $this->intervalHour == $currentDateTime['hours'] && $this->intervalMinute == $currentDateTime['minutes'];
+
+      case self::INTERVAL_TYPE_WEEKLY: //1: Monday, 7:Sunday
+        //return $this->intervalDay == $currentDateTime['wday'] && $this->intervalHour == $currentDateTime['hours'] && $this->intervalMinute == $currentDateTime['minutes'];
+
       case self::INTERVAL_TYPE_MONTHLY:
-        break;
+        //return $this->intervalDay == $currentDateTime['mday'] && $this->intervalHour == $currentDateTime['hours'] && $this->intervalMinute == $currentDateTime['minutes'];
+
+      default:
+        //throw new InvalidStateException("Invalid interval: $this->intervalTypeId for report ID: $this->reportId");
     }
 
     return false;
   }
 
-  protected function process()
+  public function process()
   {
     throw new InvalidStateException("'" . __METHOD__ . "' must be implemented in '" . get_class($this) . "' class.");
   }
