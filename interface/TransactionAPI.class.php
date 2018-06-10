@@ -217,14 +217,17 @@ class TransactionAPI extends WS
           try{
             if($apiTransactionId){
               $subject = "Problem re-submit transaction $apiTransactionId";
+              $body = "TrackId $apiTransactionId";
             }else{
               $subject = "Problem submit transaction $apiTransactionId";
+              $body = "Nameid $apiTransactionId";
             }
 
-            $body = "TrackId $apiTransactionId";
             $body .= "\n" . "Status: $response->status";
             $body .= "\n" . "Comentario: $response->comentario";
+            $body .= "\n\n" . "Request:";
             $body .= "\n\n" . $this->getLastRequest();
+            $body .= "\n\n" . "Response:";
             $body .= "\n\n" . Util::objToStr($response);
 
             $bodyTemplate = MailManager::getEmailTemplate('default', array('body' => $body));
