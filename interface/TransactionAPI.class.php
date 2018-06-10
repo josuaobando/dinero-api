@@ -180,6 +180,7 @@ class TransactionAPI extends WS
       $person = Session::getPerson($transaction->getPersonId());
       $customer = Session::getCustomer($transaction->getCustomerId());
       $apiTransactionId = $transaction->getApiTransactionId();
+      $nameId = $person->getNameId();
 
       $params = array();
       //credentials
@@ -189,7 +190,7 @@ class TransactionAPI extends WS
       if($apiTransactionId){
         $params['trackid'] = $apiTransactionId;
       }else{
-        $params['nameid'] = $person->getNameId();
+        $params['nameid'] = $nameId;
       }
       $params['amount'] = $transaction->getAmount();
       $params['controlnumber'] = $transaction->getControlNumber();
@@ -216,11 +217,11 @@ class TransactionAPI extends WS
 
           try{
             if($apiTransactionId){
-              $subject = "Problem re-submit transaction $apiTransactionId";
+              $subject = "Problem re-submit transaction";
               $body = "TrackId $apiTransactionId";
             }else{
-              $subject = "Problem submit transaction $apiTransactionId";
-              $body = "Nameid $apiTransactionId";
+              $subject = "Problem submit transaction";
+              $body = "Nameid $nameId";
             }
 
             $body .= "\n" . "Status: $response->status";
