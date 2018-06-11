@@ -62,8 +62,10 @@ class Encrypt
   /**
    * mysql AES decrypt method
    *
-   * @param string $val
-   * @param string $ky
+   * @param $val
+   * @param $ky
+   *
+   * @return string
    */
   public static function aesDecrypt($val, $ky)
   {
@@ -80,8 +82,10 @@ class Encrypt
   /**
    * mysql AES encrypt method
    *
-   * @param string $val
-   * @param string $ky
+   * @param $val
+   * @param $ky
+   *
+   * @return string
    */
   public static function aesEncrypt($val, $ky)
   {
@@ -128,6 +132,17 @@ class Encrypt
       }
     }
     return $result;
+  }
+
+  /**
+   * generate md5 string
+   *
+   * @param string $val
+   *
+   * @return string
+   */
+  public static function generateMD5($val){
+    return hash('md5', $val);
   }
 
   /**

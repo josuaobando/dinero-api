@@ -103,7 +103,7 @@ class TransactionAPI extends WS
         if($this->apiStatus == self::STATUS_API_REQUESTED){
 
           $name = $response->recibe;
-          $nameId = $response->nameId;
+          $personalId = $response->nameId;
 
           $person = new Person();
           $person->setPersonLisId(100);
@@ -117,7 +117,7 @@ class TransactionAPI extends WS
           $person->setIsActive(1);
           $person->setName($name);
           $person->setLastName('');
-          $person->setPersonalId($nameId);
+          $person->setPersonalId($personalId);
           $person->setTypeId('ID');
           $person->setExpirationDateId('NR');
           $person->setAddress('NR');
@@ -127,10 +127,116 @@ class TransactionAPI extends WS
           $person->setGender('NR');
           $person->setProfession('NR');
           $person->setPhone('NR');
-          $person->setNameId($nameId);
+          $person->setNameId($personalId);
           $person->add();
 
           return $person;
+        }elseif($this->apiStatus == self::STATUS_API_ERROR){
+
+          if(stripos($this->apiMessage, 'No Names Available') !== false){
+
+            $subject = "No Names Available";
+            $body = "There are no names available in Saturn agency";
+            $bodyTemplate = MailManager::getEmailTemplate('default', array('body' => $body));
+            $recipients = array('To' => 'mgoficinasf0117@outlook.com', 'Cc' => CoreConfig::MAIL_DEV);
+            MailManager::sendEmail($recipients, $subject, $bodyTemplate);
+
+            Log::custom('Saturno', $body);
+            $this->apiMessage = 'We cannot give this Customer a name';
+            return null;
+          }elseif(stripos(strtolower($this->apiMessage), 'black') && stripos(strtolower($this->apiMessage), 'list')){
+            $this->apiMessage = 'The Customer has been blacklisted';
+            return null;
+          }elseif(stripos(strtolower($this->apiMessage), 'limit') && stripos(strtolower($this->apiMessage), 'reached')){
+            $this->apiMessage = 'Limits: The Customer has exceeded the limits in MG';
+            return null;
+          }
+
+          $this->apiMessage = 'We cannot give this Customer a name';
+          return null;
+        }
+
+        throw new InvalidStateException('Saturno', $response->comentario . "\n" . $this->getLastRequest());
+      }
+
+    }catch(Exception $ex){
+      ExceptionManager::handleException($ex);
+    }
+
+    $this->apiMessage = 'We cannot give this Customer a name';
+    return null;
+  }
+
+  /**
+   * get name for the customer
+   *
+   * @return Person
+   */
+  public function getSender()
+  {
+    try{
+
+      $customer = Session::getCustomer();
+      $transaction = Session::getTransaction();
+
+      $params = array();
+      //credentials
+      $params['user'] = $this->agency['Setting_User'];
+      $params['password'] = $this->agency['Setting_Password'];
+      //transaction
+      $params['amount'] = $transaction->getAmount();
+      $params['receivername'] = $customer->getCustomer();
+      $params['receivercity'] = $customer->getStateName();
+      $params['receiverstate'] = $customer->getState();
+      $params['receivercountry'] = $customer->getCountry();
+
+      $url = $this->agency['Setting_URL'];
+      $response = $this->execSoapSimple($url, 'SubmitPayout', $params, array('uri' => 'http://WS/', 'soapaction' => ''));
+      if($response && $response instanceof stdClass){
+
+        $this->apiMessage = $response->comentario;
+        $this->apiStatus = strtolower($response->status);
+        if($this->apiStatus == self::STATUS_API_PENDING){
+
+          $name = trim($response->envia);
+          $personalId = Encrypt::generateMD5($name);
+
+          $person = new Person();
+          $person->setPersonLisId(100);
+          $person->setCountry('CR');
+          $person->setCountryId(52);
+          $person->setCountryName('Costa Rica');
+          $person->setState('SJ');
+          $person->setStateId(877);
+          $person->setStateName('San José');
+          $person->setAvailable(1);
+          $person->setIsActive(1);
+          $person->setName($name);
+          $person->setLastName('');
+          $person->setPersonalId($personalId);
+          $person->setTypeId('Hash');
+          $person->setExpirationDateId('NR');
+          $person->setAddress('NR');
+          $person->setCity('San José');
+          $person->setBirthDate('NR');
+          $person->setMaritalStatus('NR');
+          $person->setGender('NR');
+          $person->setProfession('NR');
+          $person->setPhone('NR');
+          $person->setNameId($personalId);
+          $person->add();
+
+          if($response->trackId){
+            if(is_numeric($this->cargo)){
+              $transaction->setFee($this->cargo);
+            }
+
+            $transaction->setApiTransactionId($this->apiTransactionId);
+            $transaction->update();
+            return $person;
+          }
+
+          return null;
         }elseif($this->apiStatus == self::STATUS_API_ERROR){
 
           if(stripos($this->apiMessage, 'No Names Available') !== false){
@@ -189,13 +295,13 @@ class TransactionAPI extends WS
       if($apiTransactionId){
         $params['trackid'] = $apiTransactionId;
       }else{
-        $params['nameid'] = $person->getNameId();
+        $params['nameid'] = $person->getPersonalId();
       }
       $params['amount'] = $transaction->getAmount();
       $params['controlnumber'] = $transaction->getControlNumber();
       //customer
       $params['sendername'] = $customer->getCustomer();
-      $params['sendercity'] = $customer->getState();
+      $params['sendercity'] = $customer->getStateName();
       $params['senderstate'] = $customer->getState();
       $params['sendercountry'] = $customer->getCountry();
 
@@ -268,7 +374,9 @@ class TransactionAPI extends WS
       $params['trackid'] = $transaction->getApiTransactionId();
 
       $url = $this->agency['Setting_URL'];
-      $response = $this->execSoapSimple($url, 'GetDeposito', $params, array('uri' => 'http://WS/', 'soapaction' => ''));
+      $method = ($transaction->getTransactionTypeId() == Transaction::TYPE_SENDER) ? 'GetPayout' : 'GetDeposito';
+
+      $response = $this->execSoapSimple($url, $method, $params, array('uri' => 'http://WS/', 'soapaction' => ''));
       if($response && $response instanceof stdClass){
 
         $this->apiMessage = $response->comentario;
@@ -277,7 +385,6 @@ class TransactionAPI extends WS
           case self::STATUS_API_APPROVED:
             $transaction->setTransactionStatusId(Transaction::STATUS_APPROVED);
             $transaction->setAmount($response->monto);
-            $transaction->setFee($response->cargo);
             $transaction->setReason('Ok');
             break;
           case self::STATUS_API_REJECTED:

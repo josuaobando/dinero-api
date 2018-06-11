@@ -391,7 +391,6 @@ class Customer
       if($similarList && COUNT($similarList) > 0){
         foreach($similarList as $similar){
           $registerCustomerName = strtoupper($similar['CustomerName']);
-          //similar_text($customerNameRequest, $registerCustomerName, $percent);
           $percent = Util::similarPercent($customerNameRequest, $registerCustomerName);
           if($percent >= CoreConfig::CUSTOMER_SIMILAR_PERCENT && $percent > $maxPercent){
 

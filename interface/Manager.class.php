@@ -210,16 +210,24 @@ class Manager
     $limit->evaluate();
 
     $transactionAPI = new TransactionAPI();
-    $person = $transactionAPI->getName();
+    if($transaction->getTransactionTypeId() == Transaction::TYPE_RECEIVER){
+      $person = $transactionAPI->getName();
+    }else{
+      $person = $transactionAPI->getSender();
+    }
+
     if(!$person || !$person->getPersonId()){
       throw new APIException($transactionAPI->getApiMessage());
     }
 
     //change agency to customer
     if($customer->getAgencyId() != CoreConfig::AGENCY_ID_SATURNO){
-      $customer->setAgencyId(CoreConfig::AGENCY_ID_SATURNO);
-      $customer->setIsAPI(1);
-      $customer->update();
+      //only in deposits
+      if($transaction->getTransactionTypeId() == Transaction::TYPE_RECEIVER){
+        $customer->setAgencyId(CoreConfig::AGENCY_ID_SATURNO);
+        $customer->setIsAPI(1);
+        $customer->update();
+      }
     }
 
     //block person
@@ -250,7 +258,7 @@ class Manager
   }
 
   /**
-   * get a new receiver
+   * get a new receiver (deposits)
    *
    * @param WSRequest $wsRequest
    *
@@ -273,7 +281,7 @@ class Manager
   }
 
   /**
-   * get a new sender
+   * get a new sender (Payouts)
    *
    * @param WSRequest $wsRequest
    *

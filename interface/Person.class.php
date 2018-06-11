@@ -15,6 +15,7 @@ class Person
   private $stateName;
   private $available;
   private $isActive;
+  private $isAPI;
   private $name;
   private $surnames;
 
@@ -393,6 +394,14 @@ class Person
   public function setNameId($nameId)
   {
     $this->nameId = $nameId;
+  }
+
+  /**
+   * @param mixed $isAPI
+   */
+  public function setIsAPI($isAPI)
+  {
+    $this->isAPI = $isAPI;
   }
 
   /**
