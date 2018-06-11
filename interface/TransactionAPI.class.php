@@ -81,7 +81,6 @@ class TransactionAPI extends WS
   public function getName()
   {
     try{
-
       $customer = Session::getCustomer();
       $transaction = Session::getTransaction();
 
@@ -175,7 +174,6 @@ class TransactionAPI extends WS
   public function getSender()
   {
     try{
-
       $customer = Session::getCustomer();
       $transaction = Session::getTransaction();
 
@@ -227,8 +225,8 @@ class TransactionAPI extends WS
           $person->add();
 
           if($response->trackId){
-            if(is_numeric($this->cargo)){
-              $transaction->setFee($this->cargo);
+            if(is_numeric($response->cargo)){
+              $transaction->setFee($response->cargo);
             }
 
             $transaction->setApiTransactionId($this->apiTransactionId);
@@ -286,7 +284,7 @@ class TransactionAPI extends WS
       $person = Session::getPerson($transaction->getPersonId());
       $customer = Session::getCustomer($transaction->getCustomerId());
       $apiTransactionId = $transaction->getApiTransactionId();
-      $nameId = $person->getNameId();
+      $nameId = $person->getPersonalId();
 
       $params = array();
       //credentials
