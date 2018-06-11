@@ -338,9 +338,13 @@ class Manager
 
       $customerTransaction->setFirstName($customerRequest->getFirstName());
       $customerTransaction->setLastName($customerRequest->getLastName());
-      $customerTransaction->update();
+      $customerUpdated = $customerTransaction->update();
 
-      Log::custom('UpdateCustomer', "Customer updated | Original: $originalCustomerName New: $newCustomerName Percent: $percent%");
+      if($customerUpdated){
+        Log::custom('UpdateCustomer', "Customer updated | Original: $originalCustomerName New: $newCustomerName Percent: $percent%");
+      }else{
+        Log::custom('UpdateCustomer', "Customer not updated | Original: $originalCustomerName New: $newCustomerName Percent: $percent%");
+      }
     }
 
     //set new values
