@@ -136,7 +136,8 @@ class MailManager
     $mailer->SMTPSecure = "tls";
 
     if(!$mailer->send()){
-      MailManager::$lastError = 'Email was not sent: ' . $mailer->ErrorInfo;
+      MailManager::$lastError = 'Email was not sent: ' . $mailer->ErrorInfo . ' Subject: ' . $subject;
+      Log::custom('Email', MailManager::$lastError);
       return false;
     }
 

@@ -94,7 +94,14 @@ class CoreConfig
    *
    * @var string
    */
-  const LOG_PATH = "D:/Tavo/api/@LOGS/";
+  const LOG_PATH = "C:/Logs/";
+
+  /**
+   * path where all attachments will be stored
+   *
+   * @var string
+   */
+  const ATTACHMENT_PATH = "C:/Logs/";
 
   /**
    * options to configure the db stats tracking process

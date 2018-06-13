@@ -28,20 +28,13 @@ class Task_Status extends Task
     $account = Session::getAccount();
     foreach($this->transactions as $transaction){
 
-      $agencyId = $transaction['Agency_Id'];
-      if($agencyId == CoreConfig::AGENCY_ID_SATURNO){
+      $transactionId = $transaction['Transaction_Id'];
+      $transaction = Session::getTransaction();
+      $transaction->restore($transactionId);
+      $transaction->setModifiedBy($account->getAccountId());
 
-        $transactionId = $transaction['Transaction_Id'];
-        $transaction = Session::getTransaction();
-        $transaction->restore($transactionId);
-        $transaction->setModifiedBy($account->getAccountId());
-
-        if($transaction->getTransactionStatusId() == Transaction::STATUS_SUBMITTED){
-          $transactionAPI = new TransactionAPI();
-          $transactionAPI->getStatus();
-        }
-
-      }
+      $transactionAPI = new TransactionAPI();
+      $transactionAPI->getStatus();
 
     }
   }

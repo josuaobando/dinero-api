@@ -56,6 +56,28 @@ class TblTask extends Db
     return $rows;
   }
 
+  /**
+   * get report transactions
+   *
+   * @param int $agencyTypeId
+   * @param int $agencyId
+   *
+   * @return array
+   */
+  public function getReportTransactions($agencyTypeId, $agencyId = 0)
+  {
+    $sql = "CALL spTask_Report_Transactions('{agencyTypeId}', '{agencyId}')";
+
+    $params = array();
+    $params['agencyTypeId'] = $agencyTypeId;
+    $params['agencyId'] = $agencyId;
+
+    $rows = array();
+    $this->executeQuery($sql, $rows, $params);
+
+    return $rows;
+  }
+
 }
 
 ?>
