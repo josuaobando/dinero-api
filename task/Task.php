@@ -126,7 +126,7 @@ class Task
         Log::custom($this->name, "hour interval [$this->hour] current hour: $currentHour current minutes: $currentMinutes");
         if($this->hour > 0){
           if($this->specific){
-            return ($currentHour == $this->hour) && $currentMinutes == $currentMinutes;
+            return ($currentHour == $this->hour) && $currentMinutes == $this->minute;
           }
           return ($currentHour % $this->hour) == 0 && $currentMinutes == 0;
         }
