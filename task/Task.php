@@ -115,7 +115,7 @@ class Task
     switch($this->intervalTypeId){
       case self::INTERVAL_TYPE_MINUTE:
 
-        Log::custom($this->name, "minute interval [$this->minute] current: $currentMinutes");
+        Log::custom($this->name, "minute interval [$this->minute] current minutes: $currentMinutes");
         if($this->specific){
           return $currentMinutes == $this->minute;
         }
@@ -123,7 +123,7 @@ class Task
 
       case self::INTERVAL_TYPE_HOURLY:
 
-        Log::custom($this->name, "hour interval [$this->hour] current hour: $currentHour current: $currentMinutes");
+        Log::custom($this->name, "hour interval [$this->hour] current hour: $currentHour current minutes: $currentMinutes");
         if($this->hour > 0){
           if($this->specific){
             return ($currentHour == $this->hour) && $currentMinutes == $currentMinutes;
