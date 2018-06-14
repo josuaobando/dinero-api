@@ -16,10 +16,6 @@ class Task_Report extends Task
   public function init($setting)
   {
     parent::init($setting);
-
-    $this->transactions['Saturno'] = $this->tblTask->getReportTransactions(Transaction::AGENCY_MONEY_GRAM, CoreConfig::AGENCY_ID_SATURNO);
-    $this->transactions['MG'] = $this->tblTask->getReportTransactions(Transaction::AGENCY_MONEY_GRAM, 0);
-    $this->transactions['RIA'] = $this->tblTask->getReportTransactions(Transaction::AGENCY_RIA, 0);
   }
 
   /**
@@ -27,6 +23,10 @@ class Task_Report extends Task
    */
   public function process()
   {
+    $this->transactions['Saturno'] = $this->tblTask->getReportTransactions(Transaction::AGENCY_MONEY_GRAM, CoreConfig::AGENCY_ID_SATURNO);
+    $this->transactions['MG'] = $this->tblTask->getReportTransactions(Transaction::AGENCY_MONEY_GRAM, 0);
+    $this->transactions['RIA'] = $this->tblTask->getReportTransactions(Transaction::AGENCY_RIA, 0);
+
     foreach($this->transactions as $group => $transactions){
       if(is_array($transactions) && count($transactions) > 0){
         $this->report($group, $transactions);

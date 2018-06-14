@@ -16,8 +16,6 @@ class Task_Status extends Task
   public function init($setting)
   {
     parent::init($setting);
-
-    $this->transactions = $this->tblTask->getPendingTransactions();
   }
 
   /**
@@ -26,6 +24,8 @@ class Task_Status extends Task
   public function process()
   {
     $account = Session::getAccount();
+
+    $this->transactions = $this->tblTask->getPendingTransactions();
     foreach($this->transactions as $transaction){
 
       $transactionId = $transaction['Transaction_Id'];

@@ -41,13 +41,18 @@ class TaskManager
         }
 
         try{
+          Log::custom($taskName, "Start");
+
           $taskClass = new $taskNameClass();
           if($taskClass instanceof Task){
             $taskClass->init($task);
             if($taskClass->check()){
+              Log::custom($taskName, "Process...");
               $taskClass->process();
             }
           }
+
+          Log::custom($taskName, "Finish");
         }catch(Exception $ex){
           ExceptionManager::handleException($ex);
         }
