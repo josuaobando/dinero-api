@@ -113,25 +113,22 @@ class Task
     switch($this->intervalTypeId){
       case self::INTERVAL_TYPE_MINUTE:
 
-        Log::custom($this->name, "Minute Interval [$this->minute] | Current minutes: $currentMinutes");
         if($this->specific){
           return $currentMinutes == $this->minute;
+        }else{
+          return $this->minute == 0 || ($currentMinutes % $this->minute) == 0;
         }
-        return $this->minute == 0 || ($currentMinutes % $this->minute) == 0;
 
       case self::INTERVAL_TYPE_HOURLY:
 
-        Log::custom($this->name, "Hour Interval [hour: $this->hour minutes: $this->minute] | Current hour: $currentHour | Current minutes: $currentMinutes");
         if($this->hour > 0){
-          if($this->specific){
-            return ($currentHour == $this->hour) && $currentMinutes == $this->minute;
-          }
-          return ($currentHour % $this->hour) == 0 && $currentMinutes == 0;
+          return $currentHour % $this->hour == 0 && $currentMinutes == 0;
+        }else{
+          return $currentMinutes == 0;
         }
 
-        return $currentMinutes == 0;
       case self::INTERVAL_TYPE_DAILY:
-        //return $this->intervalHour == $currentDateTime['hours'] && $this->intervalMinute == $currentDateTime['minutes'];
+        return $currentHour == $this->hour && $currentMinutes == $this->minute;
 
       case self::INTERVAL_TYPE_WEEKLY: //1: Monday, 7:Sunday
         //return $this->intervalDay == $currentDateTime['wday'] && $this->intervalHour == $currentDateTime['hours'] && $this->intervalMinute == $currentDateTime['minutes'];

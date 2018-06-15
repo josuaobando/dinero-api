@@ -78,7 +78,7 @@ class Task_Report extends Task
       if($attachment){
 
         $subject = "Report Transactions | $name";
-        $body = "This attachment report include the all approved transaction of $name";
+        $body = "The attachment include all approved transaction of $name";
         $bodyTemplate = MailManager::getEmailTemplate('default', array('body' => $body));
         $recipients = array('To' => 'eric.barahona@gmail.com', 'Cc' => CoreConfig::MAIL_DEV);
 
