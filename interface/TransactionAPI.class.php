@@ -225,12 +225,10 @@ class TransactionAPI extends WS
           $person->add();
 
           if($response->trackId){
+            $transaction->setApiTransactionId($response->trackId);
             if(is_numeric($response->cargo)){
               $transaction->setFee($response->cargo);
             }
-
-            $transaction->setApiTransactionId($this->apiTransactionId);
-            $transaction->update();
             return $person;
           }
 
@@ -385,6 +383,9 @@ class TransactionAPI extends WS
         $this->apiStatus = strtolower($response->status);
         switch($this->apiStatus){
           case self::STATUS_API_APPROVED:
+            if($transaction->getTransactionTypeId() == Transaction::TYPE_SENDER){
+              $transaction->setControlNumber($response->documento);
+            }
             $transaction->setTransactionStatusId(Transaction::STATUS_APPROVED);
             $transaction->setAmount($response->monto);
             $transaction->setReason('Ok');

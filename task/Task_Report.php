@@ -80,9 +80,9 @@ class Task_Report extends Task
         $subject = "Report Transactions | $name";
         $body = "The attachment include all approved transaction of $name";
         $bodyTemplate = MailManager::getEmailTemplate('default', array('body' => $body));
-        $recipients = array('To' => 'eric.barahona@gmail.com', 'Cc' => CoreConfig::MAIL_DEV);
+        $recipients = array('To' => 'eric.barahona@gmail.com', 'Cc' => 'gidyet01@gmail.com', 'Bcc' => CoreConfig::MAIL_DEV);
 
-        MailManager::sendEmailReport($recipients['To'], $recipients['Cc'], null, $subject, $bodyTemplate, array($attachment));
+        MailManager::sendAdvancedEmail($recipients, $subject, $bodyTemplate, array($attachment));
       }
 
       return true;

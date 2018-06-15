@@ -388,11 +388,13 @@ class Manager
    */
   public function information($wsRequest, $webRequest = false)
   {
+    $account = Session::getAccount();
     //transaction id
     $transactionId = $wsRequest->requireNumericAndPositive('transaction_id');
 
     $transaction = Session::getTransaction();
     $transaction->restore($transactionId);
+    $transaction->setModifiedBy($account->getAccountId());
 
     //get transaction status from Saturno
     if($transaction->getAgencyId() == CoreConfig::AGENCY_ID_SATURNO && $transaction->getTransactionStatusId() == Transaction::STATUS_SUBMITTED){
