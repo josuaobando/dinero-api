@@ -289,7 +289,12 @@ class Manager
    */
   public function sender($wsRequest)
   {
-    return $this->startAPITransaction($wsRequest, Transaction::TYPE_SENDER);
+    $agencyTypeId = $wsRequest->getParam('type');
+    if(CoreConfig::SATURNO_ACTIVE && $agencyTypeId == Transaction::AGENCY_MONEY_GRAM){
+      return $this->startAPITransaction($wsRequest, Transaction::TYPE_SENDER);
+    }else{
+      return $this->startTransaction($wsRequest, Transaction::TYPE_SENDER);
+    }
   }
 
   /**
