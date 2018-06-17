@@ -92,6 +92,10 @@ class TblTransaction extends Db
   {
     $sql = "CALL spTransaction_Update('{transactionId}', '{transactionStatusId}', '{customerId}', '{personId}', '{amount}', '{fee}', '{agencyId}', '{modifiedBy}', '{controlNumber}', '{reason}', '{note}', '{apiTransactionId}')";
 
+    if(!$modifiedBy){
+      $modifiedBy = CoreConfig::USER_SYSTEM;
+    }
+
     $params = array();
     $params['transactionId'] = $transactionId;
     $params['transactionStatusId'] = $transactionStatusId;
