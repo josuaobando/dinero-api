@@ -85,21 +85,18 @@ class Session
    * get account from session
    *
    * @param null $username
-   * @param null $accountId
    *
    * @return Account
-   * @throws InvalidStateException
    */
-  public static function getAccount($username = null, $accountId = null)
+  public static function getAccount($username = null)
   {
+    $account = new Account();
     $accountSession = self::getSessionObject(self::SID_ACCOUNT);
     if($accountSession && $accountSession instanceof Account){
       $account = $accountSession;
-    }elseif($username || $accountId){
-      $account = new Account($username, $accountId);
+    }elseif($username){
+      $account = new Account($username);
       self::storeSessionObject(self::SID_ACCOUNT, $account, true);
-    }else{
-      throw new InvalidStateException("Session has expired!");
     }
 
     return $account;
