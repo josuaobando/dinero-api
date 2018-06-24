@@ -345,10 +345,11 @@ class Manager
       $customerTransaction->setLastName($customerRequest->getLastName());
       $customerUpdated = $customerTransaction->update();
 
+      $username = $transaction->getUsername();
       if($customerUpdated){
-        Log::custom('UpdateCustomer', "Customer updated | Original: $originalCustomerName New: $newCustomerName Percent: $percent%");
+        Log::custom('UpdateCustomer', "Customer updated | Username: $username Original: $originalCustomerName New: $newCustomerName Percent: $percent%");
       }else{
-        Log::custom('UpdateCustomer', "Customer not updated | Original: $originalCustomerName New: $newCustomerName Percent: $percent%");
+        Log::custom('UpdateCustomer', "Customer not updated | Username: $username Original: $originalCustomerName New: $newCustomerName Percent: $percent%");
       }
     }
 
