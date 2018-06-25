@@ -61,16 +61,18 @@ class TblTask extends Db
    *
    * @param int $agencyTypeId
    * @param int $agencyId
+   * @param int $transactionTypeId | options: Transaction::TYPE_RECEIVER, Transaction::TYPE_SENDER
    *
    * @return array
    */
-  public function getReportTransactions($agencyTypeId, $agencyId = 0)
+  public function getReportTransactions($agencyTypeId, $agencyId = 0, $transactionTypeId = 0)
   {
-    $sql = "CALL spTask_Report_Transactions('{agencyTypeId}', '{agencyId}')";
+    $sql = "CALL spTask_Report_Transactions('{agencyTypeId}', '{agencyId}', '{transactionTypeId}')";
 
     $params = array();
     $params['agencyTypeId'] = $agencyTypeId;
     $params['agencyId'] = $agencyId;
+    $params['transactionTypeId'] = $transactionTypeId;
 
     $rows = array();
     $this->executeQuery($sql, $rows, $params);
