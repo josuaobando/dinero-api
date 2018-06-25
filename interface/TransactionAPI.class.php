@@ -155,7 +155,7 @@ class TransactionAPI extends WS
           return null;
         }
 
-        throw new InvalidStateException('Saturno', $response->comentario . "\n" . $this->getLastRequest());
+        Log::custom('Saturno', "Invalid Object Response" . "\n Request: \n\n" . $this->getLastRequest() . "\n Response: \n\n" . Util::objToStr($response));
       }
 
     }catch(Exception $ex){
@@ -258,7 +258,7 @@ class TransactionAPI extends WS
           return null;
         }
 
-        throw new InvalidStateException('Saturno', $response->comentario . "\n" . $this->getLastRequest());
+        Log::custom('Saturno', "Invalid Object Response" . "\n Request: \n\n" . $this->getLastRequest() . "\n Response: \n\n" . Util::objToStr($response));
       }
 
     }catch(Exception $ex){
@@ -270,7 +270,7 @@ class TransactionAPI extends WS
   }
 
   /**
-   * Submit o Re-Submit transaction
+   * Submit or Re-Submit transaction
    *
    * @return bool
    */
@@ -401,7 +401,7 @@ class TransactionAPI extends WS
             $transaction->setTransactionStatusId(Transaction::STATUS_REQUESTED);
             break;
           default:
-            Log::custom('Saturno', $this->apiMessage . "\n" . $this->getLastRequest());
+            Log::custom('Saturno', "Invalid Object Response" . "\n Request: \n\n" . $this->getLastRequest() . "\n Response: \n\n" . Util::objToStr($response));
             return false;
         }
 
