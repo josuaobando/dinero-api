@@ -108,7 +108,7 @@ class Task_Report extends Task
         $row['Date'] = $transaction['ModifiedDate'];
         $row['ControlNumber'] = $transaction['ControlNumber'];
         $row['UniqueId'] = strtoupper($transaction['Username']);
-        $row['Customer'] = ucwords(strtolower($transaction['Customer']));
+        $row['Amount'] = $transaction['Amount'];
         $row['Fee'] = $transaction['Fee'];
 
         $rows[] = $row;
