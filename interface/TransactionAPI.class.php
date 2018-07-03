@@ -387,8 +387,12 @@ class TransactionAPI extends WS
               $transaction->setControlNumber($response->documento);
             }
             $transaction->setTransactionStatusId(Transaction::STATUS_APPROVED);
-            $transaction->setAmount($response->monto);
             $transaction->setReason('Ok');
+
+            //only change amount in deposits
+            if($transaction->getTransactionTypeId() == Transaction::TYPE_RECEIVER){
+              $transaction->setAmount($response->monto);
+            }
             break;
           case self::STATUS_API_REJECTED:
             $transaction->setTransactionStatusId(Transaction::STATUS_REJECTED);
