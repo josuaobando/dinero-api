@@ -74,6 +74,7 @@ class System
    * @param $statusId
    * @param $transactionTypeId
    * @param $filterAgencyType
+   * @param $filterAgencyId
    * @param $accountId
    * @param $beginDate
    * @param $endDate
@@ -85,9 +86,9 @@ class System
    *
    * @return array
    */
-  public function transactionsReport($statusId, $transactionTypeId, $filterAgencyType, $accountId, $beginDate, $endDate, $controlNumber, $customer, $transactionId, $reference, $currentPage)
+  public function transactionsReport($statusId, $transactionTypeId, $filterAgencyType, $filterAgencyId, $accountId, $beginDate, $endDate, $controlNumber, $customer, $transactionId, $reference, $currentPage)
   {
-    return $this->tblSystem->getTransactionsReport($statusId, $transactionTypeId, $filterAgencyType, $accountId, $beginDate, $endDate, $controlNumber, $customer, $transactionId, $reference, $currentPage);
+    return $this->tblSystem->getTransactionsReport($statusId, $transactionTypeId, $filterAgencyType, $filterAgencyId, $accountId, $beginDate, $endDate, $controlNumber, $customer, $transactionId, $reference, $currentPage);
   }
 
 }

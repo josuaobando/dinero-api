@@ -128,6 +128,7 @@ class TblSystem extends Db
    * @param $statusId
    * @param $transactionTypeId
    * @param $filterAgencyType
+   * @param $filterAgencyId
    * @param $accountId
    * @param $beginDate
    * @param $endDate
@@ -139,14 +140,15 @@ class TblSystem extends Db
    *
    * @return array
    */
-  public function getTransactionsReport($statusId, $transactionTypeId, $filterAgencyType, $accountId, $beginDate, $endDate, $controlNumber, $customer, $transactionId, $reference, $currentPage)
+  public function getTransactionsReport($statusId, $transactionTypeId, $filterAgencyType, $filterAgencyId, $accountId, $beginDate, $endDate, $controlNumber, $customer, $transactionId, $reference, $currentPage)
   {
-    $sql = "CALL spReport_Transactions('{statusId}', '{transactionTypeId}', '{agencyType}', '{accountId}', '{beginDate}', '{endDate}', '{controlNumber}', '{customer}', '{transactionId}', '{reference}', '{pageStart}', '{pageSize}')";
+    $sql = "CALL spReport_Transactions('{statusId}', '{transactionTypeId}', '{agencyType}', '{agencyId}', '{accountId}', '{beginDate}', '{endDate}', '{controlNumber}', '{customer}', '{transactionId}', '{reference}', '{pageStart}', '{pageSize}')";
 
     $params = array();
     $params['statusId'] = $statusId;
     $params['transactionTypeId'] = $transactionTypeId;
     $params['agencyType'] = $filterAgencyType;
+    $params['agencyId'] = $filterAgencyId;
     $params['accountId'] = $accountId;
     $params['beginDate'] = $beginDate;
     $params['endDate'] = $endDate;
