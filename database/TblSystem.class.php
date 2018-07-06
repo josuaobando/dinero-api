@@ -137,10 +137,11 @@ class TblSystem extends Db
    * @param $transactionId
    * @param $reference
    * @param $currentPage
+   * @param $pageSize
    *
    * @return array
    */
-  public function getTransactionsReport($statusId, $transactionTypeId, $filterAgencyType, $filterAgencyId, $accountId, $beginDate, $endDate, $controlNumber, $customer, $transactionId, $reference, $currentPage)
+  public function getTransactionsReport($statusId, $transactionTypeId, $filterAgencyType, $filterAgencyId, $accountId, $beginDate, $endDate, $controlNumber, $customer, $transactionId, $reference, $currentPage, $pageSize)
   {
     $sql = "CALL spReport_Transactions('{statusId}', '{transactionTypeId}', '{agencyType}', '{agencyId}', '{accountId}', '{beginDate}', '{endDate}', '{controlNumber}', '{customer}', '{transactionId}', '{reference}', '{pageStart}', '{pageSize}')";
 
@@ -156,42 +157,7 @@ class TblSystem extends Db
     $params['customer'] = $customer;
     $params['transactionId'] = $transactionId;
     $params['reference'] = $reference;
-    $params['pageStart'] = ($currentPage - 1) * CoreConfig::PAGINATION_TABLE_MAX_ROWS;
-    $params['pageSize'] = CoreConfig::PAGINATION_TABLE_MAX_ROWS;
-
-    return $this->executeMultiQuery($sql, array('transactions', 'total', 'summary'), $params);
-  }
-
-  /**
-   * get a list of transactions report
-   *
-   * @param int $statusId
-   * @param int $transactionTypeId
-   * @param int $filterAgencyType
-   * @param int $accountId
-   * @param string $beginDate
-   * @param string $endDate
-   * @param string $controlNumber
-   * @param string $customer
-   * @param int $pageStart
-   * @param int $pageSize
-   *
-   * @return array
-   */
-  public function getExportReport($statusId, $transactionTypeId, $filterAgencyType, $accountId, $beginDate, $endDate, $controlNumber, $customer, $pageStart, $pageSize)
-  {
-    $sql = "CALL transactions_report('{statusId}', '{transactionTypeId}', '{agencyType}', '{accountId}', '{beginDate}', '{endDate}', '{controlNumber}', '{customer}', '{pageStart}', '{pageSize}')";
-
-    $params = array();
-    $params['statusId'] = $statusId;
-    $params['transactionTypeId'] = $transactionTypeId;
-    $params['agencyType'] = $filterAgencyType;
-    $params['accountId'] = $accountId;
-    $params['beginDate'] = $beginDate;
-    $params['endDate'] = $endDate;
-    $params['controlNumber'] = $controlNumber;
-    $params['customer'] = $customer;
-    $params['pageStart'] = $pageStart;
+    $params['pageStart'] = $currentPage;
     $params['pageSize'] = $pageSize;
 
     return $this->executeMultiQuery($sql, array('transactions', 'total', 'summary'), $params);

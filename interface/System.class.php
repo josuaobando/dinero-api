@@ -88,7 +88,9 @@ class System
    */
   public function transactionsReport($statusId, $transactionTypeId, $filterAgencyType, $filterAgencyId, $accountId, $beginDate, $endDate, $controlNumber, $customer, $transactionId, $reference, $currentPage)
   {
-    return $this->tblSystem->getTransactionsReport($statusId, $transactionTypeId, $filterAgencyType, $filterAgencyId, $accountId, $beginDate, $endDate, $controlNumber, $customer, $transactionId, $reference, $currentPage);
+    $pageSize = CoreConfig::PAGINATION_TABLE_MAX_ROWS;
+    $currentPage = ($currentPage - 1) * CoreConfig::PAGINATION_TABLE_MAX_ROWS;
+    return $this->tblSystem->getTransactionsReport($statusId, $transactionTypeId, $filterAgencyType, $filterAgencyId, $accountId, $beginDate, $endDate, $controlNumber, $customer, $transactionId, $reference, $currentPage, $pageSize);
   }
 
 }
