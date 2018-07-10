@@ -23,26 +23,7 @@ try{
     $taskManager->init();
 
   }else{
-
-    $system = new System();
-    $transactions = $system->transactions(Transaction::STATUS_SUBMITTED, $account->getAccountId());
-
-    foreach($transactions as $transaction){
-      $agencyId = $transaction['Agency_Id'];
-      if($agencyId == CoreConfig::AGENCY_ID_SATURNO){
-
-        $transactionId = $transaction['Transaction_Id'];
-        $transaction = Session::getTransaction();
-        $transaction->restore($transactionId);
-        $transaction->setModifiedBy($account->getAccountId());
-
-        if($transaction->getTransactionStatusId() == Transaction::STATUS_SUBMITTED){
-          $transactionAPI = new TransactionAPI();
-          $transactionAPI->getStatus();
-        }
-
-      }
-    }
+    Log::custom('JobService', 'Services is disabled');
   }
 
 }catch(Exception $ex){

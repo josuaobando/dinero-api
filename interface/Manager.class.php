@@ -400,10 +400,10 @@ class Manager
 
     $transaction = Session::getTransaction();
     $transaction->restore($transactionId);
-    $transaction->setModifiedBy($account->getAccountId());
 
     //get transaction status from Saturno
-    if($transaction->getAgencyId() == CoreConfig::AGENCY_ID_SATURNO && $transaction->getTransactionStatusId() == Transaction::STATUS_SUBMITTED){
+    if($webRequest && $transaction->getAgencyId() == CoreConfig::AGENCY_ID_SATURNO && $transaction->getTransactionStatusId() == Transaction::STATUS_SUBMITTED){
+      $transaction->setModifiedBy($account->getAccountId());
       $transactionAPI = new TransactionAPI();
       $transactionAPI->getStatus();
     }

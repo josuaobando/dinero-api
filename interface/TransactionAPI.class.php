@@ -379,12 +379,23 @@ class TransactionAPI extends WS
       $response = $this->execSoapSimple($url, $method, $params, array('uri' => 'http://WS/', 'soapaction' => ''));
       if($response && $response instanceof stdClass){
 
+        //validate trackId
+        if($response->trackId != $transaction->getApiTransactionId()){
+          Log::custom('Saturno', "Transaction ID mismatch" . "\n Request: \n\n" . $this->getLastRequest() . "\n Response: \n\n" . Util::objToStr($response));
+          return false;
+        }
+
         $this->apiMessage = $response->comentario;
         $this->apiStatus = strtolower($response->status);
         switch($this->apiStatus){
           case self::STATUS_API_APPROVED:
             if($transaction->getTransactionTypeId() == Transaction::TYPE_SENDER){
-              $transaction->setControlNumber($response->documento);
+              if($response->documento){
+                $transaction->setControlNumber($response->documento);
+              }else{
+                Log::custom('Saturno', "Transaction without MTCN" . "\n Request: \n\n" . $this->getLastRequest() . "\n Response: \n\n" . Util::objToStr($response));
+                return false;
+              }
             }
             $transaction->setTransactionStatusId(Transaction::STATUS_APPROVED);
             $transaction->setReason('Ok');
