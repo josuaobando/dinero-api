@@ -423,6 +423,9 @@ class TransactionAPI extends WS
                 //sets  new personId
                 $transaction->setPersonId($newPerson->getPersonId());
                 $transaction->update();
+              }else{
+                $transaction->setTransactionStatusId(Transaction::STATUS_REJECTED);
+                $transaction->setReason($this->apiMessage);
               }
             }else{
               $transaction->setTransactionStatusId(Transaction::STATUS_REJECTED);
