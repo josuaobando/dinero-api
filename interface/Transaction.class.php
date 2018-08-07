@@ -89,7 +89,7 @@ class Transaction
   /**
    * @var string
    */
-  private $reference;
+  private $merchantId;
 
   /**
    * @var string
@@ -110,6 +110,7 @@ class Transaction
   const STATUS_APPROVED = 3;
   const STATUS_REJECTED = 4;
   const STATUS_CANCELED = 5;
+  const STATUS_EXPIRED = 6;
 
   /**
    * Agency Type
@@ -119,7 +120,7 @@ class Transaction
   const AGENCY_RIA = 3;
 
   /**
-   * TblTransaction reference
+   * TblTransaction
    *
    * @var TblTransaction
    */
@@ -230,9 +231,9 @@ class Transaction
   /**
    * @return string
    */
-  public function getReference()
+  public function getMerchantId()
   {
-    return $this->reference;
+    return $this->merchantId;
   }
 
   /**
@@ -370,11 +371,11 @@ class Transaction
   }
 
   /**
-   * @param string $reference
+   * @param string $merchantId
    */
-  public function setReference($reference)
+  public function setMerchantId($merchantId)
   {
-    $this->reference = $reference;
+    $this->merchantId = $merchantId;
   }
 
   /**
@@ -390,7 +391,7 @@ class Transaction
    */
   public function create()
   {
-    $this->transactionId = $this->tblTransaction->insert($this->transactionTypeId, $this->transactionStatusId, $this->agencyTypeId, $this->customerId, $this->personId, $this->username, $this->amount, $this->fee, $this->agencyId, $this->accountId, $this->reference, $this->apiTransactionId);
+    $this->transactionId = $this->tblTransaction->insert($this->transactionTypeId, $this->transactionStatusId, $this->agencyTypeId, $this->customerId, $this->personId, $this->username, $this->amount, $this->fee, $this->agencyId, $this->accountId, $this->merchantId, $this->apiTransactionId);
   }
 
   /**
@@ -425,7 +426,7 @@ class Transaction
     $this->API = $transactionData['API'];
     $this->reason = $transactionData['Reason'];
     $this->note = $transactionData['Note'];
-    $this->reference = $transactionData['Reference'];
+    $this->merchantId = $transactionData['Reference'];
     $this->apiTransactionId = $transactionData['ApiTransactionId'];
   }
 
@@ -447,6 +448,8 @@ class Transaction
         return "rejected";
       case Transaction::STATUS_CANCELED:
         return "canceled";
+      case Transaction::STATUS_EXPIRED:
+        return "expired";
       default:
         return "unknown";
     }
@@ -488,7 +491,15 @@ class Transaction
     $data['fee'] = $this->fee;
     $data['notes'] = $this->reason;
     $data['controlNumber'] = $this->controlNumber;
-    $data['reference'] = $this->reference;
+    $data['merchantId'] = $this->merchantId;
+
+    //extra information
+    if($this->transactionTypeId == Transaction::AGENCY_RIA){
+      $data['information'] = 'EASYPAY';
+      if($this->agencyId == CoreConfig::AGENCY_ID_SATURNO_RIA){
+        $data['information'] = 'TELEDOLAR';
+      }
+    }
 
     return $data;
   }

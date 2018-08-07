@@ -15,7 +15,8 @@ function login($wsRequest)
     $username = trim($wsRequest->requireNotNullOrEmpty('username'));
     $password = trim($wsRequest->requireNotNullOrEmpty('password'));
 
-    $account = new Account($username);
+    Session::startSession();
+    $account = Session::getAccount($username);
     $account->authenticate($password);
 
     $wsResponse = new WSResponseOk();
@@ -41,7 +42,8 @@ function name($wsRequest)
     $apiUser = trim($wsRequest->requireNotNullOrEmpty('api_user'));
     $apiPass = trim($wsRequest->requireNotNullOrEmpty('api_pass'));
 
-    $account = new Account($username);
+    Session::startSession();
+    $account = Session::getAccount($username);
     $account->authenticateAPI($apiUser, $apiPass);
 
     if($account->isAuthenticated()){
@@ -50,6 +52,8 @@ function name($wsRequest)
     }else{
       $wsResponse = new WSResponseError("authentication failed");
     }
+  }catch(SessionException $ex){
+    $wsResponse = new WSResponseError("authentication failed");
   }catch(InvalidParameterException $ex){
     $wsResponse = new WSResponseError($ex->getMessage());
   }catch(Exception $ex){
@@ -73,7 +77,8 @@ function sender($wsRequest)
     $apiUser = trim($wsRequest->requireNotNullOrEmpty('api_user'));
     $apiPass = trim($wsRequest->requireNotNullOrEmpty('api_pass'));
 
-    $account = new Account($username);
+    Session::startSession();
+    $account = Session::getAccount($username);
     $account->authenticateAPI($apiUser, $apiPass);
 
     if($account->isAuthenticated()){
@@ -83,6 +88,8 @@ function sender($wsRequest)
     }else{
       $wsResponse = new WSResponseError("authentication failed");
     }
+  }catch(SessionException $ex){
+    $wsResponse = new WSResponseError("authentication failed");
   }catch(InvalidParameterException $ex){
     $wsResponse = new WSResponseError($ex->getMessage());
   }catch(Exception $ex){
@@ -106,7 +113,8 @@ function confirm($wsRequest)
     $apiUser = trim($wsRequest->requireNotNullOrEmpty('api_user'));
     $apiPass = trim($wsRequest->requireNotNullOrEmpty('api_pass'));
 
-    $account = new Account($username);
+    Session::startSession();
+    $account = Session::getAccount($username);
     $account->authenticateAPI($apiUser, $apiPass);
 
     if($account->isAuthenticated()){
@@ -115,6 +123,8 @@ function confirm($wsRequest)
     }else{
       $wsResponse = new WSResponseError("authentication failed");
     }
+  }catch(SessionException $ex){
+    $wsResponse = new WSResponseError("authentication failed");
   }catch(InvalidParameterException $ex){
     $wsResponse = new WSResponseError($ex->getMessage());
   }catch(Exception $ex){
@@ -138,7 +148,8 @@ function information($wsRequest)
     $apiUser = trim($wsRequest->requireNotNullOrEmpty('api_user'));
     $apiPass = trim($wsRequest->requireNotNullOrEmpty('api_pass'));
 
-    $account = new Account($username);
+    Session::startSession();
+    $account = Session::getAccount($username);
     $account->authenticateAPI($apiUser, $apiPass);
     if($account->isAuthenticated()){
 
@@ -148,6 +159,8 @@ function information($wsRequest)
     }else{
       $wsResponse = new WSResponseError("authentication failed");
     }
+  }catch(SessionException $ex){
+    $wsResponse = new WSResponseError("authentication failed");
   }catch(InvalidParameterException $ex){
     $wsResponse = new WSResponseError($ex->getMessage());
   }catch(Exception $ex){

@@ -40,7 +40,7 @@ class Manager
    *
    * @return array
    *
-   * @throws InvalidStateException
+   * @throws PersonException
    */
   private function getPersonAvailable($amount, $agencyTypeId, $agencyId)
   {
@@ -55,7 +55,7 @@ class Manager
         //do nothing
       }
 
-      throw new InvalidStateException("There are not names available");
+      throw new PersonException("There are not names available");
     }
     $selectedId = array_rand($availableList, 1);
 
@@ -70,13 +70,13 @@ class Manager
    *
    * @return WSResponseOk
    *
-   * @throws InvalidStateException|P2PException
+   * @throws TransactionException|P2PException
    */
   public function startTransaction($wsRequest, $transactionType)
   {
     $amount = $wsRequest->requireNumericAndPositive('amount');
     $username = trim($wsRequest->requireNotNullOrEmpty('uid'));
-    $reference = trim($wsRequest->getParam('reference'));
+    $merchantId = trim($wsRequest->getParam('merchantId'));
 
     $transactionStatus = ($transactionType == Transaction::TYPE_RECEIVER) ? Transaction::STATUS_REQUESTED : Transaction::STATUS_SUBMITTED;
 
@@ -92,7 +92,7 @@ class Manager
     $transaction->setCustomerId($customer->getCustomerId());
     $transaction->setTransactionTypeId($transactionType);
     $transaction->setTransactionStatusId($transactionStatus);
-    $transaction->setReference($reference);
+    $transaction->setMerchantId($merchantId);
     $transaction->setUsername($username);
     $transaction->setAmount($amount);
     $transaction->setFee(0);
@@ -163,7 +163,7 @@ class Manager
         $wsResponse->addElement('receiver', $customer);
       }
     }else{
-      throw new InvalidStateException("The Transaction not has been created. Please, try later!");
+      throw new TransactionException("The Transaction not has been created. Please, try later!");
     }
 
     return $wsResponse;
@@ -177,13 +177,13 @@ class Manager
    *
    * @return WSResponse
    *
-   * @throws APIException|InvalidStateException
+   * @throws APIException|TransactionException
    */
   public function startAPITransaction($wsRequest, $transactionType)
   {
     $amount = $wsRequest->requireNumericAndPositive('amount');
     $username = trim($wsRequest->requireNotNullOrEmpty('uid'));
-    $reference = trim($wsRequest->getParam('reference'));
+    $merchantId = trim($wsRequest->getParam('merchantId'));
 
     $transactionStatus = ($transactionType == Transaction::TYPE_RECEIVER) ? Transaction::STATUS_REQUESTED : Transaction::STATUS_SUBMITTED;
 
@@ -199,10 +199,20 @@ class Manager
       $transaction->setCustomerId($customer->getCustomerId());
       $transaction->setTransactionTypeId($transactionType);
       $transaction->setTransactionStatusId($transactionStatus);
-      $transaction->setReference($reference);
+      $transaction->setMerchantId($merchantId);
       $transaction->setUsername($username);
       $transaction->setAmount($amount);
       $transaction->setFee(0);
+    }
+
+    //change agency to customer
+    if($customer->getAgencyId() != CoreConfig::AGENCY_ID_SATURNO && $customer->getAgencyId() != CoreConfig::AGENCY_ID_SATURNO_RIA){
+      if($customer->getAgencyTypeId() == Transaction::AGENCY_RIA){
+        $customer->setAgencyId(CoreConfig::AGENCY_ID_SATURNO_RIA);
+      }else{
+        $customer->setAgencyId(CoreConfig::AGENCY_ID_SATURNO);
+      }
+      $customer->setIsAPI(1);
     }
 
     //evaluate limits
@@ -220,21 +230,13 @@ class Manager
       throw new APIException($transactionAPI->getApiMessage());
     }
 
-    //change agency to customer
-    if($customer->getAgencyId() != CoreConfig::AGENCY_ID_SATURNO){
-      //only in deposits
-      if($transaction->getTransactionTypeId() == Transaction::TYPE_RECEIVER){
-        $customer->setAgencyId(CoreConfig::AGENCY_ID_SATURNO);
-        $customer->setIsAPI(1);
-        $customer->update();
-      }
-    }
-
+    //update customer
+    $customer->update();
     //block person
     $person->block();
     //sets personId
     $transaction->setPersonId($person->getPersonId());
-    $transaction->setAgencyId(CoreConfig::AGENCY_ID_SATURNO);
+    $transaction->setAgencyId($customer->getAgencyId());
 
     //create transaction after the validation of the data
     $transaction->create();
@@ -251,7 +253,7 @@ class Manager
       }
 
     }else{
-      throw new InvalidStateException("The Transaction not has been created. Please, try later!");
+      throw new TransactionException("The Transaction not has been created. Please, try later!");
     }
 
     return $wsResponse;
@@ -304,7 +306,7 @@ class Manager
    *
    * @return WSResponseOk
    *
-   * @throws InvalidStateException
+   * @throws TransactionException
    */
   public function confirm($wsRequest)
   {
@@ -318,16 +320,16 @@ class Manager
     $transaction = Session::getTransaction();
     $transaction->restore($transactionId);
     if(!$transaction->getTransactionId()){
-      throw new InvalidStateException("this transaction not exist or not can be loaded: " . $transactionId);
+      throw new TransactionException("This transaction not exist or not can be loaded: " . $transactionId);
     }
 
     $wsRequest->putParam('type', $transaction->getAgencyTypeId());
 
     if($transaction->getTransactionStatusId() != Transaction::STATUS_REQUESTED && $transaction->getTransactionStatusId() != Transaction::STATUS_REJECTED){
       if($transaction->getTransactionStatusId() == Transaction::STATUS_CANCELED){
-        throw new InvalidStateException("The transaction has expired. Valid time is 48 hours to confirm.");
+        throw new TransactionException("The transaction has expired. Valid time is 48 hours to confirm.");
       }else{
-        throw new InvalidStateException("Transaction cannot be confirmed since the current status is: " . $transaction->getTransactionStatus());
+        throw new TransactionException("Transaction cannot be confirmed since the current status is: " . $transaction->getTransactionStatus());
       }
     }
 
@@ -357,7 +359,6 @@ class Manager
     $transaction->setAmount($amount);
     $transaction->setFee($fee);
     $transaction->setControlNumber($controlNumber);
-    $transaction->setTransactionStatusId(Transaction::STATUS_SUBMITTED);
     $transaction->setModifiedBy($this->account->getAccountId());
 
     //confirm in Saturno
@@ -367,11 +368,12 @@ class Manager
       if($confirm){
         $transaction->setApiTransactionId($transactionAPI->getApiTransactionId());
       }else{
-        throw new InvalidStateException("Transaction cannot be confirmed. Please try again in a few minutes!");
+        throw new TransactionException("Transaction cannot be confirmed. Please try again in a few minutes!");
       }
     }
 
     //update transaction after the validation of the data
+    $transaction->setTransactionStatusId(Transaction::STATUS_SUBMITTED);
     $transaction->setNote('');
     $transaction->setReason('');
     $transaction->update();
@@ -402,10 +404,14 @@ class Manager
     $transaction->restore($transactionId);
 
     //get transaction status from Saturno
-    if($webRequest && $transaction->getAgencyId() == CoreConfig::AGENCY_ID_SATURNO && $transaction->getTransactionStatusId() == Transaction::STATUS_SUBMITTED){
-      $transaction->setModifiedBy($account->getAccountId());
-      $transactionAPI = new TransactionAPI();
-      $transactionAPI->getStatus();
+    if($webRequest){
+      if($transaction->getAgencyId() == CoreConfig::AGENCY_ID_SATURNO || $transaction->getAgencyId() == CoreConfig::AGENCY_ID_SATURNO_RIA){
+        if($transaction->getTransactionStatusId() == Transaction::STATUS_SUBMITTED){
+          $transaction->setModifiedBy($account->getAccountId());
+          $transactionAPI = new TransactionAPI();
+          $transactionAPI->getStatus();
+        }
+      }
     }
 
     $wsResponse = new WSResponseOk();
@@ -514,23 +520,23 @@ class Manager
   /**
    * gets a new person to the transaction
    *
-   * @param int $transactionId
-   *
-   * @throws InvalidStateException
+   * @param $transactionId
    *
    * @return Person
+   *
+   * @throws TransactionException
    */
   public function getNewPerson($transactionId)
   {
     $transaction = new Transaction();
     $transaction->restore($transactionId);
     if(!$transaction->getTransactionId()){
-      throw new InvalidStateException("The transaction [$transactionId] has not been restored, please check!");
+      throw new TransactionException("The transaction [$transactionId] has not been restored, please check!");
     }
 
     //validation to Saturno transaction
     if($transaction->getAgencyId() == CoreConfig::AGENCY_ID_SATURNO){
-      throw new InvalidStateException("Transaction cannot be Modify. Saturno Transaction!");
+      throw new TransactionException("Transaction cannot be Modify. Saturno Transaction!");
     }
 
     //select new person
@@ -553,7 +559,7 @@ class Manager
     $success = $transaction->update();
 
     if(!$success){
-      throw new InvalidStateException("The transaction [$transactionId] has not been updated, please check!");
+      throw new TransactionException("The transaction [$transactionId] has not been updated, please check!");
     }
 
     return $newPerson;

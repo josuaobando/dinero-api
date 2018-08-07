@@ -10,6 +10,7 @@ class TransactionAPI extends WS
   const STATUS_API_PENDING = 'pending';
   const STATUS_API_APPROVED = 'approved';
   const STATUS_API_REJECTED = 'rejected';
+  const STATUS_API_CANCELED = 'cancelled';
   const STATUS_API_ERROR = 'error';
 
   /**
@@ -408,6 +409,25 @@ class TransactionAPI extends WS
           case self::STATUS_API_REJECTED:
             $transaction->setTransactionStatusId(Transaction::STATUS_REJECTED);
             $transaction->setReason($this->apiMessage);
+            break;
+          case self::STATUS_API_CANCELED:
+            if($transaction->getTransactionTypeId() == Transaction::TYPE_SENDER){
+
+              Session::getCustomer($transaction->getCustomerId());
+              $transaction->setTransactionStatusId(Transaction::STATUS_SUBMITTED);
+
+              $newPerson = $this->getSender();
+              if($newPerson instanceof Person && $newPerson->getPersonId()){
+                //block person
+                $newPerson->block();
+                //sets  new personId
+                $transaction->setPersonId($newPerson->getPersonId());
+                $transaction->update();
+              }
+            }else{
+              $transaction->setTransactionStatusId(Transaction::STATUS_REJECTED);
+              $transaction->setReason($this->apiMessage);
+            }
             break;
           case self::STATUS_API_PENDING:
             $transaction->setTransactionStatusId(Transaction::STATUS_SUBMITTED);

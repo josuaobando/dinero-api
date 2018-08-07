@@ -279,8 +279,9 @@ class WS
    * @param $wsdl
    * @param $method
    * @param $params
+   * @param null $options
    *
-   * @return object
+   * @return null|object
    *
    * @throws WSException
    */

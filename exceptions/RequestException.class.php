@@ -7,11 +7,12 @@ class RequestException extends Exception
 {
 
   const SUCCESS = 0;
-  const ERROR_CUSTOMER = 100;
-  const ERROR_PERSON = 200;
-  const ERROR_LIMIT = 300;
-  const ERROR_P2P = 400;
-  const ERROR_API = 500;
+  const ERROR_TRANSACTION = 100;
+  const ERROR_CUSTOMER = 200;
+  const ERROR_PERSON = 300;
+  const ERROR_LIMIT = 400;
+  const ERROR_P2P = 500;
+  const ERROR_API = 600;
 
   protected $description = "Alert";
 
