@@ -494,7 +494,7 @@ class Transaction
     $data['merchantId'] = $this->merchantId;
 
     //extra information
-    if($this->transactionTypeId == Transaction::AGENCY_RIA){
+    if($this->agencyTypeId == Transaction::AGENCY_RIA){
       $data['information'] = 'EASYPAY';
       if($this->agencyId == CoreConfig::AGENCY_ID_SATURNO_RIA){
         $data['information'] = 'TELEDOLAR';
