@@ -135,8 +135,8 @@ class TransactionAPI extends WS
 
           if(stripos($this->apiMessage, 'No Names Available') !== false){
 
-            $subject = "No Names Available";
-            $body = "There are no names available in Saturn agency";
+            $subject = "No deposit names available";
+            $body = "There are no deposit names available in Saturn agency";
             $bodyTemplate = MailManager::getEmailTemplate('default', array('body' => $body));
             $recipients = array('To' => 'mgoficinasf0117@outlook.com', 'Cc' => CoreConfig::MAIL_DEV);
             MailManager::sendEmail($recipients, $subject, $bodyTemplate);
@@ -238,7 +238,7 @@ class TransactionAPI extends WS
 
           if(stripos($this->apiMessage, 'No Names Available') !== false || stripos($this->apiMessage, 'No Payouts Names Available') !== false){
 
-            $subject = "No Payouts Names Available";
+            $subject = "No payouts names available";
             $body = "There are no payouts names available in Saturn agency";
             $bodyTemplate = MailManager::getEmailTemplate('default', array('body' => $body));
             $recipients = array('To' => 'mgoficinasf0117@outlook.com', 'Cc' => CoreConfig::MAIL_DEV);
