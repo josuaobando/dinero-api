@@ -1,7 +1,5 @@
 <?php
 
-
- 
-echo "index";
+header("Location:document/");
 
 ?>

@@ -11,5 +11,5 @@ php_value error_reporting 6135
     RewriteCond %{REQUEST_FILENAME} !-d
  RewriteRule ^deposit/([^/]+)/$ api/process.php?f=$1 [QSA]
  RewriteRule ^withdraw/([^/]+)/$ api/process.php?f=$1 [QSA]
- RewriteRule ^document/(.*) api/document/DineroSeguroHF_API.html [L]
+ RewriteRule ^document/(.*) api/document/DineroSeguroHF_4.0.pdf [L]
 </IfModule>
