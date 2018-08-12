@@ -33,9 +33,13 @@ class Task_Status extends Task
       $transaction->restore($transactionId);
       $transaction->setModifiedBy($account->getAccountId());
 
-      $transactionAPI = new TransactionAPI();
-      $transactionAPI->getStatus();
+      if($transaction->getAgencyTypeId() == Transaction::AGENCY_TYPE_RIA){
+        $transactionAPI = new SaturnoRia();
+      }else{
+        $transactionAPI = new TransactionAPI();
+      }
 
+      $transactionAPI->status();
     }
   }
 

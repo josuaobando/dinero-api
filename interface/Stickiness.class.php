@@ -460,7 +460,7 @@ class Stickiness
       }catch(Exception $ex){
         ExceptionManager::handleException($ex);
       }
-
+      throw new P2PException("The Customer is linked to another Person.");
       if($result){
 
         if($result->response && $result->response->verification){
@@ -484,7 +484,7 @@ class Stickiness
             break;
           case self::STATUS_CODE_LINKED_OTHER_COMPANY:
             ExceptionManager::handleException(new P2PException("The Person [$this->person] is linked to another Customer [$this->customer]. " . __FUNCTION__));
-            throw new InvalidStateException("Due to external factors, we cannot give this Customer a Name.");
+            throw new TransactionException("Due to external factors, we cannot give this Customer a Name.");
             break;
           case self::STATUS_CODE_LINKED_OTHER:
           case self::STATUS_CODE_LINKED_OTHER_CUSTOMER:
@@ -493,10 +493,10 @@ class Stickiness
             break;
           default:
             ExceptionManager::handleException(new P2PException("Invalid Response Code >> Code: $resultCode  Message: $resultCodeMessage : (" . __FUNCTION__ . ")"));
-            throw new InvalidStateException("Due to external factors, we cannot give this Customer a Name.");
+            throw new TransactionException("Due to external factors, we cannot give this Customer a Name.");
         }
       }else{
-        throw new InvalidStateException("The Customer cannot be verify.");
+        throw new TransactionException("The Customer cannot be verify.");
       }
 
     }else{
@@ -522,19 +522,7 @@ class Stickiness
         $params['receiverId'] = $this->personalId;
         $params['controlNumber'] = $this->controlNumber;
 
-        //temporal
         $apiURL = $this->agencyP2P_Url;
-        $agencyTypeId = $this->stickinessTransactionData['AgencyType_Id'];
-        if($agencyTypeId == Transaction::AGENCY_RIA){
-          $createdDate = $this->stickinessTransactionData['CreatedDate'];
-          $limitDate = strtotime('2018-03-11 21:35:00');
-          $transactionDate = strtotime($createdDate);
-          if($transactionDate < $limitDate){
-            $apiURL = CoreConfig::WS_STICKINESS_URL;
-          }
-        }
-        //temporal
-
         $wsConnector = new WS();
         $wsConnector->setReader(new Reader_Json());
         $result = $wsConnector->execPost($apiURL . 'confirm/', $params);

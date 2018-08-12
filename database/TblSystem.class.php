@@ -28,6 +28,28 @@ class TblSystem extends Db
   }
 
   /**
+   * get provider
+   *
+   * @param int $providerId
+   * @param int $agencyId
+   *
+   * @return array
+   */
+  public function getProvider($providerId, $agencyId)
+  {
+    $sql = "CALL spProvider('{providerId}', '{agencyId}')";
+
+    $params = array();
+    $params['providerId'] = $providerId;
+    $params['agencyId'] = $agencyId;
+
+    $rows = array();
+    $this->executeQuery($sql, $rows, $params);
+
+    return $rows;
+  }
+
+  /**
    * get agencies
    *
    * @param int $agencyId

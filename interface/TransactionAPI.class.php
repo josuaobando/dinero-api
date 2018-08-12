@@ -79,7 +79,7 @@ class TransactionAPI extends WS
    *
    * @return Person
    */
-  public function getName()
+  public function receiver()
   {
     try{
       $customer = Session::getCustomer();
@@ -172,7 +172,7 @@ class TransactionAPI extends WS
    *
    * @return Person
    */
-  public function getSender()
+  public function sender()
   {
     try{
       $customer = Session::getCustomer();
@@ -359,7 +359,7 @@ class TransactionAPI extends WS
    *
    * @return bool
    */
-  public function getStatus()
+  public function status()
   {
     try{
 
@@ -416,7 +416,7 @@ class TransactionAPI extends WS
               Session::getCustomer($transaction->getCustomerId());
               $transaction->setTransactionStatusId(Transaction::STATUS_SUBMITTED);
 
-              $newPerson = $this->getSender();
+              $newPerson = $this->sender();
               if($newPerson instanceof Person && $newPerson->getPersonId()){
                 //block person
                 $newPerson->block();

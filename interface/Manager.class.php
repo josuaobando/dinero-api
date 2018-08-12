@@ -98,7 +98,7 @@ class Manager
     $transaction->setFee(0);
 
     //Sent to API
-    if($customer->getAgencyId() == CoreConfig::AGENCY_ID_SATURNO){
+    if($customer->getAgencyId() == CoreConfig::AGENCY_ID_SATURNO || $customer->getAgencyId() == CoreConfig::AGENCY_ID_SATURNO_RIA){
       if(CoreConfig::SATURNO_ACTIVE){
         throw new P2PException("Redirect to API...");
       }else{
@@ -207,7 +207,7 @@ class Manager
 
     //change agency to customer
     if($customer->getAgencyId() != CoreConfig::AGENCY_ID_SATURNO && $customer->getAgencyId() != CoreConfig::AGENCY_ID_SATURNO_RIA){
-      if($customer->getAgencyTypeId() == Transaction::AGENCY_RIA){
+      if($customer->getAgencyTypeId() == Transaction::AGENCY_TYPE_RIA){
         $customer->setAgencyId(CoreConfig::AGENCY_ID_SATURNO_RIA);
       }else{
         $customer->setAgencyId(CoreConfig::AGENCY_ID_SATURNO);
@@ -219,11 +219,17 @@ class Manager
     $limit = new Limit($transaction, $customer);
     $limit->evaluate();
 
-    $transactionAPI = new TransactionAPI();
-    if($transaction->getTransactionTypeId() == Transaction::TYPE_RECEIVER){
-      $person = $transactionAPI->getName();
+    if($transaction->getAgencyTypeId() == Transaction::AGENCY_TYPE_RIA){
+      $transactionAPI = new SaturnoRia();
     }else{
-      $person = $transactionAPI->getSender();
+      $transactionAPI = new TransactionAPI();
+    }
+
+    //get name
+    if($transaction->getTransactionTypeId() == Transaction::TYPE_RECEIVER){
+      $person = $transactionAPI->receiver();
+    }else{
+      $person = $transactionAPI->sender();
     }
 
     if(!$person || !$person->getPersonId()){
@@ -273,8 +279,7 @@ class Manager
     try{
       return $this->startTransaction($wsRequest, Transaction::TYPE_RECEIVER);
     }catch(P2PException $ex){
-      $agencyTypeId = $wsRequest->getParam('type');
-      if(CoreConfig::SATURNO_ACTIVE && $agencyTypeId == Transaction::AGENCY_MONEY_GRAM){
+      if(CoreConfig::SATURNO_ACTIVE){
         return $this->startAPITransaction($wsRequest, Transaction::TYPE_RECEIVER);
       }else{
         throw $ex;
@@ -292,7 +297,7 @@ class Manager
   public function sender($wsRequest)
   {
     $agencyTypeId = $wsRequest->getParam('type');
-    if(CoreConfig::SATURNO_ACTIVE && $agencyTypeId == Transaction::AGENCY_MONEY_GRAM){
+    if(CoreConfig::SATURNO_ACTIVE && $agencyTypeId == Transaction::AGENCY_TYPE_MG){
       return $this->startAPITransaction($wsRequest, Transaction::TYPE_SENDER);
     }else{
       return $this->startTransaction($wsRequest, Transaction::TYPE_SENDER);
@@ -362,8 +367,13 @@ class Manager
     $transaction->setModifiedBy($this->account->getAccountId());
 
     //confirm in Saturno
-    if($transaction->getAgencyId() == CoreConfig::AGENCY_ID_SATURNO){
-      $transactionAPI = new TransactionAPI();
+    if($transaction->getAgencyId() == CoreConfig::AGENCY_ID_SATURNO || $transaction->getAgencyId() == CoreConfig::AGENCY_ID_SATURNO_RIA){
+      if($transaction->getAgencyId() == CoreConfig::AGENCY_ID_SATURNO_RIA){
+        $transactionAPI = new SaturnoRia();
+      }else{
+        $transactionAPI = new TransactionAPI();
+      }
+
       $confirm = $transactionAPI->confirm();
       if($confirm){
         $transaction->setApiTransactionId($transactionAPI->getApiTransactionId());
@@ -409,7 +419,7 @@ class Manager
         if($transaction->getTransactionStatusId() == Transaction::STATUS_SUBMITTED){
           $transaction->setModifiedBy($account->getAccountId());
           $transactionAPI = new TransactionAPI();
-          $transactionAPI->getStatus();
+          $transactionAPI->status();
         }
       }
     }

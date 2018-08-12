@@ -448,11 +448,11 @@ class Customer
         if($percent >= CoreConfig::CUSTOMER_SIMILAR_PERCENT){
 
           $agencyType = $this->agencyTypeId;
-          if($agencyType == Transaction::AGENCY_MONEY_GRAM){
+          if($agencyType == Transaction::AGENCY_TYPE_MG){
             $agencyType = 'MG';
-          }elseif($agencyType == Transaction::AGENCY_WESTERN_UNION){
+          }elseif($agencyType == Transaction::AGENCY_TYPE_WU){
             $agencyType = 'WU';
-          }elseif($agencyType == Transaction::AGENCY_RIA){
+          }elseif($agencyType == Transaction::AGENCY_TYPE_RIA){
             $agencyType = 'RIA';
           }
           throw new CustomerException("The Customer has been blacklisted by $agencyType International");

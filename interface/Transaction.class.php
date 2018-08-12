@@ -115,9 +115,9 @@ class Transaction
   /**
    * Agency Type
    */
-  const AGENCY_WESTERN_UNION = 1;
-  const AGENCY_MONEY_GRAM = 2;
-  const AGENCY_RIA = 3;
+  const AGENCY_TYPE_WU = 1;
+  const AGENCY_TYPE_MG = 2;
+  const AGENCY_TYPE_RIA = 3;
 
   /**
    * TblTransaction
@@ -165,7 +165,7 @@ class Transaction
   /**
    * @return int
    *
-   * @see Transaction::AGENCY_WESTERN_UNION, Transaction::AGENCY_MONEY_GRAM, Transaction::AGENCY_RIA
+   * @see Transaction::AGENCY_TYPE_WU, Transaction::AGENCY_TYPE_MG, Transaction::AGENCY_TYPE_RIA
    */
   public function getAgencyTypeId()
   {
@@ -267,7 +267,7 @@ class Transaction
   /**
    * @param int $agencyTypeId
    *
-   * @see Transaction::AGENCY_WESTERN_UNION, Transaction::AGENCY_MONEY_GRAM, Transaction::AGENCY_RIA
+   * @see Transaction::AGENCY_TYPE_WU, Transaction::AGENCY_TYPE_MG, Transaction::AGENCY_TYPE_RIA
    */
   public function setAgencyTypeId($agencyTypeId)
   {
@@ -494,7 +494,7 @@ class Transaction
     $data['merchantId'] = $this->merchantId;
 
     //extra information
-    if($this->agencyTypeId == Transaction::AGENCY_RIA){
+    if($this->agencyTypeId == Transaction::AGENCY_TYPE_RIA){
       $data['information'] = 'EASYPAY';
       if($this->agencyId == CoreConfig::AGENCY_ID_SATURNO_RIA){
         $data['information'] = 'TELEDOLAR';

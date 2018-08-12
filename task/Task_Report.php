@@ -23,10 +23,10 @@ class Task_Report extends Task
    */
   public function process()
   {
-    $this->transactions['Saturno'] = $this->tblTask->getReportTransactions(Transaction::AGENCY_MONEY_GRAM, CoreConfig::AGENCY_ID_SATURNO, Transaction::TYPE_RECEIVER);
-    $this->transactions['Saturno-Payouts'] = $this->tblTask->getReportTransactions(Transaction::AGENCY_MONEY_GRAM, CoreConfig::AGENCY_ID_SATURNO, Transaction::TYPE_SENDER);
-    $this->transactions['MG'] = $this->tblTask->getReportTransactions(Transaction::AGENCY_MONEY_GRAM);
-    $this->transactions['RIA'] = $this->tblTask->getReportTransactions(Transaction::AGENCY_RIA);
+    $this->transactions['Saturno'] = $this->tblTask->getReportTransactions(Transaction::AGENCY_TYPE_MG, CoreConfig::AGENCY_ID_SATURNO, Transaction::TYPE_RECEIVER);
+    $this->transactions['Saturno-Payouts'] = $this->tblTask->getReportTransactions(Transaction::AGENCY_TYPE_MG, CoreConfig::AGENCY_ID_SATURNO, Transaction::TYPE_SENDER);
+    $this->transactions['MG'] = $this->tblTask->getReportTransactions(Transaction::AGENCY_TYPE_MG);
+    $this->transactions['RIA'] = $this->tblTask->getReportTransactions(Transaction::AGENCY_TYPE_RIA);
 
     foreach($this->transactions as $group => $transactions){
       if(is_array($transactions) && count($transactions) > 0){
