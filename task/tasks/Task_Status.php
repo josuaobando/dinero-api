@@ -34,7 +34,7 @@ class Task_Status extends Task
       $transaction->setModifiedBy($account->getAccountId());
 
       if($transaction->getAgencyTypeId() == Transaction::AGENCY_TYPE_RIA){
-        $transactionAPI = new SaturnoRia();
+        $transactionAPI = new Ria();
       }else{
         $transactionAPI = new TransactionAPI();
       }

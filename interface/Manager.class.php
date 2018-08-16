@@ -220,7 +220,7 @@ class Manager
     $limit->evaluate();
 
     if($transaction->getAgencyTypeId() == Transaction::AGENCY_TYPE_RIA){
-      $transactionAPI = new SaturnoRia();
+      $transactionAPI = new Ria();
     }else{
       $transactionAPI = new TransactionAPI();
     }
@@ -369,7 +369,7 @@ class Manager
     //confirm in Saturno
     if($transaction->getAgencyId() == CoreConfig::AGENCY_ID_SATURNO || $transaction->getAgencyId() == CoreConfig::AGENCY_ID_SATURNO_RIA){
       if($transaction->getAgencyId() == CoreConfig::AGENCY_ID_SATURNO_RIA){
-        $transactionAPI = new SaturnoRia();
+        $transactionAPI = new Ria();
       }else{
         $transactionAPI = new TransactionAPI();
       }
