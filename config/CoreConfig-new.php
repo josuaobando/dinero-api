@@ -216,7 +216,8 @@ class CoreConfig
    * Agencies
    */
   const AGENCY_ID_SATURNO = 100;
-  const AGENCY_ID_SATURNO_RIA = 101;
+  const AGENCY_ID_NICARAGUA = 101;
+  const AGENCY_ID_SATURNO_RIA = 102;
 
   /**
    * user id of system

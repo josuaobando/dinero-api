@@ -131,11 +131,17 @@ class Customer
   }
 
   /**
-   * @return mixed
+   * @return int
    */
   public function getIsAPI()
   {
-    return $this->isAPI;
+    if($this->isAPI ||
+      $this->agencyId == CoreConfig::AGENCY_ID_SATURNO ||
+      $this->agencyId == CoreConfig::AGENCY_ID_NICARAGUA ||
+      $this->agencyId == CoreConfig::AGENCY_ID_SATURNO_RIA){
+      return 1;
+    }
+    return 0;
   }
 
   /**
@@ -277,20 +283,20 @@ class Customer
     if($customerId){
       $this->customerId = $customerId;
 
-      $personData = $this->tblCustomer->getCustomer($customerId);
+      $customerData = $this->tblCustomer->getCustomer($customerId);
 
-      $this->agencyId = $personData['Agency_Id'];
-      $this->agencyTypeId = $personData['AgencyType_Id'];
-      $this->firstName = $personData['FirstName'];
-      $this->lastName = $personData['LastName'];
-      $this->country = $personData['countryCode'];
-      $this->countryId = $personData['Country_Id'];
-      $this->countryName = $personData['countryName'];
-      $this->state = $personData['stateCode'];
-      $this->stateId = $personData['CountryState_Id'];
-      $this->stateName = $personData['stateName'];
-      $this->phone = $personData['Phone'];
-      $this->isAPI = $personData['IsAPI'];
+      $this->agencyId = $customerData['Agency_Id'];
+      $this->agencyTypeId = $customerData['AgencyType_Id'];
+      $this->firstName = $customerData['FirstName'];
+      $this->lastName = $customerData['LastName'];
+      $this->country = $customerData['countryCode'];
+      $this->countryId = $customerData['Country_Id'];
+      $this->countryName = $customerData['countryName'];
+      $this->state = $customerData['stateCode'];
+      $this->stateId = $customerData['CountryState_Id'];
+      $this->stateName = $customerData['stateName'];
+      $this->phone = $customerData['Phone'];
+      $this->isAPI = $customerData['IsAPI'];
     }
   }
 
@@ -426,7 +432,7 @@ class Customer
    */
   public function update()
   {
-    return $this->tblCustomer->update($this->agencyId, $this->customerId, $this->firstName, $this->lastName, $this->countryId, $this->stateId, $this->phone, $this->isAPI);
+    return $this->tblCustomer->update($this->agencyId, $this->customerId, $this->firstName, $this->lastName, $this->countryId, $this->stateId, $this->phone, $this->getIsAPI());
   }
 
   /**

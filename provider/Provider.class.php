@@ -54,6 +54,38 @@ abstract class Provider extends WS
   protected $tblSystem;
 
   /**
+   * @return int|string
+   */
+  protected function getApiCode()
+  {
+    return $this->code;
+  }
+
+  /**
+   * @return string
+   */
+  protected function getApiStatus()
+  {
+    return $this->status;
+  }
+
+  /**
+   * @return string
+   */
+  protected function getApiMessage()
+  {
+    return $this->status;
+  }
+
+  /**
+   * @return string
+   */
+  protected function getApiTransactionId()
+  {
+    return $this->id;
+  }
+
+  /**
    * @param $code
    *
    * @return string
@@ -126,6 +158,34 @@ abstract class Provider extends WS
    * @param $response
    */
   protected abstract function unpack($response);
+
+  /**
+   * get name for the customer
+   *
+   * @return Person
+   */
+  protected abstract function receiver();
+
+  /**
+   * get name for the customer
+   *
+   * @return Person
+   */
+  protected abstract function sender();
+
+  /**
+   * Submit or Re-Submit transaction
+   *
+   * @return bool
+   */
+  protected abstract function confirm();
+
+  /**
+   * get transaction status
+   *
+   * @return bool
+   */
+  protected abstract function status();
 
 }
 

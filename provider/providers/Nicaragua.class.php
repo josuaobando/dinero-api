@@ -3,7 +3,7 @@
 /**
  * @author Josua
  */
-class SaturnoRia extends Provider
+class Nicaragua extends Provider
 {
   const STATUS_API_REQUESTED = 'requested';
   const STATUS_API_PENDING = 'pending';
@@ -56,7 +56,7 @@ class SaturnoRia extends Provider
         $personalId = Encrypt::generateMD5($name);
 
         $person = new Person();
-        $person->setPersonLisId(101);
+        $person->setPersonLisId(102);
         $person->setCountry('CR');
         $person->setCountryId(52);
         $person->setCountryName('Costa Rica');
@@ -116,6 +116,18 @@ class SaturnoRia extends Provider
     }
 
     return null;
+  }
+
+  /**
+   * get name for the customer
+   *
+   * @return Person
+   *
+   * @throws InvalidStateException
+   */
+  public function sender()
+  {
+    throw new InvalidStateException("'" . __METHOD__ . "' must be implemented in '" . get_class($this) . "' class.");
   }
 
   /**

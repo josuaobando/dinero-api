@@ -3,7 +3,7 @@
 /**
  * @author Josua
  */
-class TransactionAPI extends WS
+class Saturno extends Provider
 {
 
   const STATUS_API_REQUESTED = 'requested';
@@ -70,8 +70,9 @@ class TransactionAPI extends WS
    */
   public function __construct()
   {
-    $tblSystem = TblSystem::getInstance();
-    $this->agency = $tblSystem->getAgency(CoreConfig::AGENCY_ID_SATURNO);
+    $customer = Session::getCustomer();
+    $agencyId = $customer->getAgencyId();
+    parent::__construct(0, $agencyId);
   }
 
   /**
@@ -278,7 +279,6 @@ class TransactionAPI extends WS
   public function confirm()
   {
     try{
-
       $transaction = Session::getTransaction();
       $person = Session::getPerson($transaction->getPersonId());
       $customer = Session::getCustomer($transaction->getCustomerId());
@@ -365,17 +365,14 @@ class TransactionAPI extends WS
 
       //get transaction object
       $transaction = Session::getTransaction();
-      $personId = $transaction->getPersonId();
-      $transactionId = $transaction->getTransactionId();
-      $apiTransactionId = $transaction->getApiTransactionId();
-      $transactionStatusId = $transaction->getTransactionStatusId();
+      $currentTransactionStatusId = $transaction->getTransactionStatusId();
 
       $params = array();
       //credentials
       $params['user'] = $this->agency['Setting_User'];
       $params['password'] = $this->agency['Setting_Password'];
       //transaction
-      $params['trackid'] = $apiTransactionId;
+      $params['trackid'] = $transaction->getApiTransactionId();
 
       $url = $this->agency['Setting_URL'];
       $method = ($transaction->getTransactionTypeId() == Transaction::TYPE_SENDER) ? 'GetPayout' : 'GetDeposito';
@@ -384,7 +381,7 @@ class TransactionAPI extends WS
       if($response && $response instanceof stdClass){
 
         //validate trackId
-        if($response->trackId != $apiTransactionId){
+        if($response->trackId != $transaction->getApiTransactionId()){
           Log::custom('Saturno', "Transaction ID mismatch" . "\n Request: \n\n" . $this->getLastRequest() . "\n Response: \n\n" . Util::objToStr($response));
           return false;
         }
@@ -426,9 +423,6 @@ class TransactionAPI extends WS
                 //sets  new personId
                 $transaction->setPersonId($newPerson->getPersonId());
                 $transaction->update();
-
-                $newApiTransactionId = $transaction->getApiTransactionId();
-                Log::custom('Saturno', "TransactionId $transactionId | ApiId $apiTransactionId | PersonId $personId >> has been canceled and was it changed to newApiId $newApiTransactionId");
               }else{
                 $transaction->setTransactionStatusId(Transaction::STATUS_REJECTED);
                 $transaction->setReason($this->apiMessage);
@@ -450,7 +444,7 @@ class TransactionAPI extends WS
         }
 
         //update transaction
-        if($transactionStatusId != $transaction->getTransactionStatusId()){
+        if($currentTransactionStatusId != $transaction->getTransactionStatusId()){
           if($transaction->getTransactionStatusId() == Transaction::STATUS_APPROVED || $transaction->getTransactionStatusId() == Transaction::STATUS_REJECTED){
             $transaction->update();
           }
@@ -462,6 +456,30 @@ class TransactionAPI extends WS
       ExceptionManager::handleException($ex);
     }
 
+  }
+
+  /**
+   * execute request
+   *
+   * @param $method
+   *
+   * @throws InvalidStateException
+   */
+  public function execute($method)
+  {
+    throw new InvalidStateException("'" . __METHOD__ . "' must be implemented in '" . get_class($this) . "' class.");
+  }
+
+  /**
+   * unpack response
+   *
+   * @param $response
+   *
+   * @throws InvalidStateException
+   */
+  public function unpack($response)
+  {
+    throw new InvalidStateException("'" . __METHOD__ . "' must be implemented in '" . get_class($this) . "' class.");
   }
 
 }
