@@ -495,7 +495,7 @@ class Transaction
 
     //extra information
     if($this->agencyTypeId == Transaction::AGENCY_TYPE_RIA){
-      $data['information'] = 'Easypay Phillgus';
+      $data['information'] = 'EasyPay-Phillgus';
       if($this->agencyId == CoreConfig::AGENCY_ID_SATURNO_RIA){
         $data['information'] = 'TeleDolar';
       }

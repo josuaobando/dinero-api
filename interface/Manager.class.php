@@ -153,6 +153,14 @@ class Manager
         $stickinessTransaction->add();
       }
 
+      //extra information
+      if($transaction->getAgencyTypeId() == Transaction::AGENCY_TYPE_RIA){
+        $transaction->setReason('Easypay Phillgus');
+        if($transaction->getAgencyId() == CoreConfig::AGENCY_ID_SATURNO_RIA){
+          $transaction->setReason('TeleDolar');
+        }
+      }
+
       $wsResponse = new WSResponseOk();
       $wsResponse->addElement('transaction', $transaction);
       if($transactionType == Transaction::TYPE_RECEIVER){
