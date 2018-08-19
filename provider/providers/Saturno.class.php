@@ -202,7 +202,7 @@ class Saturno extends Provider
           $personalId = Encrypt::generateMD5($name);
 
           $person = new Person();
-          $person->setPersonLisId(100);
+          $person->setPersonLisId(CoreConfig::AGENCY_ID_SATURNO);
           $person->setCountry('CR');
           $person->setCountryId(52);
           $person->setCountryName('Costa Rica');

@@ -56,7 +56,7 @@ class Ria extends Provider
         $personalId = Encrypt::generateMD5($name);
 
         $person = new Person();
-        $person->setPersonLisId(102);
+        $person->setPersonLisId(CoreConfig::AGENCY_ID_SATURNO_RIA);
         $person->setCountry('CR');
         $person->setCountryId(52);
         $person->setCountryName('Costa Rica');

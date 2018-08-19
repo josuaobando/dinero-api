@@ -9,7 +9,8 @@ class Nicaragua extends Provider
   const STATUS_API_PENDING = 'pending';
   const STATUS_API_APPROVED = 'approved';
   const STATUS_API_REJECTED = 'rejected';
-  const STATUS_API_ERROR = 'error';
+  const RESPONSE_ERROR = 'error';
+  const RESPONSE_SUCCESS = '0';
 
   /**
    * new Transaction instance
@@ -33,20 +34,20 @@ class Nicaragua extends Provider
       $transaction = Session::getTransaction();
 
       //transaction
-      $params = array();
-      $params['ctacte'] = $transaction->getUsername();
-      $params['firstname'] = $customer->getFirstName();
-      $params['lastname'] = $customer->getLastName();
-      $params['city'] = $customer->getStateName();
-      $params['state'] = $customer->getState();
-      $params['country'] = $customer->getCountry();
-      $params['monto'] = $transaction->getAmount();
+      $request = array();
+      $request['ctacte'] = $transaction->getUsername();
+      $request['firstname'] = $customer->getFirstName();
+      $request['lastname'] = $customer->getLastName();
+      $request['city'] = $customer->getStateName();
+      $request['state'] = $customer->getState();
+      $request['country'] = $customer->getCountry();
+      $request['monto'] = $transaction->getAmount();
 
       //execute request
-      $this->request = $params;
+      $this->request = $request;
       $this->execute('GetName');
       $response = $this->getResponse();
-      if($this->status == self::REQUEST_ERROR){
+      if($this->code = self::RESPONSE_ERROR){
         return null;
       }
 
@@ -56,13 +57,13 @@ class Nicaragua extends Provider
         $personalId = Encrypt::generateMD5($name);
 
         $person = new Person();
-        $person->setPersonLisId(102);
-        $person->setCountry('CR');
-        $person->setCountryId(52);
-        $person->setCountryName('Costa Rica');
-        $person->setState('SJ');
-        $person->setStateId(877);
-        $person->setStateName('San José');
+        $person->setPersonLisId(CoreConfig::AGENCY_ID_NICARAGUA);
+        $person->setCountry('NI');
+        $person->setCountryId(155);
+        $person->setCountryName('Nicaragua');
+        $person->setState('MN');
+        $person->setStateId(2915);
+        $person->setStateName('Managua');
         $person->setAvailable(1);
         $person->setIsActive(1);
         $person->setName($name);
@@ -71,7 +72,7 @@ class Nicaragua extends Provider
         $person->setTypeId('Hash');
         $person->setExpirationDateId('NR');
         $person->setAddress('NR');
-        $person->setCity('San José');
+        $person->setCity('Managua');
         $person->setBirthDate('NR');
         $person->setMaritalStatus('NR');
         $person->setGender('NR');
@@ -86,12 +87,12 @@ class Nicaragua extends Provider
         }
 
         return null;
-      }elseif($this->status == self::STATUS_API_ERROR){
+      }elseif($this->status == self::RESPONSE_ERROR || $this->code != self::RESPONSE_SUCCESS){
 
         if(stripos($this->message, 'No Names Available') !== false){
 
           $subject = "No deposit names available";
-          $body = "There are no deposit names available in Saturn agency";
+          $body = "There are no deposit names available in Nicaragua agency";
           $bodyTemplate = MailManager::getEmailTemplate('default', array('body' => $body));
           $recipients = array('To' => 'mgoficinasf0117@outlook.com', 'Cc' => CoreConfig::MAIL_DEV);
           MailManager::sendEmail($recipients, $subject, $bodyTemplate);
@@ -161,7 +162,7 @@ class Nicaragua extends Provider
 
       if($this->status == self::STATUS_API_PENDING){
         return true;
-      }elseif($this->status == self::STATUS_API_ERROR || $this->status == self::REQUEST_ERROR){
+      }elseif($this->status == self::RESPONSE_ERROR || $this->status == self::REQUEST_ERROR){
 
         try{
           if($isSubmit){
@@ -299,7 +300,7 @@ class Nicaragua extends Provider
         $this->status = strtolower($response->status);
         $this->message = $response->comentario;
       }else{
-        $this->code = self::REQUEST_ERROR;
+        $this->code = self::RESPONSE_ERROR;
         $this->message = 'At this time, we can not carry out. Please try again in a few minutes!';
         Log::custom(__CLASS__, "Invalid Object Response" . "\n Request: \n\n" . $this->getLastRequest() . "\n Response: \n\n" . Util::objToStr($response));
       }

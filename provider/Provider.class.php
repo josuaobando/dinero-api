@@ -10,7 +10,7 @@ abstract class Provider extends WS
   const SETTING_USER = 'USER';
   const SETTING_PASSWORD = 'PASSWORD';
   const SETTING_KEY = 'KEY';
-  const REQUEST_ERROR = 'Error';
+  const REQUEST_ERROR = 'error';
 
   /**
    * @var string|int
