@@ -460,7 +460,7 @@ class Stickiness
       }catch(Exception $ex){
         ExceptionManager::handleException($ex);
       }
-      throw new P2PException("The Customer is linked to another Person.");
+
       if($result){
 
         if($result->response && $result->response->verification){
