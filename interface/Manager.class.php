@@ -51,7 +51,7 @@ class Manager
         $subject = "There are not names available";
         $body = "There are not names available. \n\n Agency Type: $agencyTypeId \n\n Agency Id: $agencyId";
         MailManager::sendEmail(MailManager::getRecipients(), $subject, $body);
-      }catch(WSException $ex){
+      }catch(Exception $ex){
         //do nothing
       }
 
@@ -279,7 +279,8 @@ class Manager
     try{
       return $this->startTransaction($wsRequest, Transaction::TYPE_RECEIVER);
     }catch(P2PException $ex){
-      if(CoreConfig::SATURNO_ACTIVE){
+      $agencyTypeId = $wsRequest->getParam('type');
+      if(CoreConfig::SATURNO_ACTIVE && $agencyTypeId == Transaction::AGENCY_TYPE_MG){
         return $this->startAPITransaction($wsRequest, Transaction::TYPE_RECEIVER);
       }else{
         throw $ex;

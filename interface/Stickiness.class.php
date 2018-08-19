@@ -457,7 +457,7 @@ class Stickiness
         $result = $wsConnector->execPost($this->agencyP2P_Url . 'check/', $params);
 
         $this->tblStickiness->addProviderMessage($this->stickinessId, $wsConnector->getLastRequest(), $result);
-      }catch(Exception $ex){
+      }catch(WSException $ex){
         ExceptionManager::handleException($ex);
       }
 
