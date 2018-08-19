@@ -155,7 +155,7 @@ class Manager
 
       //extra information
       if($transaction->getAgencyTypeId() == Transaction::AGENCY_TYPE_RIA){
-        $transaction->setReason('Easypay Phillgus');
+        $transaction->setReason('EasyPay-Phillgus');
         if($transaction->getAgencyId() == CoreConfig::AGENCY_ID_SATURNO_RIA){
           $transaction->setReason('TeleDolar');
         }
