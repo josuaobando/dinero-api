@@ -10,8 +10,7 @@ abstract class Provider extends WS
   const SETTING_USER = 'USER';
   const SETTING_PASSWORD = 'PASSWORD';
   const SETTING_KEY = 'KEY';
-  const REQUEST_ERROR = 0;
-  const REQUEST_SUCCESS = 1;
+  const REQUEST_ERROR = 'Error';
 
   /**
    * @var string|int
@@ -56,7 +55,7 @@ abstract class Provider extends WS
   /**
    * @return int|string
    */
-  protected function getApiCode()
+  public function getApiCode()
   {
     return $this->code;
   }
@@ -64,7 +63,7 @@ abstract class Provider extends WS
   /**
    * @return string
    */
-  protected function getApiStatus()
+  public function getApiStatus()
   {
     return $this->status;
   }
@@ -72,7 +71,7 @@ abstract class Provider extends WS
   /**
    * @return string
    */
-  protected function getApiMessage()
+  public function getApiMessage()
   {
     return $this->status;
   }
@@ -80,7 +79,7 @@ abstract class Provider extends WS
   /**
    * @return string
    */
-  protected function getApiTransactionId()
+  public function getApiTransactionId()
   {
     return $this->id;
   }
@@ -150,7 +149,7 @@ abstract class Provider extends WS
    *
    * @param $method
    */
-  protected abstract function execute($method);
+  protected abstract function execute($method = null);
 
   /**
    * unpack response
@@ -163,29 +162,49 @@ abstract class Provider extends WS
    * get name for the customer
    *
    * @return Person
+   *
+   * @throws InvalidStateException
    */
-  protected abstract function receiver();
+  protected function receiver()
+  {
+    throw new InvalidStateException("'" . __METHOD__ . "' must be implemented in '" . get_class($this) . "' class.");
+  }
 
   /**
    * get name for the customer
    *
    * @return Person
+   *
+   * @throws InvalidStateException
    */
-  protected abstract function sender();
+  protected function sender()
+  {
+    throw new InvalidStateException("'" . __METHOD__ . "' must be implemented in '" . get_class($this) . "' class.");
+  }
 
   /**
    * Submit or Re-Submit transaction
    *
    * @return bool
+   *
+   * @throws InvalidStateException
    */
-  protected abstract function confirm();
+  protected function confirm()
+  {
+    throw new InvalidStateException("'" . __METHOD__ . "' must be implemented in '" . get_class($this) . "' class.");
+  }
 
   /**
    * get transaction status
    *
    * @return bool
+   *
+   * @throws InvalidStateException
    */
-  protected abstract function status();
+  protected function status()
+  {
+    throw new InvalidStateException("'" . __METHOD__ . "' must be implemented in '" . get_class($this) . "' class.");
+  }
 
 }
 

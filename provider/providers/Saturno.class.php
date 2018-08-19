@@ -465,7 +465,7 @@ class Saturno extends Provider
    *
    * @throws InvalidStateException
    */
-  public function execute($method)
+  public function execute($method = null)
   {
     throw new InvalidStateException("'" . __METHOD__ . "' must be implemented in '" . get_class($this) . "' class.");
   }

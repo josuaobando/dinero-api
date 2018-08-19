@@ -40,7 +40,7 @@ class Nicaragua extends Provider
       $params['city'] = $customer->getStateName();
       $params['state'] = $customer->getState();
       $params['country'] = $customer->getCountry();
-      $params['amount'] = $transaction->getAmount();
+      $params['monto'] = $transaction->getAmount();
 
       //execute request
       $this->request = $params;
@@ -263,7 +263,7 @@ class Nicaragua extends Provider
    *
    * @param $method
    */
-  protected function execute($method)
+  protected function execute($method = null)
   {
     try{
       //credentials params

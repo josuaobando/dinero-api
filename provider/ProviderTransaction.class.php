@@ -3,7 +3,7 @@
 /**
  * @author Josua
  */
-class ProviderManager
+class ProviderTransaction
 {
 
   /**
@@ -12,7 +12,7 @@ class ProviderManager
   private $wsRequest;
 
   /**
-   * ProviderManager constructor.
+   * ProviderTransaction constructor.
    *
    * @param WSRequest $wsRequest
    */
