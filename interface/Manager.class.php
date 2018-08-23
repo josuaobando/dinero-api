@@ -239,8 +239,12 @@ class Manager
       }catch(Exception $ex){
         if($ex instanceof APIBlackListException && $transaction->getAgencyId() == CoreConfig::AGENCY_ID_SATURNO){
           $transaction->setAgencyId(CoreConfig::AGENCY_ID_NICARAGUA);
-          $transactionAPI = new Nicaragua();
-          $person = $transactionAPI->receiver();
+          try{
+            $transactionAPI = new Nicaragua();
+            $person = $transactionAPI->receiver();
+          }catch(Exception $ex){
+            $person = null;
+          }
         }else{
           $person = null;
         }

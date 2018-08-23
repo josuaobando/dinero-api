@@ -77,7 +77,9 @@ class TransactionAPI extends WS
   /**
    * get name for the customer
    *
-   * @return Person
+   * @return null|Person
+   *
+   * @throws APIBlackListException
    */
   public function receiver()
   {
@@ -140,7 +142,7 @@ class TransactionAPI extends WS
           return null;
         }elseif(stripos(strtolower($this->apiMessage), 'black') && stripos(strtolower($this->apiMessage), 'list')){
           $this->apiMessage = 'The Customer has been blacklisted';
-          return null;
+          throw new APIBlackListException($this->apiMessage);
         }elseif(stripos(strtolower($this->apiMessage), 'limit') && stripos(strtolower($this->apiMessage), 'reached')){
           $this->apiMessage = 'Limits: The Customer has exceeded the limits in MG';
           return null;
