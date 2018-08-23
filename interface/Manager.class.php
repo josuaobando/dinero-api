@@ -225,19 +225,21 @@ class Manager
     //evaluate limits
     $limit = new Limit($transaction, $customer);
     $limit->evaluate();
-
+/*
     if($transaction->getAgencyTypeId() == Transaction::AGENCY_TYPE_RIA){
       $transactionAPI = new Ria();
     }else{
       $transactionAPI = new TransactionAPI();
     }
-
+*/
+    //@todo: temporally
+    $transactionAPI = new TransactionAPI();
     //get name
     if($transaction->getTransactionTypeId() == Transaction::TYPE_RECEIVER){
       try{
         $person = $transactionAPI->receiver();
       }catch(Exception $ex){
-        if($ex instanceof APIBlackListException && $transaction->getAgencyId() == CoreConfig::AGENCY_ID_SATURNO){
+        /*if($ex instanceof APIBlackListException && $transaction->getAgencyId() == CoreConfig::AGENCY_ID_SATURNO){
           $transaction->setAgencyId(CoreConfig::AGENCY_ID_NICARAGUA);
           try{
             $transactionAPI = new Nicaragua();
@@ -247,7 +249,8 @@ class Manager
           }
         }else{
           $person = null;
-        }
+        }*/
+        $person = null;
       }
     }else{
       $person = $transactionAPI->sender();

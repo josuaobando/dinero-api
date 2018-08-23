@@ -142,7 +142,8 @@ class TransactionAPI extends WS
           return null;
         }elseif(stripos(strtolower($this->apiMessage), 'black') && stripos(strtolower($this->apiMessage), 'list')){
           $this->apiMessage = 'The Customer has been blacklisted';
-          throw new APIBlackListException($this->apiMessage);
+          return null;
+          //throw new APIBlackListException($this->apiMessage);
         }elseif(stripos(strtolower($this->apiMessage), 'limit') && stripos(strtolower($this->apiMessage), 'reached')){
           $this->apiMessage = 'Limits: The Customer has exceeded the limits in MG';
           return null;
@@ -453,12 +454,12 @@ class TransactionAPI extends WS
   /**
    * execute call to API
    *
-   * @param string $method
-   * @param array $params
+   * @param $method
+   * @param $params
    *
    * @return null|object
    */
-  private function exAPIRequest(string $method, array $params)
+  private function exAPIRequest($method, $params)
   {
     try{
       $request = array();
