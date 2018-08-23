@@ -493,14 +493,6 @@ class Transaction
     $data['controlNumber'] = $this->controlNumber;
     $data['merchantId'] = $this->merchantId;
 
-    //extra information
-    if($this->agencyTypeId == Transaction::AGENCY_TYPE_RIA){
-      $data['information'] = 'EasyPay-Phillgus';
-      if($this->agencyId == CoreConfig::AGENCY_ID_SATURNO_RIA){
-        $data['information'] = 'TeleDolar';
-      }
-    }
-
     return $data;
   }
 
