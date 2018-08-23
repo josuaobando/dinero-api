@@ -13,6 +13,8 @@ class RequestException extends Exception
   const ERROR_LIMIT = 400;
   const ERROR_P2P = 500;
   const ERROR_API = 600;
+  const ERROR_API_BLACKLIST = 601;
+  const ERROR_API_LIMIT = 602;
 
   protected $description = "Alert";
 

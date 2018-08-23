@@ -30,9 +30,9 @@ class ProviderTransaction
    */
   private static function provider()
   {
-    $customer = Session::getCustomer();
-    $agencyTypeId = $customer->getAgencyTypeId();
-    $agencyId = $customer->getAgencyId();
+    $transaction = Session::getTransaction();
+    $agencyTypeId = $transaction->getAgencyTypeId();
+    $agencyId = $transaction->getAgencyId();
 
     switch($agencyTypeId){
       case Transaction::AGENCY_TYPE_MG:
@@ -196,8 +196,6 @@ class ProviderTransaction
 
   /**
    * get transaction information
-   *
-   * @return WSResponse|Transaction
    *
    * @throws InvalidStateException
    */

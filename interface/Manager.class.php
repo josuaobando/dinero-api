@@ -216,11 +216,10 @@ class Manager
     //change agency to customer
     if($customer->getAgencyId() != CoreConfig::AGENCY_ID_SATURNO && $customer->getAgencyId() != CoreConfig::AGENCY_ID_SATURNO_RIA){
       if($customer->getAgencyTypeId() == Transaction::AGENCY_TYPE_RIA){
-        $customer->setAgencyId(CoreConfig::AGENCY_ID_SATURNO_RIA);
+        $transaction->setAgencyId(CoreConfig::AGENCY_ID_SATURNO_RIA);
       }else{
-        $customer->setAgencyId(CoreConfig::AGENCY_ID_SATURNO);
+        $transaction->setAgencyId(CoreConfig::AGENCY_ID_SATURNO);
       }
-      $customer->setIsAPI(1);
     }
 
     //evaluate limits
@@ -235,7 +234,17 @@ class Manager
 
     //get name
     if($transaction->getTransactionTypeId() == Transaction::TYPE_RECEIVER){
-      $person = $transactionAPI->receiver();
+      try{
+        $person = $transactionAPI->receiver();
+      }catch(Exception $ex){
+        if($ex instanceof APIBlackListException && $transaction->getAgencyId() == CoreConfig::AGENCY_ID_SATURNO){
+          $transaction->setAgencyId(CoreConfig::AGENCY_ID_NICARAGUA);
+          $transactionAPI = new Nicaragua();
+          $person = $transactionAPI->receiver();
+        }else{
+          $person = null;
+        }
+      }
     }else{
       $person = $transactionAPI->sender();
     }
@@ -245,12 +254,13 @@ class Manager
     }
 
     //update customer
+    $customer->setAgencyId($transaction->getAgencyId());
+    $customer->setIsAPI(1);
     $customer->update();
     //block person
     $person->block();
     //sets personId
     $transaction->setPersonId($person->getPersonId());
-    $transaction->setAgencyId($customer->getAgencyId());
 
     //create transaction after the validation of the data
     $transaction->create();
