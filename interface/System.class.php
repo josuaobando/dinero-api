@@ -93,6 +93,16 @@ class System
     return $this->tblSystem->getTransactionsReport($statusId, $transactionTypeId, $filterAgencyType, $filterAgencyId, $accountId, $beginDate, $endDate, $controlNumber, $customer, $transactionId, $reference, $currentPage, $pageSize);
   }
 
+  /**
+   * get attempts transactions
+   *
+   * @return array
+   */
+  public function transactionAttempts()
+  {
+    return $this->tblSystem->getTransactionAttempts();
+  }
+
 }
 
 ?>

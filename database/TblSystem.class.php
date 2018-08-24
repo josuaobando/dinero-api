@@ -145,6 +145,22 @@ class TblSystem extends Db
   }
 
   /**
+   * get attempts transactions
+   *
+   * @return array
+   */
+  public function getTransactionAttempts()
+  {
+    $sql = "CALL spTransaction_Attempts()";
+
+    $rows = array();
+    $params = array();
+    $this->executeQuery($sql, $rows, $params);
+
+    return $rows;
+  }
+
+  /**
    * get a list of transactions report
    *
    * @param $statusId
