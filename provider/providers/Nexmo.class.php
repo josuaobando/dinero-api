@@ -9,7 +9,7 @@ class Nexmo extends Provider
   /**
    * ID
    */
-  const PROVIDER_ID = 6;
+  const PROVIDER_ID = 2;
 
   /**
    * 0: success | Other: Live mobile lookup not returned

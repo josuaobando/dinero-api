@@ -467,7 +467,22 @@ class Saturno extends Provider
    */
   public function execute($method = null)
   {
-    throw new InvalidStateException("'" . __METHOD__ . "' must be implemented in '" . get_class($this) . "' class.");
+    try{
+      //credentials params
+      $params = array();
+      $params['user'] = $this->getSetting(self::SETTING_USER);
+      $params['password'] = $this->getSetting(self::SETTING_PASSWORD);
+      //request params
+      $request = array_merge($params, $this->getRequest());
+      //make ws request
+      $url = $this->getSetting(self::SETTING_URL);
+      $response = $this->execSoapSimple($url, $method, $request, array('uri' => 'http://WS/', 'soapaction' => ''));
+      //get response
+      $this->response = $response;
+      $this->unpack($response);
+    }catch(WSException $ex){
+      ExceptionManager::handleException($ex);
+    }
   }
 
   /**

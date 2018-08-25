@@ -55,7 +55,7 @@ class ProviderTransaction
    *
    * @return bool
    *
-   * @throws APIException
+   * @throws APIException|TransactionException
    */
   public function receiver()
   {
@@ -71,18 +71,19 @@ class ProviderTransaction
     $merchantId = trim($this->wsRequest->getParam('merchantId'));
     $amount = $this->wsRequest->requireNumericAndPositive('amount');
     $username = trim($this->wsRequest->requireNotNullOrEmpty('uid'));
+    $agencyTypeId = $this->wsRequest->requireNumericAndPositive('type');
 
     $transaction->setFee(0);
     $transaction->setAmount($amount);
     $transaction->setUsername($username);
     $transaction->setMerchantId($merchantId);
+    $transaction->setAgencyTypeId($agencyTypeId);
 
     //validate if need to create the customer
     if(!$customer->getCustomerId()){
       $customer->validateFromRequest($account, $this->wsRequest);
     }
     $transaction->setCustomerId($customer->getCustomerId());
-    $transaction->setAgencyTypeId($customer->getAgencyTypeId());
 
     //evaluate limits
     $limit = new Limit($transaction, $customer);
@@ -103,9 +104,14 @@ class ProviderTransaction
     $transaction->setPersonId($person->getPersonId());
     $transaction->setAgencyId($customer->getAgencyId());
 
-    //create transaction after the validation of the data
     $transaction->create();
-    return $transaction->getTransactionId();
+    if($transaction->getTransactionId()){
+      $provider->stickiness();
+    }else{
+      throw new TransactionException("The Transaction not has been created. Please, try later!");
+    }
+
+    return true;
   }
 
   /**

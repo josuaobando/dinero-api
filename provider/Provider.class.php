@@ -206,6 +206,16 @@ abstract class Provider extends WS
     throw new InvalidStateException("'" . __METHOD__ . "' must be implemented in '" . get_class($this) . "' class.");
   }
 
+  /**
+   * @return bool
+   */
+  public function stickiness()
+  {
+    //get transaction object
+    $transaction = Session::getTransaction();
+    return $transaction->getTransactionId();
+  }
+
 }
 
 ?>

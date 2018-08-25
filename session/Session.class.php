@@ -12,6 +12,7 @@ class Session
   const SID_TRANSACTION = 'transaction';
   const SID_CUSTOMER = 'customer';
   const SID_PERSON = 'person';
+  const SID_STICKINESS = 'stickiness';
 
   /**
    * get sid generated
@@ -199,6 +200,26 @@ class Session
     }
 
     return $person;
+  }
+
+  /**
+   * get person
+   *
+   * @param bool $crate
+   *
+   * @return Stickiness
+   */
+  public static function getStickiness($crate = false)
+  {
+    $stickinessSession = self::getSessionObject(self::SID_STICKINESS);
+    if($crate){
+      $stickiness = new Stickiness();
+      self::storeSessionObject(self::SID_STICKINESS, $stickiness, true);
+    }else{
+      $stickiness = $stickinessSession;
+    }
+
+    return $stickiness;
   }
 
 }
