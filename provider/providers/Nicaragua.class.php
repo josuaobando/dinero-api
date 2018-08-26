@@ -5,6 +5,12 @@
  */
 class Nicaragua extends Provider
 {
+
+  /**
+   * ID
+   */
+  const PROVIDER_ID = 4;
+
   const STATUS_API_REQUESTED = 'requested';
   const STATUS_API_PENDING = 'pending';
   const STATUS_API_APPROVED = 'approved';
@@ -17,9 +23,7 @@ class Nicaragua extends Provider
    */
   public function __construct()
   {
-    $customer = Session::getCustomer();
-    $agencyId = $customer->getAgencyId();
-    parent::__construct(0, $agencyId);
+    parent::__construct(self::PROVIDER_ID);
   }
 
   /**
