@@ -11,6 +11,11 @@ class Nicaragua extends Provider
    */
   const PROVIDER_ID = 4;
 
+  /**
+   * agency id
+   */
+  const AGENCY_ID = 101;
+
   const STATUS_API_REQUESTED = 'requested';
   const STATUS_API_PENDING = 'pending';
   const STATUS_API_APPROVED = 'approved';
@@ -85,12 +90,11 @@ class Nicaragua extends Provider
         $person->setNameId($personalId);
         $person->add();
 
-        if($this->id){
-          $transaction->setApiTransactionId($this->id);
-          return $person;
-        }
+        $transaction->setApiTransactionId($this->id);
+        $transaction->setAgencyId(self::AGENCY_ID);
 
-        return null;
+        return $person;
+
       }elseif($this->status == self::RESPONSE_ERROR || $this->code != self::RESPONSE_SUCCESS){
 
         if(stripos($this->message, 'No Names Available') !== false){
@@ -103,17 +107,20 @@ class Nicaragua extends Provider
 
           Log::custom(__CLASS__, $body);
           $this->message = 'We cannot give this Customer a name';
+
           return null;
         }elseif(stripos(strtolower($this->message), 'black') && stripos(strtolower($this->message), 'list')){
           $this->message = 'The Customer has been blacklisted';
+
           return null;
         }elseif(stripos(strtolower($this->message), 'limit') && stripos(strtolower($this->message), 'reached')){
           $this->message = 'Limits: The Customer has exceeded the limits in MG';
+
           return null;
         }
 
         $this->message = 'We cannot give this Customer a name';
-        Log::custom(__CLASS__, "Unmapped message" . "\n Response: \n\n" . Util::objToStr($response));
+        Log::custom(__CLASS__, "Unmapped message"."\n Response: \n\n".Util::objToStr($response));
       }
 
     }catch(Exception $ex){
@@ -132,7 +139,7 @@ class Nicaragua extends Provider
    */
   public function sender()
   {
-    throw new InvalidStateException("'" . __METHOD__ . "' must be implemented in '" . get_class($this) . "' class.");
+    return new Person();
   }
 
   /**
@@ -177,12 +184,12 @@ class Nicaragua extends Provider
             $body = "Trans Id: $apiTransactionId";
           }
 
-          $body .= "<br>" . "Status: $response->status";
-          $body .= "<br><br>" . "Comentario: $response->comentario";
-          $body .= "<br><br>" . "Request:";
-          $body .= "<br><br>" . $this->getLastRequest();
-          $body .= "<br><br>" . "Response:";
-          $body .= "<br><br>" . Util::objToStr($response);
+          $body .= "<br>"."Status: $response->status";
+          $body .= "<br><br>"."Comentario: $response->comentario";
+          $body .= "<br><br>"."Request:";
+          $body .= "<br><br>".$this->getLastRequest();
+          $body .= "<br><br>"."Response:";
+          $body .= "<br><br>".Util::objToStr($response);
 
           $bodyTemplate = MailManager::getEmailTemplate('default', array('body' => $body));
           MailManager::sendEmail(MailManager::getRecipients(), $subject, $bodyTemplate);
@@ -223,7 +230,8 @@ class Nicaragua extends Provider
 
       //validate trackId
       if($this->id != $transaction->getApiTransactionId()){
-        Log::custom(__CLASS__, "Transaction ID mismatch" . "\n Request: \n\n" . $this->getLastRequest() . "\n Response: \n\n" . Util::objToStr($response));
+        Log::custom(__CLASS__, "Transaction ID mismatch"."\n Request: \n\n".$this->getLastRequest()."\n Response: \n\n".Util::objToStr($response));
+
         return false;
       }
 
@@ -244,7 +252,8 @@ class Nicaragua extends Provider
           $transaction->setTransactionStatusId(Transaction::STATUS_REQUESTED);
           break;
         default:
-          Log::custom(__CLASS__, "Invalid Object Response" . "\n Request: \n\n" . $this->getLastRequest() . "\n Response: \n\n" . Util::objToStr($response));
+          Log::custom(__CLASS__, "Invalid Object Response"."\n Request: \n\n".$this->getLastRequest()."\n Response: \n\n".Util::objToStr($response));
+
           return false;
       }
 
@@ -306,7 +315,7 @@ class Nicaragua extends Provider
       }else{
         $this->code = self::RESPONSE_ERROR;
         $this->message = 'At this time, we can not carry out. Please try again in a few minutes!';
-        Log::custom(__CLASS__, "Invalid Object Response" . "\n Request: \n\n" . $this->getLastRequest() . "\n Response: \n\n" . Util::objToStr($response));
+        Log::custom(__CLASS__, "Invalid Object Response"."\n Request: \n\n".$this->getLastRequest()."\n Response: \n\n".Util::objToStr($response));
       }
     }catch(Exception $ex){
       ExceptionManager::handleException($ex);

@@ -149,7 +149,7 @@ class Dinero extends Provider
    */
   public function sender()
   {
-    throw new InvalidStateException("'" . __METHOD__ . "' must be implemented in '" . get_class($this) . "' class.");
+    return new Person();
   }
 
   /**
@@ -197,30 +197,6 @@ class Dinero extends Provider
       $stickinessTransaction->setVerificationId($stickiness->getVerificationId());
       $stickinessTransaction->add();
     }
-  }
-
-  /**
-   * execute request
-   *
-   * @param $method
-   *
-   * @throws InvalidStateException
-   */
-  public function execute($method = null)
-  {
-    //do nothing
-  }
-
-  /**
-   * unpack response
-   *
-   * @param $response
-   *
-   * @throws InvalidStateException
-   */
-  public function unpack($response)
-  {
-    //do nothing
   }
 
 }

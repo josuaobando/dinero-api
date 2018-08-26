@@ -3,7 +3,7 @@
 /**
  * @author Josua
  */
-abstract class Provider extends WS
+class Provider extends WS
 {
 
   const SETTING_URL = 'URL';
@@ -97,6 +97,7 @@ abstract class Provider extends WS
     if(!$setting){
       throw new InvalidStateException("Missing setting: $code");
     }
+
     return $setting;
   }
 
@@ -149,25 +150,19 @@ abstract class Provider extends WS
    *
    * @param $method
    */
-  protected abstract function execute($method = null);
+  protected function execute($method = null)
+  {
+    //do nothing
+  }
 
   /**
    * unpack response
    *
    * @param $response
    */
-  protected abstract function unpack($response);
-
-  /**
-   * get name for the customer
-   *
-   * @return Person
-   *
-   * @throws InvalidStateException
-   */
-  protected function receiver()
+  protected function unpack($response)
   {
-    throw new InvalidStateException("'" . __METHOD__ . "' must be implemented in '" . get_class($this) . "' class.");
+    //do nothing
   }
 
   /**
@@ -177,9 +172,21 @@ abstract class Provider extends WS
    *
    * @throws InvalidStateException
    */
-  protected function sender()
+  public function receiver()
   {
-    throw new InvalidStateException("'" . __METHOD__ . "' must be implemented in '" . get_class($this) . "' class.");
+    throw new InvalidStateException("'".__METHOD__."' must be implemented in '".get_class($this)."' class.");
+  }
+
+  /**
+   * get name for the customer
+   *
+   * @return Person
+   *
+   * @throws InvalidStateException
+   */
+  public function sender()
+  {
+    throw new InvalidStateException("'".__METHOD__."' must be implemented in '".get_class($this)."' class.");
   }
 
   /**
@@ -189,9 +196,9 @@ abstract class Provider extends WS
    *
    * @throws InvalidStateException
    */
-  protected function confirm()
+  public function confirm()
   {
-    throw new InvalidStateException("'" . __METHOD__ . "' must be implemented in '" . get_class($this) . "' class.");
+    throw new InvalidStateException("'".__METHOD__."' must be implemented in '".get_class($this)."' class.");
   }
 
   /**
@@ -201,9 +208,9 @@ abstract class Provider extends WS
    *
    * @throws InvalidStateException
    */
-  protected function status()
+  public function status()
   {
-    throw new InvalidStateException("'" . __METHOD__ . "' must be implemented in '" . get_class($this) . "' class.");
+    throw new InvalidStateException("'".__METHOD__."' must be implemented in '".get_class($this)."' class.");
   }
 
   /**
@@ -213,6 +220,7 @@ abstract class Provider extends WS
   {
     //get transaction object
     $transaction = Session::getTransaction();
+
     return $transaction->getTransactionId();
   }
 

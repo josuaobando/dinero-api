@@ -11,6 +11,11 @@ class Ria extends Provider
    */
   const PROVIDER_ID = 5;
 
+  /**
+   * agency id
+   */
+  const AGENCY_ID = 102;
+
   const STATUS_API_REQUESTED = 'requested';
   const STATUS_API_PENDING = 'pending';
   const STATUS_API_APPROVED = 'approved';
@@ -84,12 +89,10 @@ class Ria extends Provider
         $person->setNameId($personalId);
         $person->add();
 
-        if($this->id){
-          $transaction->setApiTransactionId($this->id);
-          return $person;
-        }
+        $transaction->setAgencyId(self::AGENCY_ID);
+        $transaction->setApiTransactionId($this->id);
+        return $person;
 
-        return null;
       }elseif($this->status == self::STATUS_API_ERROR){
 
         if(stripos($this->message, 'No Names Available') !== false){
@@ -131,7 +134,7 @@ class Ria extends Provider
    */
   public function sender()
   {
-    throw new InvalidStateException("'" . __METHOD__ . "' must be implemented in '" . get_class($this) . "' class.");
+    return new Person();
   }
 
   /**

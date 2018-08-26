@@ -50,6 +50,26 @@ class TblSystem extends Db
   }
 
   /**
+   * get provider by agency type id
+   *
+   * @param int $agencyTypeId
+   *
+   * @return array
+   */
+  public function getAgencyProviders($agencyTypeId)
+  {
+    $sql = "CALL spProvider('{agencyTypeId}')";
+
+    $params = array();
+    $params['agencyTypeId'] = $agencyTypeId;
+
+    $rows = array();
+    $this->executeQuery($sql, $rows, $params);
+
+    return $rows;
+  }
+
+  /**
    * get agencies
    *
    * @param int $agencyId

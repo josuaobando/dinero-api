@@ -12,42 +12,26 @@ class ProviderTransaction
   private $wsRequest;
 
   /**
+   * @var array
+   */
+  private $providers = array();
+
+  /**
+   * @var Provider
+   */
+  private $provider;
+
+  /**
    * ProviderTransaction constructor.
    *
    * @param WSRequest $wsRequest
    */
   public function __construct($wsRequest)
   {
+    $tblSystem = TblSystem::getInstance();
+    $agencyTypeId = $wsRequest->requireNumericAndPositive('type');
+    $this->providers = $tblSystem->getAgencyProviders($agencyTypeId);
     $this->wsRequest = $wsRequest;
-  }
-
-  /**
-   * get provider instance
-   *
-   * @return Nicaragua|Ria|Saturno
-   *
-   * @throws InvalidStateException
-   */
-  private static function provider()
-  {
-    $transaction = Session::getTransaction();
-    $agencyTypeId = $transaction->getAgencyTypeId();
-    $agencyId = $transaction->getAgencyId();
-
-    switch($agencyTypeId){
-      case Transaction::AGENCY_TYPE_MG:
-        if($agencyId == CoreConfig::AGENCY_ID_NICARAGUA){
-          return new Nicaragua();
-        }else{
-          return new Saturno();
-        }
-        break;
-      case Transaction::AGENCY_TYPE_RIA:
-        return new Ria();
-        break;
-      default:
-        throw new InvalidStateException("Missing Provider");
-    }
   }
 
   /**
@@ -64,6 +48,7 @@ class ProviderTransaction
     $transaction = Session::getTransaction();
 
     $transaction->setAccountId($account->getAccountId());
+    $transaction->setCompanyId($account->getCompanyId());
     $transaction->setTransactionTypeId(Transaction::TYPE_RECEIVER);
     $transaction->setTransactionStatusId(Transaction::STATUS_REQUESTED);
 
@@ -80,20 +65,34 @@ class ProviderTransaction
     $transaction->setAgencyTypeId($agencyTypeId);
 
     //validate if need to create the customer
-    if(!$customer->getCustomerId()){
-      $customer->validateFromRequest($account, $this->wsRequest);
-    }
+    $customer->validateFromRequest($account, $this->wsRequest);
     $transaction->setCustomerId($customer->getCustomerId());
 
     //evaluate limits
     $limit = new Limit($transaction, $customer);
     $limit->evaluate();
 
-    //get a sender
-    $provider = self::provider();
-    $person = $provider->receiver();
+    //get name
+    $person = new Person();
+    foreach($this->providers as $provider){
+      $providerClassName = $provider['Name'];
+      if(class_exists($providerClassName)){
+        try{
+          $this->provider = new $providerClassName();
+          $person = $this->provider->receiver();
+          if($person && $person->getPersonId()){
+            $providerId = $provider['Provider_Id'];
+            $transaction->setProviderId($providerId);
+            break;
+          }
+        }catch(Exception $exception){
+          Log::custom(__CLASS__, $exception->getMessage().': '.$this->provider->getApiMessage());
+        }
+      }
+    }
+
     if(!$person || !$person->getPersonId()){
-      throw new APIException($provider->getApiMessage());
+      throw new APIException($this->provider->getApiMessage());
     }
 
     //update customer
@@ -106,7 +105,7 @@ class ProviderTransaction
 
     $transaction->create();
     if($transaction->getTransactionId()){
-      $provider->stickiness();
+      $this->provider->stickiness();
     }else{
       throw new TransactionException("The Transaction not has been created. Please, try later!");
     }
@@ -128,6 +127,7 @@ class ProviderTransaction
     $transaction = Session::getTransaction();
 
     $transaction->setAccountId($account->getAccountId());
+    $transaction->setCompanyId($account->getCompanyId());
     $transaction->setTransactionTypeId(Transaction::TYPE_SENDER);
     $transaction->setTransactionStatusId(Transaction::STATUS_SUBMITTED);
 
@@ -135,28 +135,43 @@ class ProviderTransaction
     $merchantId = trim($this->wsRequest->getParam('merchantId'));
     $amount = $this->wsRequest->requireNumericAndPositive('amount');
     $username = trim($this->wsRequest->requireNotNullOrEmpty('uid'));
+    $agencyTypeId = $this->wsRequest->requireNumericAndPositive('type');
 
     $transaction->setFee(0);
     $transaction->setAmount($amount);
     $transaction->setUsername($username);
     $transaction->setMerchantId($merchantId);
+    $transaction->setAgencyTypeId($agencyTypeId);
 
     //validate if need to create the customer
-    if(!$customer->getCustomerId()){
-      $customer->validateFromRequest($account, $this->wsRequest);
-    }
+    $customer->validateFromRequest($account, $this->wsRequest);
     $transaction->setCustomerId($customer->getCustomerId());
-    $transaction->setAgencyTypeId($customer->getAgencyTypeId());
 
     //evaluate limits
     $limit = new Limit($transaction, $customer);
     $limit->evaluate();
 
-    //get a sender
-    $provider = self::provider();
-    $person = $provider->sender();
+    //get name
+    $person = new Person();
+    foreach($this->providers as $provider){
+      $providerClassName = $provider['Name'];
+      if(class_exists($providerClassName)){
+        try{
+          $this->provider = new $providerClassName();
+          $person = $this->provider->receiver();
+          if($person && $person->getPersonId()){
+            $providerId = $provider['Provider_Id'];
+            $transaction->setProviderId($providerId);
+            break;
+          }
+        }catch(Exception $exception){
+          Log::custom(__CLASS__, $exception->getMessage().': '.$this->provider->getApiMessage());
+        }
+      }
+    }
+
     if(!$person || !$person->getPersonId()){
-      throw new APIException($provider->getApiMessage());
+      throw new APIException($this->provider->getApiMessage());
     }
 
     //update customer
@@ -169,6 +184,7 @@ class ProviderTransaction
 
     //create transaction after the validation of the data
     $transaction->create();
+
     return $transaction->getTransactionId();
   }
 
@@ -186,7 +202,7 @@ class ProviderTransaction
     $transaction->setModifiedBy($account->getAccountId());
 
     //confirm transaction
-    $provider = self::provider();
+    $provider = $this->provider();
     $confirm = $provider->confirm();
     if(!$confirm){
       throw new TransactionException("Transaction cannot be confirmed. Please try again in a few minutes!");
@@ -212,7 +228,7 @@ class ProviderTransaction
     $transaction->setModifiedBy($account->getAccountId());
 
     //check status
-    $provider = self::provider();
+    $provider = $this->provider();
     $provider->status();
   }
 

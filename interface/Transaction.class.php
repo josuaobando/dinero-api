@@ -5,6 +5,15 @@
  */
 class Transaction
 {
+  /**
+   * @var int
+   */
+  private $companyId;
+
+  /**
+   * @var int
+   */
+  private $providerId;
 
   /**
    * @var int
@@ -144,6 +153,22 @@ class Transaction
 
   /**
    * @return int
+   */
+  public function getCompanyId()
+  {
+    return $this->companyId;
+  }
+
+  /**
+   * @return int
+   */
+  public function getProviderId()
+  {
+    return $this->providerId;
+  }
+
+  /**
+   * @return int
    *
    * @see Transaction::TYPE_RECEIVER, Transaction::TYPE_SENDER
    */
@@ -242,6 +267,22 @@ class Transaction
   public function getApiTransactionId()
   {
     return $this->apiTransactionId;
+  }
+
+  /**
+   * @param int $companyId
+   */
+  public function setCompanyId($companyId)
+  {
+    $this->companyId = $companyId;
+  }
+
+  /**
+   * @param int $providerId
+   */
+  public function setProviderId($providerId)
+  {
+    $this->providerId = $providerId;
   }
 
   /**

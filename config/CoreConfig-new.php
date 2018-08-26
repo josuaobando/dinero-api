@@ -206,6 +206,7 @@ class CoreConfig
    */
   const CUSTOMER_SIMILAR_PERCENT_ACTIVE = true;
   const CUSTOMER_SIMILAR_PERCENT = 90;
+  const CUSTOMER_SIMILAR_PERCENT_UPDATE = 95;
 
   /**
    * Saturno API

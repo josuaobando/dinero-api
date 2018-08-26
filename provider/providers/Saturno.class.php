@@ -11,6 +11,11 @@ class Saturno extends Provider
    */
   const PROVIDER_ID = 3;
 
+  /**
+   * agency id
+   */
+  const AGENCY_ID = 100;
+
   const STATUS_API_REQUESTED = 'requested';
   const STATUS_API_PENDING = 'pending';
   const STATUS_API_APPROVED = 'approved';
@@ -134,6 +139,7 @@ class Saturno extends Provider
           $person->setNameId($personalId);
           $person->add();
 
+          $transaction->setAgencyId(self::AGENCY_ID);
           return $person;
         }elseif($this->apiStatus == self::STATUS_API_ERROR){
 

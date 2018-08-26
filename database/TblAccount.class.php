@@ -35,7 +35,7 @@ class TblAccount extends Db
    */
   public function getAccount($username)
   {
-    $sql = "CALL account('{username}')";
+    $sql = "CALL spAccount('{username}')";
 
     $params = array();
     $params['username'] = $username;
@@ -75,7 +75,7 @@ class TblAccount extends Db
    */
   public function getPermission($accountId)
   {
-    $sql = "CALL account_permission('{accountId}')";
+    $sql = "CALL spAccount_Permission('{accountId}')";
 
     $params = array();
     $params['accountId'] = $accountId;
@@ -96,7 +96,7 @@ class TblAccount extends Db
    */
   public function changePassword($accountId, $newPassword)
   {
-    $sql = "CALL account_changePassword('{accountId}', '{newPassword}')";
+    $sql = "CALL spAccount_ChangePassword('{accountId}', '{newPassword}')";
 
     $params = array();
     $params['accountId'] = $accountId;
