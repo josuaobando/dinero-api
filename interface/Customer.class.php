@@ -291,7 +291,7 @@ class Customer
       $this->lastName = $customerData['LastName'];
       $this->country = $customerData['countryCode'];
       $this->countryId = $customerData['Country_Id'];
-      $this->countryName = $customerData['countryName'];
+      $this->countryName = trim($customerData['countryName']);
       $this->state = $customerData['stateCode'];
       $this->stateId = $customerData['CountryState_Id'];
       $this->stateName = $customerData['stateName'];

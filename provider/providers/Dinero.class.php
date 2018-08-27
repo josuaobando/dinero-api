@@ -100,6 +100,8 @@ class Dinero extends Provider
         //do nothing
       }
 
+      $this->apiStatus = self::REQUEST_ERROR;
+      $this->apiMessage = "There are not names available";
       throw new PersonException("There are not names available");
     }
     $selectedId = array_rand($availableList, 1);
@@ -159,13 +161,7 @@ class Dinero extends Provider
    */
   public function confirm()
   {
-    try{
-      $transaction = Session::getTransaction();
-    }catch(Exception $ex){
-      ExceptionManager::handleException($ex);
-    }
-
-    return false;
+    return true;
   }
 
   /**
@@ -175,7 +171,7 @@ class Dinero extends Provider
    */
   public function status()
   {
-    //do nothing
+    return true;
   }
 
   /**
@@ -185,18 +181,15 @@ class Dinero extends Provider
    */
   public function stickiness()
   {
-    $valid = parent::stickiness();
-    if($valid){
-      $stickiness = Session::getStickiness();
-      $transaction = Session::getTransaction();
-      //add stickiness transaction
-      $stickinessTransaction = new StickinessTransaction();
-      $stickinessTransaction->setStickinessId($stickiness->getStickinessId());
-      $stickinessTransaction->setVerification($stickiness->getVerification());
-      $stickinessTransaction->setTransactionId($transaction->getTransactionId());
-      $stickinessTransaction->setVerificationId($stickiness->getVerificationId());
-      $stickinessTransaction->add();
-    }
+    $stickiness = Session::getStickiness();
+    $transaction = Session::getTransaction();
+    //add stickiness transaction
+    $stickinessTransaction = new StickinessTransaction();
+    $stickinessTransaction->setStickinessId($stickiness->getStickinessId());
+    $stickinessTransaction->setVerification($stickiness->getVerification());
+    $stickinessTransaction->setTransactionId($transaction->getTransactionId());
+    $stickinessTransaction->setVerificationId($stickiness->getVerificationId());
+    $stickinessTransaction->add();
   }
 
 }

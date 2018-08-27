@@ -428,7 +428,7 @@ class Person
 
       $this->country = $personData['Country'];
       $this->countryId = $personData['Country_Id'];
-      $this->countryName = $personData['CountryName'];
+      $this->countryName = trim($personData['CountryName']);
       $this->state = $personData['CountryState'];
       $this->stateId = $personData['CountryState_Id'];
       $this->stateName = $personData['CountryStateName'];

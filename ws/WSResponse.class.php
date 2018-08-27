@@ -30,7 +30,7 @@ class WSResponse
 
   private $elements = null;
 
-  public function __construct($systemMessage = null)
+  public function __construct($systemMessage = "")
   {
     $this->state = WSResponse::STATE_OK;
     $this->systemMessage = $systemMessage;

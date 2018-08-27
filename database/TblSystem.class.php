@@ -31,17 +31,16 @@ class TblSystem extends Db
    * get provider
    *
    * @param int $providerId
-   * @param int $agencyId
    *
    * @return array
    */
-  public function getProvider($providerId, $agencyId)
+  public function getProvider($providerId)
   {
     $sql = "CALL spProvider('{providerId}', '{agencyId}')";
 
     $params = array();
     $params['providerId'] = $providerId;
-    $params['agencyId'] = $agencyId;
+    $params['agencyId'] = 0;
 
     $rows = array();
     $this->executeQuery($sql, $rows, $params);
@@ -58,7 +57,7 @@ class TblSystem extends Db
    */
   public function getAgencyProviders($agencyTypeId)
   {
-    $sql = "CALL spProvider('{agencyTypeId}')";
+    $sql = "CALL spProviderAgency('{agencyTypeId}')";
 
     $params = array();
     $params['agencyTypeId'] = $agencyTypeId;

@@ -222,6 +222,20 @@ class Session
     return $stickiness;
   }
 
+  /**
+   * set person
+   *
+   * @param Person $person
+   *
+   * @return Person
+   */
+  public static function setPerson($person)
+  {
+    self::storeSessionObject(self::SID_PERSON, $person, true);
+    $personSession = self::getSessionObject(self::SID_PERSON);
+    return $personSession;
+  }
+
 }
 
 ?>

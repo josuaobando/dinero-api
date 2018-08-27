@@ -91,7 +91,7 @@ class Ria extends Provider
 
         $transaction->setAgencyId(self::AGENCY_ID);
         $transaction->setApiTransactionId($this->id);
-        return $person;
+        return Session::setPerson($person);
 
       }elseif($this->status == self::STATUS_API_ERROR){
 

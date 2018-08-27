@@ -301,14 +301,20 @@ class Manager
    */
   public function receiver($wsRequest)
   {
-    try{
-      return $this->startTransaction($wsRequest, Transaction::TYPE_RECEIVER);
-    }catch(P2PException $ex){
-      $agencyTypeId = $wsRequest->getParam('type');
-      if(CoreConfig::SATURNO_ACTIVE && $agencyTypeId == Transaction::AGENCY_TYPE_MG){
-        return $this->startAPITransaction($wsRequest, Transaction::TYPE_RECEIVER);
-      }else{
-        throw $ex;
+    //@todo: temporally
+    if(CoreConfig::USED_PROVIDERS){
+      $providerTransaction = new ProviderTransaction($wsRequest);
+      return $providerTransaction->receiver();
+    }else{
+      try{
+        return $this->startTransaction($wsRequest, Transaction::TYPE_RECEIVER);
+      }catch(P2PException $ex){
+        $agencyTypeId = $wsRequest->getParam('type');
+        if(CoreConfig::SATURNO_ACTIVE && $agencyTypeId == Transaction::AGENCY_TYPE_MG){
+          return $this->startAPITransaction($wsRequest, Transaction::TYPE_RECEIVER);
+        }else{
+          throw $ex;
+        }
       }
     }
   }
@@ -335,12 +341,18 @@ class Manager
    *
    * @param WSRequest $wsRequest
    *
-   * @return WSResponseOk
+   * @return WSResponse
    *
    * @throws TransactionException
    */
   public function confirm($wsRequest)
   {
+    //@todo: temporally
+    if(CoreConfig::USED_PROVIDERS){
+      $providerTransaction = new ProviderTransaction($wsRequest);
+      return $providerTransaction->confirm();
+    }
+
     //transaction id
     $transactionId = $wsRequest->requireNumericAndPositive('transaction_id');
     $controlNumber = $wsRequest->requireNumericAndPositive('control_number');
@@ -432,6 +444,11 @@ class Manager
    */
   public function information($wsRequest, $webRequest = false)
   {
+    //@todo: temporally
+    if(CoreConfig::USED_PROVIDERS){
+      $providerTransaction = new ProviderTransaction($wsRequest);
+      return $providerTransaction->status($webRequest);
+    }
     $account = Session::getAccount();
     //transaction id
     $transactionId = $wsRequest->requireNumericAndPositive('transaction_id');
@@ -502,7 +519,7 @@ class Manager
 
     //validation to Saturno transaction
     if($transaction->getAgencyId() == CoreConfig::AGENCY_ID_SATURNO){
-      throw new InvalidStateException("Transaction cannot be Modify. Saturno Transaction!");
+      throw new InvalidStateException("Transaction cannot be Modify!");
     }
 
     //get current status

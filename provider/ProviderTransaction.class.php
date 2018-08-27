@@ -17,27 +17,29 @@ class ProviderTransaction
   private $providers = array();
 
   /**
-   * @var Provider
-   */
-  private $provider;
-
-  /**
    * ProviderTransaction constructor.
    *
    * @param WSRequest $wsRequest
+   *
+   * @throws TransactionException
    */
   public function __construct($wsRequest)
   {
-    $tblSystem = TblSystem::getInstance();
-    $agencyTypeId = $wsRequest->requireNumericAndPositive('type');
-    $this->providers = $tblSystem->getAgencyProviders($agencyTypeId);
+    $agencyTypeId = $wsRequest->getParam('type');
+    if($agencyTypeId){
+      $tblSystem = TblSystem::getInstance();
+      $this->providers = $tblSystem->getAgencyProviders($agencyTypeId);
+      if(!$this->providers){
+        throw new TransactionException("The Transaction not has been created. Please, try later!");
+      }
+    }
     $this->wsRequest = $wsRequest;
   }
 
   /**
    * get a receiver from API
    *
-   * @return bool
+   * @return WSResponse
    *
    * @throws APIException|TransactionException
    */
@@ -74,25 +76,26 @@ class ProviderTransaction
 
     //get name
     $person = new Person();
-    foreach($this->providers as $provider){
-      $providerClassName = $provider['Name'];
+    $provider = new Provider();
+    foreach($this->providers as $providerData){
+      $providerClassName = $providerData['Name'];
       if(class_exists($providerClassName)){
         try{
-          $this->provider = new $providerClassName();
-          $person = $this->provider->receiver();
+          $provider = new $providerClassName();
+          $person = $provider->receiver();
           if($person && $person->getPersonId()){
-            $providerId = $provider['Provider_Id'];
+            $providerId = $providerData['Provider_Id'];
             $transaction->setProviderId($providerId);
             break;
           }
         }catch(Exception $exception){
-          Log::custom(__CLASS__, $exception->getMessage().': '.$this->provider->getApiMessage());
+          Log::custom(__CLASS__, $exception->getMessage());
         }
       }
     }
 
     if(!$person || !$person->getPersonId()){
-      throw new APIException($this->provider->getApiMessage());
+      throw new APIException($provider->getApiMessage());
     }
 
     //update customer
@@ -105,20 +108,34 @@ class ProviderTransaction
 
     $transaction->create();
     if($transaction->getTransactionId()){
-      $this->provider->stickiness();
+      $provider->stickiness();
+
+      //extra information
+      if($transaction->getAgencyTypeId() == Transaction::AGENCY_TYPE_RIA){
+        $transaction->setReason('EasyPay-Phillgus');
+        if($transaction->getAgencyId() == CoreConfig::AGENCY_ID_SATURNO_RIA){
+          $transaction->setReason('TeleDolar');
+        }
+      }
+
+      $wsResponse = new WSResponseOk();
+      $wsResponse->addElement('transaction', $transaction);
+      $wsResponse->addElement('sender', $customer);
+      $wsResponse->addElement('receiver', $person);
+
     }else{
       throw new TransactionException("The Transaction not has been created. Please, try later!");
     }
 
-    return true;
+    return $wsResponse;
   }
 
   /**
    * get a sender from API
    *
-   * @return bool
+   * @return WSResponse
    *
-   * @throws APIException
+   * @throws APIException|TransactionException
    */
   public function sender()
   {
@@ -153,25 +170,26 @@ class ProviderTransaction
 
     //get name
     $person = new Person();
-    foreach($this->providers as $provider){
-      $providerClassName = $provider['Name'];
+    $provider = new Provider();
+    foreach($this->providers as $providerData){
+      $providerClassName = $providerData['Name'];
       if(class_exists($providerClassName)){
         try{
-          $this->provider = new $providerClassName();
-          $person = $this->provider->receiver();
+          $provider = new $providerClassName();
+          $person = $provider->receiver();
           if($person && $person->getPersonId()){
-            $providerId = $provider['Provider_Id'];
+            $providerId = $providerData['Provider_Id'];
             $transaction->setProviderId($providerId);
             break;
           }
         }catch(Exception $exception){
-          Log::custom(__CLASS__, $exception->getMessage().': '.$this->provider->getApiMessage());
+          Log::custom(__CLASS__, $exception->getMessage());
         }
       }
     }
 
     if(!$person || !$person->getPersonId()){
-      throw new APIException($this->provider->getApiMessage());
+      throw new APIException($provider->getApiMessage());
     }
 
     //update customer
@@ -184,52 +202,124 @@ class ProviderTransaction
 
     //create transaction after the validation of the data
     $transaction->create();
+    if($transaction->getTransactionId()){
+      $wsResponse = new WSResponseOk();
+      $wsResponse->addElement('transaction', $transaction);
+      $wsResponse->addElement('sender', $person);
+      $wsResponse->addElement('receiver', $customer);
+    }else{
+      throw new TransactionException("The Transaction not has been created. Please, try later!");
+    }
 
-    return $transaction->getTransactionId();
+    return $wsResponse;
   }
 
   /**
    * confirm transaction with the control number
    *
-   * @return WSResponseOk
+   * @return WSResponse
    *
    * @throws TransactionException
    */
   public function confirm()
   {
+    //transaction id
+    $fee = $this->wsRequest->getParam('fee', 0);
+    $amount = $this->wsRequest->requireNumericAndPositive('amount');
+    $transactionId = $this->wsRequest->requireNumericAndPositive('transaction_id');
+    $controlNumber = $this->wsRequest->requireNumericAndPositive('control_number');
+
     $account = Session::getAccount();
     $transaction = Session::getTransaction();
+    $transaction->restore($transactionId);
+    if(!$transaction->getTransactionId()){
+      throw new TransactionException("This transaction not exist or not can be loaded: " . $transactionId);
+    }else{
+      $this->wsRequest->putParam('type', $transaction->getAgencyTypeId());
+    }
+
+    if($transaction->getTransactionStatusId() != Transaction::STATUS_REQUESTED && $transaction->getTransactionStatusId() != Transaction::STATUS_REJECTED){
+      if($transaction->getTransactionStatusId() == Transaction::STATUS_CANCELED){
+        throw new TransactionException("The transaction has expired. Valid time is 48 hours to confirm.");
+      }else{
+        throw new TransactionException("Transaction cannot be confirmed since the current status is: " . $transaction->getTransactionStatus());
+      }
+    }
+
+    //validate customer
+    $customerRequest = new Customer();
+    $customerRequest->restoreFromRequest($this->wsRequest);
+    $newCustomerName = strtoupper($customerRequest->getCustomer());
+    $customerTransaction = Session::getCustomer($transaction->getCustomerId());
+    $originalCustomerName = strtoupper($customerTransaction->getCustomer());
+    $percent = Util::similarPercent($newCustomerName, $originalCustomerName);
+    if($newCustomerName != $originalCustomerName && $percent >= CoreConfig::CUSTOMER_SIMILAR_PERCENT_UPDATE){
+      $customerTransaction->setFirstName($customerRequest->getFirstName());
+      $customerTransaction->setLastName($customerRequest->getLastName());
+      $customerUpdated = $customerTransaction->update();
+      $username = $transaction->getUsername();
+      if($customerUpdated){
+        Log::custom('UpdateCustomer', "Customer updated | Username: $username Original: $originalCustomerName New: $newCustomerName Percent: $percent%");
+      }else{
+        Log::custom('UpdateCustomer', "Customer not updated | Username: $username Original: $originalCustomerName New: $newCustomerName Percent: $percent%");
+      }
+    }
+
+    $transaction->setFee($fee);
+    $transaction->setAmount($amount);
+    $transaction->setControlNumber($controlNumber);
     $transaction->setModifiedBy($account->getAccountId());
 
-    //confirm transaction
-    $provider = $this->provider();
+    $provider = $transaction->getProvider();
     $confirm = $provider->confirm();
     if(!$confirm){
       throw new TransactionException("Transaction cannot be confirmed. Please try again in a few minutes!");
     }
 
     //update transaction after the validation of the data
-    $transaction->setApiTransactionId($provider->getApiTransactionId());
     $transaction->setTransactionStatusId(Transaction::STATUS_SUBMITTED);
     $transaction->setNote('');
     $transaction->setReason('');
     $transaction->update();
+
+    $wsResponse = new WSResponseOk();
+    $wsResponse->addElement('transaction', $transaction);
+
+    return $wsResponse;
   }
 
   /**
    * get transaction information
    *
+   * @param bool $webRequest
+   *
+   * @return WSResponse|Transaction
+   *
    * @throws InvalidStateException
    */
-  public function status()
+  public function status($webRequest = false)
   {
-    $account = Session::getAccount();
+    $transactionId = $this->wsRequest->requireNumericAndPositive('transaction_id');
     $transaction = Session::getTransaction();
-    $transaction->setModifiedBy($account->getAccountId());
+    $transaction->restore($transactionId);
 
-    //check status
-    $provider = $this->provider();
+    $provider = $transaction->getProvider();
     $provider->status();
+
+    $wsResponse = new WSResponseOk();
+    $wsResponse->addElement('transaction', $transaction);
+
+    // Payout (Sender) Information
+    if($transaction->getTransactionStatusId() == Transaction::STATUS_APPROVED && $transaction->getTransactionTypeId() == Transaction::TYPE_SENDER){
+      $person = new Person($transaction->getPersonId());
+      $wsResponse->addElement('sender', $person);
+    }
+
+    if($webRequest){
+      return $transaction;
+    }else{
+      return $wsResponse;
+    }
   }
 
 }

@@ -93,7 +93,7 @@ class Nicaragua extends Provider
         $transaction->setApiTransactionId($this->id);
         $transaction->setAgencyId(self::AGENCY_ID);
 
-        return $person;
+        return Session::setPerson($person);
 
       }elseif($this->status == self::RESPONSE_ERROR || $this->code != self::RESPONSE_SUCCESS){
 

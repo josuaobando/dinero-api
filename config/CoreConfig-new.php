@@ -225,6 +225,11 @@ class CoreConfig
    */
   const USER_SYSTEM = 100;
 
+  /**
+   * active processing by providers
+   */
+  const USED_PROVIDERS = false;
+
 }
 
 ?>

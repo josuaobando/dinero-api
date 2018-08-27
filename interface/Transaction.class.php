@@ -168,6 +168,25 @@ class Transaction
   }
 
   /**
+   * @return Dinero|Nicaragua|Provider|Ria|Saturno
+   */
+  public function getProvider()
+  {
+    switch($this->providerId){
+      case Dinero::PROVIDER_ID:
+        return new Dinero();
+      case Saturno::PROVIDER_ID:
+        return new Saturno();
+      case Nicaragua::PROVIDER_ID;
+        return new Nicaragua();
+      case Ria::PROVIDER_ID:
+        return new Ria();
+      default:
+        return new Provider($this->providerId);
+    }
+  }
+
+  /**
    * @return int
    *
    * @see Transaction::TYPE_RECEIVER, Transaction::TYPE_SENDER
@@ -530,9 +549,9 @@ class Transaction
     $data['uid'] = $this->username;
     $data['amount'] = $this->amount;
     $data['fee'] = $this->fee;
-    $data['notes'] = $this->reason;
-    $data['controlNumber'] = $this->controlNumber;
-    $data['merchantId'] = $this->merchantId;
+    $data['notes'] = (!$this->reason) ? "" : $this->reason;
+    $data['controlNumber'] = (!$this->controlNumber) ? "" : $this->controlNumber;
+    $data['merchantId'] = (!$this->merchantId) ? "" : $this->merchantId;
 
     return $data;
   }

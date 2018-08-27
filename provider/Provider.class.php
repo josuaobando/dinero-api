@@ -121,48 +121,48 @@ class Provider extends WS
    * Provider constructor.
    *
    * @param int $providerId
-   * @param int $agencyId
    *
    * @throws InvalidStateException
    */
-  public function __construct($providerId = 0, $agencyId = 0)
+  public function __construct($providerId = 0)
   {
-    if(!$providerId && !$agencyId){
-      throw new InvalidStateException("Missing Provider Id");
-    }
-
     $this->tblSystem = TblSystem::getInstance();
-    $settings = $this->tblSystem->getProvider($providerId, $agencyId);
-    if(!count($settings)){
-      throw new InvalidStateException("Missing Provider Setting");
-    }else{
-      foreach($settings as $setting){
-        $code = $setting['Code'];
-        $value = $setting['Value'];
-        $this->settings[$code] = $value;
+    if($providerId){
+      $settings = $this->tblSystem->getProvider($providerId);
+      if(!count($settings)){
+        throw new InvalidStateException("Missing Provider Setting");
+      }else{
+        foreach($settings as $setting){
+          $code = $setting['Code'];
+          $value = $setting['Value'];
+          $this->settings[$code] = $value;
+        }
       }
     }
-
   }
 
   /**
    * execute request
    *
    * @param $method
+   *
+   * @throws InvalidStateException
    */
   protected function execute($method = null)
   {
-    //do nothing
+    throw new InvalidStateException("'" . __METHOD__ . "' must be implemented in '" . get_class($this) . "' class.");
   }
 
   /**
    * unpack response
    *
    * @param $response
+   *
+   * @throws InvalidStateException
    */
   protected function unpack($response)
   {
-    //do nothing
+    throw new InvalidStateException("'" . __METHOD__ . "' must be implemented in '" . get_class($this) . "' class.");
   }
 
   /**
@@ -174,7 +174,7 @@ class Provider extends WS
    */
   public function receiver()
   {
-    throw new InvalidStateException("'".__METHOD__."' must be implemented in '".get_class($this)."' class.");
+    throw new InvalidStateException("'" . __METHOD__ . "' must be implemented in '" . get_class($this) . "' class.");
   }
 
   /**
@@ -186,7 +186,7 @@ class Provider extends WS
    */
   public function sender()
   {
-    throw new InvalidStateException("'".__METHOD__."' must be implemented in '".get_class($this)."' class.");
+    throw new InvalidStateException("'" . __METHOD__ . "' must be implemented in '" . get_class($this) . "' class.");
   }
 
   /**
@@ -198,7 +198,7 @@ class Provider extends WS
    */
   public function confirm()
   {
-    throw new InvalidStateException("'".__METHOD__."' must be implemented in '".get_class($this)."' class.");
+    throw new InvalidStateException("'" . __METHOD__ . "' must be implemented in '" . get_class($this) . "' class.");
   }
 
   /**
@@ -210,7 +210,8 @@ class Provider extends WS
    */
   public function status()
   {
-    throw new InvalidStateException("'".__METHOD__."' must be implemented in '".get_class($this)."' class.");
+    return true;
+    //throw new InvalidStateException("'" . __METHOD__ . "' must be implemented in '" . get_class($this) . "' class.");
   }
 
   /**
@@ -218,10 +219,7 @@ class Provider extends WS
    */
   public function stickiness()
   {
-    //get transaction object
-    $transaction = Session::getTransaction();
-
-    return $transaction->getTransactionId();
+    return true;
   }
 
 }
