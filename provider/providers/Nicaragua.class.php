@@ -66,7 +66,7 @@ class Nicaragua extends Provider
         $personalId = Encrypt::generateMD5($name);
 
         $person = new Person();
-        $person->setPersonLisId(CoreConfig::AGENCY_ID_NICARAGUA);
+        $person->setPersonLisId(self::AGENCY_ID);
         $person->setCountry('NI');
         $person->setCountryId(155);
         $person->setCountryName('Nicaragua');
@@ -74,7 +74,7 @@ class Nicaragua extends Provider
         $person->setStateId(2915);
         $person->setStateName('Managua');
         $person->setAvailable(1);
-        $person->setIsActive(1);
+        $person->setIsActive(0);
         $person->setName($name);
         $person->setLastName('');
         $person->setPersonalId($personalId);

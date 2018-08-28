@@ -39,9 +39,13 @@ class ProviderTransaction
   /**
    * get a receiver from API
    *
-   * @return WSResponse
+   * @return WSResponseOk
    *
-   * @throws APIException|TransactionException
+   * @throws APIBlackListException
+   * @throws APIException
+   * @throws Exception
+   * @throws P2PException
+   * @throws TransactionException
    */
   public function receiver()
   {
@@ -77,7 +81,9 @@ class ProviderTransaction
     //get name
     $person = new Person();
     $provider = new Provider();
+    $providerException = null;
     foreach($this->providers as $providerData){
+      $providerException = null;
       $providerClassName = $providerData['Name'];
       if(class_exists($providerClassName)){
         try{
@@ -88,14 +94,21 @@ class ProviderTransaction
             $transaction->setProviderId($providerId);
             break;
           }
+        }catch(APIBlackListException | P2PException $exception){
+          $providerException = $exception;
+          continue;
         }catch(Exception $exception){
-          Log::custom(__CLASS__, $exception->getMessage());
+          throw $exception;
         }
       }
     }
 
     if(!$person || !$person->getPersonId()){
-      throw new APIException($provider->getApiMessage());
+      if($providerException){
+        throw $providerException;
+      }else{
+        throw new APIException($provider->getApiMessage());
+      }
     }
 
     //update customer
@@ -135,7 +148,7 @@ class ProviderTransaction
    *
    * @return WSResponse
    *
-   * @throws APIException|TransactionException
+   * @throws APIException|TransactionException|Exception
    */
   public function sender()
   {
@@ -182,8 +195,10 @@ class ProviderTransaction
             $transaction->setProviderId($providerId);
             break;
           }
+        }catch(APIBlackListException | P2PException $exception){
+          continue;
         }catch(Exception $exception){
-          Log::custom(__CLASS__, $exception->getMessage());
+          throw $exception;
         }
       }
     }

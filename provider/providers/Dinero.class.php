@@ -113,11 +113,21 @@ class Dinero extends Provider
    * get name for the customer
    *
    * @return Person
+   *
+   * @throws P2PException
    */
   public function receiver()
   {
     $customer = Session::getCustomer();
     $transaction = Session::getTransaction();
+
+    if(CoreConfig::SATURNO_ACTIVE){
+      if($customer->getIsAPI()){
+        throw new P2PException("Redirect to API...");
+      }else{
+        throw new P2PException("Due to external factors, we cannot give this Customer a name.");
+      }
+    }
 
     //check stickiness
     $stickiness = Session::getStickiness(true);

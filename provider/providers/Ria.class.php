@@ -73,7 +73,7 @@ class Ria extends Provider
         $person->setStateId(877);
         $person->setStateName('San José');
         $person->setAvailable(1);
-        $person->setIsActive(1);
+        $person->setIsActive(0);
         $person->setName($name);
         $person->setLastName('');
         $person->setPersonalId($personalId);

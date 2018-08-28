@@ -143,6 +143,7 @@ class WSResponse
   {
     $data = array();
     $data['code'] = $this->state;
+    $data['error'] = $this->code;
     $data['message'] = $this->systemMessage;
 
     if(count($this->elements) > 0){

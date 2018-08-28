@@ -138,7 +138,8 @@ class Customer
     if($this->isAPI ||
       $this->agencyId == CoreConfig::AGENCY_ID_SATURNO ||
       $this->agencyId == CoreConfig::AGENCY_ID_NICARAGUA ||
-      $this->agencyId == CoreConfig::AGENCY_ID_SATURNO_RIA){
+      $this->agencyId == CoreConfig::AGENCY_ID_SATURNO_RIA
+    ){
       return 1;
     }
     return 0;
@@ -440,10 +441,14 @@ class Customer
    *
    * @param $customerName [optional]
    *
-   * @throws CustomerException
+   * @throws CustomerBlackListException
    */
   public function isBlacklisted($customerName = null)
   {
+    if($this->getIsAPI()){
+      return;
+    }
+
     $customerName = ($customerName) ? $customerName : $this->getCustomer();
     $customerName = strtoupper($customerName);
     $similarList = $this->tblCustomer->getSimilarSearchBlacklisted($this->agencyTypeId, $customerName);
@@ -461,12 +466,10 @@ class Customer
           }elseif($agencyType == Transaction::AGENCY_TYPE_RIA){
             $agencyType = 'RIA';
           }
-          throw new CustomerException("The Customer has been blacklisted by $agencyType International");
-
+          throw new CustomerBlackListException("The Customer has been blacklisted by $agencyType International");
         }
       }
     }
-
   }
 
   /**

@@ -23,6 +23,9 @@ class Saturno extends Provider
   const STATUS_API_CANCELED = 'cancelled';
   const STATUS_API_ERROR = 'error';
 
+  const RESPONSE_ERROR = 'error';
+  const RESPONSE_SUCCESS = '0';
+
   /**
    * @var array
    */
@@ -94,28 +97,28 @@ class Saturno extends Provider
       $customer = Session::getCustomer();
       $transaction = Session::getTransaction();
 
-      $params = array();
-      //credentials
-      $params['user'] = $this->agency['Setting_User'];
-      $params['password'] = $this->agency['Setting_Password'];
       //transaction
-      $params['sendername'] = $customer->getCustomer();
-      $params['senderaccount'] = $transaction->getUsername();
-      $params['amount'] = $transaction->getAmount();
+      $request = array();
+      $request['sendername'] = $customer->getCustomer();
+      $request['senderaccount'] = $transaction->getUsername();
+      $request['amount'] = $transaction->getAmount();
 
-      $url = $this->agency['Setting_URL'];
-      $response = $this->execSoapSimple($url, 'ObtenerNombre', $params, array('uri' => 'http://WS/', 'soapaction' => ''));
+      //execute request
+      $this->request = $request;
+      $this->execute('ObtenerNombre');
+      $response = $this->getResponse();
+      if($this->code = self::RESPONSE_ERROR){
+        return null;
+      }
+
       if($response && $response instanceof stdClass){
-
-        $this->apiMessage = $response->comentario;
-        $this->apiStatus = strtolower($response->status);
         if($this->apiStatus == self::STATUS_API_REQUESTED){
 
           $name = $response->recibe;
           $personalId = $response->nameId;
 
           $person = new Person();
-          $person->setPersonLisId(100);
+          $person->setPersonLisId(self::AGENCY_ID);
           $person->setCountry('CR');
           $person->setCountryId(52);
           $person->setCountryName('Costa Rica');
@@ -123,7 +126,7 @@ class Saturno extends Provider
           $person->setStateId(877);
           $person->setStateName('San José');
           $person->setAvailable(1);
-          $person->setIsActive(1);
+          $person->setIsActive(0);
           $person->setName($name);
           $person->setLastName('');
           $person->setPersonalId($personalId);
@@ -156,7 +159,7 @@ class Saturno extends Provider
             return null;
           }elseif(stripos(strtolower($this->apiMessage), 'black') && stripos(strtolower($this->apiMessage), 'list')){
             $this->apiMessage = 'The Customer has been blacklisted';
-            return null;
+            throw new APIBlackListException($this->apiMessage);
           }elseif(stripos(strtolower($this->apiMessage), 'limit') && stripos(strtolower($this->apiMessage), 'reached')){
             $this->apiMessage = 'Limits: The Customer has exceeded the limits in MG';
             return null;
@@ -219,7 +222,7 @@ class Saturno extends Provider
           $person->setStateId(877);
           $person->setStateName('San José');
           $person->setAvailable(1);
-          $person->setIsActive(1);
+          $person->setIsActive(0);
           $person->setName($name);
           $person->setLastName('');
           $person->setPersonalId($personalId);
@@ -503,7 +506,20 @@ class Saturno extends Provider
    */
   public function unpack($response)
   {
-    throw new InvalidStateException("'" . __METHOD__ . "' must be implemented in '" . get_class($this) . "' class.");
+    try{
+      if($response && $response instanceof stdClass){
+        $this->id = $response->trans;
+        $this->code = $response->lstatus;
+        $this->status = strtolower($response->status);
+        $this->message = $response->comentario;
+      }else{
+        $this->code = self::RESPONSE_ERROR;
+        $this->message = 'At this time, we can not carry out. Please try again in a few minutes!';
+        Log::custom(__CLASS__, "Invalid Object Response" . "\n Request: \n\n" . $this->getLastRequest() . "\n Response: \n\n" . Util::objToStr($response));
+      }
+    }catch(Exception $ex){
+      ExceptionManager::handleException($ex);
+    }
   }
 
 }
