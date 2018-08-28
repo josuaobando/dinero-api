@@ -129,6 +129,9 @@ class Dinero extends Provider
       }
     }
 
+    //validate if customer is blacklisted
+    $customer->isBlacklisted();
+
     //check stickiness
     $stickiness = Session::getStickiness(true);
     $stickiness->restoreByCustomerId($customer->getCustomerId());
@@ -149,7 +152,8 @@ class Dinero extends Provider
     $stickiness->register();
     //------------------end validation
 
-    return $person;
+    $transaction->setProviderId(self::PROVIDER_ID);
+    return Session::setPerson($person);
   }
 
   /**

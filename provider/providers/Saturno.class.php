@@ -143,7 +143,9 @@ class Saturno extends Provider
           $person->add();
 
           $transaction->setAgencyId(self::AGENCY_ID);
-          return $person;
+          $transaction->setProviderId(self::PROVIDER_ID);
+
+          return Session::setPerson($person);
         }elseif($this->apiStatus == self::STATUS_API_ERROR){
 
           if(stripos($this->apiMessage, 'No Names Available') !== false){
