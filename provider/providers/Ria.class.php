@@ -55,11 +55,11 @@ class Ria extends Provider
       $this->request = $params;
       $this->execute('GetName');
       $response = $this->getResponse();
-      if($this->status == self::REQUEST_ERROR){
+      if($this->apiStatus == self::REQUEST_ERROR){
         return null;
       }
 
-      if($this->status == self::STATUS_API_REQUESTED){
+      if($this->apiStatus == self::STATUS_API_REQUESTED){
 
         $name = trim($response->recibe);
         $personalId = Encrypt::generateMD5($name);
@@ -90,14 +90,14 @@ class Ria extends Provider
         $person->add();
 
         $transaction->setAgencyId(self::AGENCY_ID);
-        $transaction->setApiTransactionId($this->id);
+        $transaction->setApiTransactionId($this->apiTransactionId);
         $transaction->setProviderId(self::PROVIDER_ID);
 
         return Session::setPerson($person);
 
-      }elseif($this->status == self::STATUS_API_ERROR){
+      }elseif($this->apiStatus == self::STATUS_API_ERROR){
 
-        if(stripos($this->message, 'No Names Available') !== false){
+        if(stripos($this->apiMessage, 'No Names Available') !== false){
 
           $subject = "No deposit names available";
           $body = "There are no deposit names available in Saturn agency";
@@ -106,17 +106,17 @@ class Ria extends Provider
           MailManager::sendEmail($recipients, $subject, $bodyTemplate);
 
           Log::custom(__CLASS__, $body);
-          $this->message = 'We cannot give this Customer a name';
+          $this->apiMessage = 'We cannot give this Customer a name';
           return null;
-        }elseif(stripos(strtolower($this->message), 'black') && stripos(strtolower($this->message), 'list')){
-          $this->message = 'The Customer has been blacklisted';
+        }elseif(stripos(strtolower($this->apiMessage), 'black') && stripos(strtolower($this->apiMessage), 'list')){
+          $this->apiMessage = 'The Customer has been blacklisted';
           return null;
-        }elseif(stripos(strtolower($this->message), 'limit') && stripos(strtolower($this->message), 'reached')){
-          $this->message = 'Limits: The Customer has exceeded the limits in MG';
+        }elseif(stripos(strtolower($this->apiMessage), 'limit') && stripos(strtolower($this->apiMessage), 'reached')){
+          $this->apiMessage = 'Limits: The Customer has exceeded the limits in MG';
           return null;
         }
 
-        $this->message = 'We cannot give this Customer a name';
+        $this->apiMessage = 'We cannot give this Customer a name';
         Log::custom(__CLASS__, "Unmapped message" . "\n Response: \n\n" . Util::objToStr($response));
       }
 
@@ -168,9 +168,9 @@ class Ria extends Provider
       $this->execute($method);
       $response = $this->getResponse();
 
-      if($this->status == self::STATUS_API_PENDING){
+      if($this->apiStatus == self::STATUS_API_PENDING){
         return true;
-      }elseif($this->status == self::STATUS_API_ERROR || $this->status == self::REQUEST_ERROR){
+      }elseif($this->apiStatus == self::STATUS_API_ERROR || $this->apiStatus == self::REQUEST_ERROR){
 
         try{
           if($isSubmit){
@@ -226,12 +226,12 @@ class Ria extends Provider
       $response = $this->getResponse();
 
       //validate trackId
-      if($this->id != $transaction->getApiTransactionId()){
+      if($this->apiTransactionId != $transaction->getApiTransactionId()){
         Log::custom(__CLASS__, "Transaction ID mismatch" . "\n Request: \n\n" . $this->getLastRequest() . "\n Response: \n\n" . Util::objToStr($response));
         return false;
       }
 
-      switch($this->status){
+      switch($this->apiStatus){
         case self::STATUS_API_APPROVED:
           $transaction->setTransactionStatusId(Transaction::STATUS_APPROVED);
           $transaction->setReason('Ok');
@@ -239,7 +239,7 @@ class Ria extends Provider
           break;
         case self::STATUS_API_REJECTED:
           $transaction->setTransactionStatusId(Transaction::STATUS_REJECTED);
-          $transaction->setReason($this->message);
+          $transaction->setReason($this->apiMessage);
           break;
         case self::STATUS_API_PENDING:
           $transaction->setTransactionStatusId(Transaction::STATUS_SUBMITTED);
@@ -303,13 +303,13 @@ class Ria extends Provider
   {
     try{
       if($response && $response instanceof stdClass){
-        $this->id = $response->trans;
-        $this->code = $response->lstatus;
-        $this->status = strtolower($response->status);
-        $this->message = $response->comentario;
+        $this->apiTransactionId = $response->trans;
+        $this->apiCode = $response->lstatus;
+        $this->apiStatus = strtolower($response->status);
+        $this->apiMessage = $response->comentario;
       }else{
-        $this->code = self::REQUEST_ERROR;
-        $this->message = 'At this time, we can not carry out. Please try again in a few minutes!';
+        $this->apiCode = self::REQUEST_ERROR;
+        $this->apiMessage = 'At this time, we can not carry out. Please try again in a few minutes!';
         Log::custom(__CLASS__, "Invalid Object Response" . "\n Request: \n\n" . $this->getLastRequest() . "\n Response: \n\n" . Util::objToStr($response));
       }
     }catch(Exception $ex){

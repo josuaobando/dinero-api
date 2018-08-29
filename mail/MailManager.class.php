@@ -65,83 +65,86 @@ class MailManager
    * @param string $recipients
    * @param string $subject
    * @param string $body
-   * @param array $attachments
+   * @param array|bool $attachments
+   * @param mixed $from
    *
    * @return bool
    */
   public static function sendAdvancedEmail($recipients, $subject, $body, $attachments = false, $from = null)
   {
+    try{
+      $cc = "";
+      $bcc = "";
+      if(is_array($recipients)){
+        $to = $recipients['To'];
+        $cc = $recipients['Cc'];
+        $bcc = $recipients['Bcc'];
+      }else{
+        $to = $recipients;
+      }
+
+      if(Util::isDEV() || !$to){
+        $to = CoreConfig::MAIL_DEV;
+      }
+
+      $mailer = new PHPMailerManager();
+      if(MailManager::$htmlFormat){
+        $mailer->isHTML(true);
+        $mailer->Body = $body;
+      }else{
+        $mailer->Body = $body;
+      }
+
+      if($attachments && is_array($attachments)){
+        //Attach multiple files one by one
+        foreach($attachments as $att){
+          $mailer->addAttachment($att);
+        }
+      }
+
+      $mailer->setFrom($from ? $from : MailManager::$from);
+      $mailer->Subject = $subject;
+
+      $arrayTo = self::getArrayToSendEmail($to);
+      foreach($arrayTo as $t){
+        $mailer->addAddress($t);
+      }
+
+      if($cc){
+        $arrayCC = self::getArrayToSendEmail($cc);
+        foreach($arrayCC as $c){
+          $mailer->addCC($c);
+        }
+      }
+
+      if($bcc){
+        $arrayBCC = self::getArrayToSendEmail($bcc);
+        foreach($arrayBCC as $b){
+          $mailer->addCC($b);
+        }
+      }
+
+      $mailer->isSMTP();
+      $mailer->Host = MailManager::$host;
+      $mailer->Port = MailManager::$port;
+      $mailer->SMTPAuth = MailManager::$auth;
+      $mailer->Username = MailManager::$username;
+      $mailer->Password = MailManager::$password;
+      $mailer->SMTPSecure = "tls";
+
+      if(!$mailer->send()){
+        MailManager::$lastError = 'Email was not sent: ' . $mailer->ErrorInfo . ' Subject: ' . $subject;
+        Log::custom('Email', MailManager::$lastError);
+        return false;
+      }
+
+      return true;
+    }catch(Exception $exception){
+      Log::custom(__CLASS__, $exception->getMessage());
+    }
     if(!CoreConfig::MAIL_SEND_ACTIVE){
       return true;
     }
-
-    $to = "";
-    $cc = "";
-    $bcc = "";
-    if(is_array($recipients)){
-      $to = $recipients['To'];
-      $cc = $recipients['Cc'];
-      $bcc = $recipients['Bcc'];
-    }else{
-      $to = $recipients;
-    }
-
-    if(Util::isDEV()){
-      $to = CoreConfig::MAIL_DEV;
-    }
-
-    $mailer = new PHPMailerManager();
-    if(MailManager::$htmlFormat){
-      $mailer->isHTML(true);
-      $mailer->Body = $body;
-    }else{
-      $mailer->Body = $body;
-    }
-
-    if($attachments && is_array($attachments)){
-      //Attach multiple files one by one
-      foreach($attachments as $att){
-        $mailer->addAttachment($att);
-      }
-    }
-
-    $mailer->setFrom($from ? $from : MailManager::$from);
-    $mailer->Subject = $subject;
-
-    $arrayTo = self::getArrayToSendEmail($to);
-    foreach($arrayTo as $t){
-      $mailer->addAddress($t);
-    }
-
-    if($cc){
-      $arrayCC = self::getArrayToSendEmail($cc);
-      foreach($arrayCC as $c){
-        $mailer->addCC($c);
-      }
-    }
-
-    if($bcc){
-      $arrayBCC = self::getArrayToSendEmail($bcc);
-      foreach($arrayBCC as $b){
-        $mailer->addCC($b);
-      }
-    }
-
-    $mailer->isSMTP();
-    $mailer->Host = MailManager::$host;
-    $mailer->Port = MailManager::$port;
-    $mailer->SMTPAuth = MailManager::$auth;
-    $mailer->Username = MailManager::$username;
-    $mailer->Password = MailManager::$password;
-    $mailer->SMTPSecure = "tls";
-
-    if(!$mailer->send()){
-      MailManager::$lastError = 'Email was not sent: ' . $mailer->ErrorInfo . ' Subject: ' . $subject;
-      Log::custom('Email', MailManager::$lastError);
-      return false;
-    }
-
-    return true;
   }
 
   /**
@@ -321,35 +324,40 @@ AKAM;
    * @param array $recipients
    * @param string $subject
    * @param string $body
-   * @param array $attachments
+   * @param array|bool $attachments
    *
    * @return bool
    */
   public static function sendEmail($recipients, $subject, $body, $attachments = false)
   {
-    if(!CoreConfig::MAIL_SEND_ACTIVE){
-      return true;
-    }
-    if(is_array($recipients)){
-      $to = "";
-      foreach($recipients as $email){
-        $to .= "$email,";
+    try{
+      if(!CoreConfig::MAIL_SEND_ACTIVE){
+        return true;
       }
-    }else{
-      $to = "$recipients";
+      if(is_array($recipients)){
+        $to = "";
+        foreach($recipients as $email){
+          $to .= "$email,";
+        }
+      }else{
+        $to = "$recipients";
+      }
+
+      MailManager::$lastError = null;
+
+      if(CoreConfig::MAIL_STANDARD){
+        $result = MailManager::sendStandardEmail($to, $subject, $body, $attachments);
+      }else{
+        $result = MailManager::sendAdvancedEmail($to, $subject, $body, $attachments);
+      }
+
+      MailManager::$htmlFormat = true;
+
+      return $result;
+    }catch(Exception $exception){
+      Log::custom(__CLASS__, $exception->getMessage());
+      false;
     }
-
-    MailManager::$lastError = null;
-
-    if(CoreConfig::MAIL_STANDARD){
-      $result = MailManager::sendStandardEmail($to, $subject, $body, $attachments);
-    }else{
-      $result = MailManager::sendAdvancedEmail($to, $subject, $body, $attachments);
-    }
-
-    MailManager::$htmlFormat = true;
-
-    return $result;
   }
 
   /**
@@ -471,7 +479,7 @@ AKAM;
       foreach($tags as $key => $value){
         //If value is Empty don't replace
         if($value){
-          $template = preg_replace("/\{"."@$key@"."\}/", $value, $template);
+          $template = preg_replace("/\{" . "@$key@" . "\}/", $value, $template);
         }
       }
     }

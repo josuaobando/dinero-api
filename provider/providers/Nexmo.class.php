@@ -96,13 +96,13 @@ class Nexmo extends Provider
     try{
       if($response && $response->{'message-count'} && $response->{'message-count'} == "1" && $response->messages && is_array($response->messages)){
         $messageInfo = $response->messages[0];
-        $this->id = $response->{'message-id'};
-        $this->code = $messageInfo->status;
-        $this->status = $messageInfo->status;
-        $this->message = $messageInfo->{'error-text'};
+        $this->apiTransactionId = $response->{'message-id'};
+        $this->apiCode = $messageInfo->status;
+        $this->apiStatus = $messageInfo->status;
+        $this->apiMessage = $messageInfo->{'error-text'};
       }else{
-        $this->code = self::REQUEST_ERROR;
-        $this->message = 'At this time, we can not carry out. Please try again in a few minutes!';
+        $this->apiCode = self::REQUEST_ERROR;
+        $this->apiMessage = 'At this time, we can not carry out. Please try again in a few minutes!';
         Log::custom(__CLASS__, "Invalid Object Response"."\n Request: \n\n".$this->getLastRequest()."\n Response: \n\n".Util::objToStr($response));
       }
     }catch(Exception $ex){

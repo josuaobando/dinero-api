@@ -15,22 +15,22 @@ class Provider extends WS
   /**
    * @var string|int
    */
-  protected $code = self::REQUEST_ERROR;
+  protected $apiCode = self::REQUEST_ERROR;
 
   /**
    * @var string
    */
-  protected $id;
+  protected $apiTransactionId;
 
   /**
    * @var string
    */
-  protected $status;
+  protected $apiStatus;
 
   /**
    * @var string
    */
-  protected $message;
+  protected $apiMessage;
 
   /**
    * @var array
@@ -53,27 +53,33 @@ class Provider extends WS
   protected $tblSystem;
 
   /**
+   * the response code of the request (ex.: fail, error)
+   *
    * @return int|string
    */
   public function getApiCode()
   {
-    return $this->code;
+    return $this->apiCode;
   }
 
   /**
+   * status of the request (ex.: approved, rejected, 0, 1)
+   *
    * @return string
    */
   public function getApiStatus()
   {
-    return $this->status;
+    return $this->apiStatus;
   }
 
   /**
+   * message of the request (ex.: transaction completed)
+   *
    * @return string
    */
   public function getApiMessage()
   {
-    return $this->status;
+    return $this->apiMessage;
   }
 
   /**
@@ -81,7 +87,7 @@ class Provider extends WS
    */
   public function getApiTransactionId()
   {
-    return $this->id;
+    return $this->apiTransactionId;
   }
 
   /**

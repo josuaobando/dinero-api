@@ -11,68 +11,12 @@ class Dinero extends Provider
    */
   const PROVIDER_ID = 1;
 
-
-  /**
-   * TblManager reference
-   *
-   * @var TblManager
-   */
-  private $tblManager;
-
-  /**
-   * @var int
-   */
-  private $apiTransactionId;
-
-  /**
-   * @var string
-   */
-  private $apiMessage;
-
-  /**
-   * @var string
-   */
-  private $apiStatus;
-
-  /**
-   * @return int
-   */
-  public function getApiTransactionId()
-  {
-    return $this->apiTransactionId;
-  }
-
-  /**
-   * @param int $apiTransactionId
-   */
-  public function setApiTransactionId($apiTransactionId)
-  {
-    $this->apiTransactionId = $apiTransactionId;
-  }
-
-  /**
-   * @return string
-   */
-  public function getApiMessage()
-  {
-    return $this->apiMessage;
-  }
-
-  /**
-   * @return string
-   */
-  public function getApiStatus()
-  {
-    return $this->apiStatus;
-  }
-
   /**
    * new Transaction instance
    */
   public function __construct()
   {
     parent::__construct(self::PROVIDER_ID);
-    $this->tblManager = TblManager::getInstance();
   }
 
   /**
@@ -89,16 +33,13 @@ class Dinero extends Provider
   private function getPersonAvailable($amount, $agencyTypeId, $agencyId)
   {
     $account = Session::getAccount();
-    $availableList = $this->tblManager->getPersonsAvailable($account->getAccountId(), $amount, $agencyTypeId, $agencyId);
+    $tblManager = TblManager::getInstance();
+    $availableList = $tblManager->getPersonsAvailable($account->getAccountId(), $amount, $agencyTypeId, $agencyId);
     if(!$availableList || !is_array($availableList) || count($availableList) == 0){
 
-      try{
-        $subject = "There are not names available";
-        $body = "There are not names available. \n\n Agency Type: $agencyTypeId \n\n Agency Id: $agencyId";
-        MailManager::sendEmail(MailManager::getRecipients(), $subject, $body);
-      }catch(Exception $ex){
-        //do nothing
-      }
+      $subject = "There are not names available";
+      $body = "There are not names available. <br><br> Agency Type: $agencyTypeId <br><br> Agency Id: $agencyId";
+      MailManager::sendEmail(MailManager::getRecipients(), $subject, $body);
 
       $this->apiStatus = self::REQUEST_ERROR;
       $this->apiMessage = "There are not names available";

@@ -94,7 +94,7 @@ class ProviderTransaction
             $transaction->setProviderId($providerId);
             break;
           }
-        }catch(APIBlackListException | P2PException $exception){
+        }catch(CustomerBlackListException | APIBlackListException | P2PException $exception){
           $providerException = $exception;
           continue;
         }catch(Exception $exception){
@@ -111,8 +111,6 @@ class ProviderTransaction
       }
     }
 
-    //update customer
-    $customer->update();
     //block person
     $person->block();
     //sets personId
@@ -184,7 +182,9 @@ class ProviderTransaction
     //get name
     $person = new Person();
     $provider = new Provider();
+    $providerException = null;
     foreach($this->providers as $providerData){
+      $providerException = null;
       $providerClassName = $providerData['Name'];
       if(class_exists($providerClassName)){
         try{
@@ -195,7 +195,8 @@ class ProviderTransaction
             $transaction->setProviderId($providerId);
             break;
           }
-        }catch(APIBlackListException | P2PException $exception){
+        }catch(CustomerBlackListException | APIBlackListException | P2PException $exception){
+          $providerException = $exception;
           continue;
         }catch(Exception $exception){
           throw $exception;
@@ -204,11 +205,13 @@ class ProviderTransaction
     }
 
     if(!$person || !$person->getPersonId()){
-      throw new APIException($provider->getApiMessage());
+      if($providerException){
+        throw $providerException;
+      }else{
+        throw new APIException($provider->getApiMessage());
+      }
     }
 
-    //update customer
-    $customer->update();
     //block person
     $person->block();
     //sets personId
@@ -317,7 +320,6 @@ class ProviderTransaction
     $transactionId = $this->wsRequest->requireNumericAndPositive('transaction_id');
     $transaction = Session::getTransaction();
     $transaction->restore($transactionId);
-
     $provider = $transaction->getProvider();
     $provider->status();
 

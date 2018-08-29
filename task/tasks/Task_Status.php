@@ -1,9 +1,7 @@
 <?php
 
 /**
- * Created by Josua
- * Date: 27/05/2018
- * Time: 20:51
+ * @author: josua
  */
 class Task_Status extends Task
 {
@@ -24,7 +22,6 @@ class Task_Status extends Task
   public function process()
   {
     $account = Session::getAccount();
-
     $this->transactions = $this->tblTask->getPendingTransactions();
     foreach($this->transactions as $transaction){
 
@@ -33,13 +30,14 @@ class Task_Status extends Task
       $transaction->restore($transactionId);
       $transaction->setModifiedBy($account->getAccountId());
 
-      if($transaction->getAgencyTypeId() == Transaction::AGENCY_TYPE_RIA){
-        $transactionAPI = new Ria();
+      if(CoreConfig::USED_PROVIDERS){
+        $provider = $transaction->getProvider();
+        $provider->status();
       }else{
         $transactionAPI = new TransactionAPI();
+        $transactionAPI->status();
       }
 
-      $transactionAPI->status();
     }
   }
 

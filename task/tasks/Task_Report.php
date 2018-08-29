@@ -1,9 +1,7 @@
 <?php
 
 /**
- * Created by Josua
- * Date: 27/05/2018
- * Time: 20:51
+ * @author: josua
  */
 class Task_Report extends Task
 {
