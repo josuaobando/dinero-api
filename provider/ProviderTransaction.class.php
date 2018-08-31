@@ -94,7 +94,7 @@ class ProviderTransaction
             $transaction->setProviderId($providerId);
             break;
           }
-        }catch(CustomerBlackListException | APIBlackListException | P2PException $exception){
+        }catch(CustomerBlackListException | APIBlackListException | P2PException | APIPersonException $exception){
           $providerException = $exception;
           continue;
         }catch(Exception $exception){
