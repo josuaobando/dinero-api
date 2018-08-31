@@ -366,10 +366,10 @@ class Customer
 
     $this->validate($account->getCompanyId(), $account->getAccountId());
     if(!$this->customerId){
-      throw new CustomerException("invalid customer information");
+      throw new CustomerException("Invalid Customer information");
     }
     if(!$this->agencyId){
-      throw new CustomerException("The agency is not available");
+      throw new CustomerException("The Agency is not Available");
     }
 
   }
@@ -507,6 +507,21 @@ class Customer
     return $this->tblCustomer->getStats($this->customerId, $transactionTypeId);
   }
 
+  /**
+   * @param $transactionTypeId
+   *
+   * @return Transaction
+   */
+  public function getLastTransaction($transactionTypeId)
+  {
+    $transaction = new Transaction();
+    $customerTransaction = $this->tblCustomer->getLastTransaction($this->customerId, $this->agencyTypeId, $transactionTypeId);
+    if($customerTransaction){
+      $transactionId = $customerTransaction['Transaction_Id'];
+      $transaction->restore($transactionId);
+    }
+    return $transaction;
+  }
 }
 
 ?>

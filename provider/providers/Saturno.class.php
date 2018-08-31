@@ -179,6 +179,7 @@ class Saturno extends Provider
           if(is_numeric($response->cargo)){
             $transaction->setFee($response->cargo);
           }
+
           $transaction->setAgencyId(self::AGENCY_ID);
           $transaction->setProviderId(self::PROVIDER_ID);
           return Session::setPerson($person);

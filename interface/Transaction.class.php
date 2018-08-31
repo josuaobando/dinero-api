@@ -451,7 +451,10 @@ class Transaction
    */
   public function create()
   {
-    $this->transactionId = $this->tblTransaction->insert($this->transactionTypeId, $this->transactionStatusId, $this->agencyTypeId, $this->customerId, $this->personId, $this->username, $this->amount, $this->fee, $this->agencyId, $this->accountId, $this->merchantId, $this->apiTransactionId);
+    $this->transactionId = $this->tblTransaction->insert(
+      $this->companyId, $this->providerId, $this->transactionTypeId, $this->transactionStatusId,
+      $this->agencyTypeId, $this->customerId, $this->personId, $this->username, $this->amount, $this->fee,
+      $this->agencyId, $this->accountId, $this->merchantId, $this->apiTransactionId);
   }
 
   /**
@@ -473,6 +476,8 @@ class Transaction
     $this->transactionId = $transactionData['Transaction_Id'];
     $this->transactionTypeId = $transactionData['TransactionType_Id'];
     $this->transactionStatusId = $transactionData['TransactionStatus_Id'];
+    $this->companyId = $transactionData['Company_Id'];
+    $this->providerId = $transactionData['Provider_Id'];
     $this->agencyTypeId = $transactionData['AgencyType_Id'];
     $this->customerId = $transactionData['Customer_Id'];
     $this->personId = $transactionData['Person_Id'];

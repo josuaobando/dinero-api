@@ -90,8 +90,8 @@ class Ria extends Provider
         $person->add();
 
         $transaction->setAgencyId(self::AGENCY_ID);
-        $transaction->setApiTransactionId($this->apiTransactionId);
         $transaction->setProviderId(self::PROVIDER_ID);
+        $transaction->setApiTransactionId($this->apiTransactionId);
 
         return Session::setPerson($person);
 

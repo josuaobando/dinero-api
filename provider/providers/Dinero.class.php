@@ -94,6 +94,7 @@ class Dinero extends Provider
     //------------------end validation
 
     $transaction->setProviderId(self::PROVIDER_ID);
+    $transaction->setAgencyId($customer->getAgencyId());
     return Session::setPerson($person);
   }
 

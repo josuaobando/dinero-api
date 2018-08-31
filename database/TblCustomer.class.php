@@ -218,6 +218,30 @@ class TblCustomer extends Db
     return $rows;
   }
 
+  /**
+   * get last transaction [pending|confirm|approved]
+   *
+   * @param int $customerId
+   * @param int $agencyTypeId
+   * @param int $transactionTypeId
+   *
+   * @return array
+   */
+  public function getLastTransaction($customerId, $agencyTypeId, $transactionTypeId)
+  {
+    $sql = "CALL spCustomer_LastTransaction('{customerId}', '{agencyTypeId}', '{transactionTypeId}')";
+
+    $params = array();
+    $params['customerId'] = $customerId;
+    $params['agencyTypeId'] = $agencyTypeId;
+    $params['transactionTypeId'] = $transactionTypeId;
+
+    $rows = array();
+    $this->executeSingleQuery($sql, $rows, $params);
+
+    return $rows;
+  }
+
 }
 
 ?>

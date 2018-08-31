@@ -72,7 +72,9 @@ class ProviderTransaction
 
     //validate if need to create the customer
     $customer->validateFromRequest($account, $this->wsRequest);
+    $lastTransaction = $customer->getLastTransaction($transaction->getTransactionTypeId());
     $transaction->setCustomerId($customer->getCustomerId());
+    $transaction->setAgencyId($lastTransaction->getAgencyId());
 
     //evaluate limits
     $limit = new Limit($transaction, $customer);
@@ -90,8 +92,6 @@ class ProviderTransaction
           $provider = new $providerClassName();
           $person = $provider->receiver();
           if($person && $person->getPersonId()){
-            $providerId = $providerData['Provider_Id'];
-            $transaction->setProviderId($providerId);
             break;
           }
         }catch(CustomerBlackListException | APIBlackListException | P2PException | APIPersonException $exception){
@@ -115,8 +115,7 @@ class ProviderTransaction
     $person->block();
     //sets personId
     $transaction->setPersonId($person->getPersonId());
-    $transaction->setAgencyId($customer->getAgencyId());
-
+    //create transaction after the validation of the data
     $transaction->create();
     if($transaction->getTransactionId()){
       $provider->stickiness();
@@ -173,7 +172,9 @@ class ProviderTransaction
 
     //validate if need to create the customer
     $customer->validateFromRequest($account, $this->wsRequest);
+    $lastTransaction = $customer->getLastTransaction($transaction->getTransactionTypeId());
     $transaction->setCustomerId($customer->getCustomerId());
+    $transaction->setAgencyId($lastTransaction->getAgencyId());
 
     //evaluate limits
     $limit = new Limit($transaction, $customer);
@@ -191,8 +192,6 @@ class ProviderTransaction
           $provider = new $providerClassName();
           $person = $provider->receiver();
           if($person && $person->getPersonId()){
-            $providerId = $providerData['Provider_Id'];
-            $transaction->setProviderId($providerId);
             break;
           }
         }catch(CustomerBlackListException | APIBlackListException | P2PException $exception){
@@ -216,8 +215,6 @@ class ProviderTransaction
     $person->block();
     //sets personId
     $transaction->setPersonId($person->getPersonId());
-    $transaction->setAgencyId($customer->getAgencyId());
-
     //create transaction after the validation of the data
     $transaction->create();
     if($transaction->getTransactionId()){
