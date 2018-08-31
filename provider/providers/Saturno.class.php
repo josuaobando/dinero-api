@@ -25,11 +25,6 @@ class Saturno extends Provider
   const RESPONSE_ERROR = 'fail';
 
   /**
-   * @var array
-   */
-  private $agency;
-
-  /**
    * new Transaction instance
    */
   public function __construct()
@@ -40,7 +35,7 @@ class Saturno extends Provider
   /**
    * get receiver
    *
-   * @return null|Person
+   * @return Person
    *
    * @throws APIBlackListException|APILimitException
    */
@@ -95,7 +90,7 @@ class Saturno extends Provider
         $transaction->setProviderId(self::PROVIDER_ID);
 
         return Session::setPerson($person);
-      }elseif($this->apiStatus == self::STATUS_API_ERROR || $this->apiCode == self::STATUS_API_ERROR){
+      }elseif($this->apiStatus == self::STATUS_API_ERROR || $this->apiCode == self::RESPONSE_ERROR){
 
         if(stripos($this->apiMessage, 'No Names Available') !== false){
 
@@ -262,7 +257,7 @@ class Saturno extends Provider
         $transaction->setApiTransactionId($this->apiTransactionId);
         return true;
 
-      }elseif($this->apiStatus == self::STATUS_API_ERROR || !$this->apiStatus){
+      }elseif($this->apiStatus == self::STATUS_API_ERROR || $this->apiCode == self::RESPONSE_ERROR){
 
         if($apiTransactionId){
           $subject = "Problem re-submit transaction";
@@ -273,6 +268,7 @@ class Saturno extends Provider
         }
 
         $body .= "<br>" . "Status: $response->status";
+        $body .= "<br>" . "lStatus: $response->lstatus";
         $body .= "<br>" . "Comentario: $response->comentario";
         $body .= "<br><br>" . "Request:";
         $body .= "<br><br>" . $this->getLastRequest();
@@ -320,8 +316,6 @@ class Saturno extends Provider
           return false;
         }
 
-        $this->apiMessage = $response->comentario;
-        $this->apiStatus = strtolower($response->status);
         switch($this->apiStatus){
           case self::STATUS_API_APPROVED:
             if($transaction->getTransactionTypeId() == Transaction::TYPE_SENDER){
@@ -334,11 +328,15 @@ class Saturno extends Provider
             }
             $transaction->setTransactionStatusId(Transaction::STATUS_APPROVED);
             $transaction->setReason('Ok');
-            $transaction->setNote((strtolower($this->apiMessage) == 'ninguno' ? '' : $this->apiMessage));
+            if((strtolower($this->apiMessage) == 'ninguno') || strlen($this->apiMessage)){
+              $transaction->setReason($this->apiMessage);
+            }
 
             //only change amount in deposits
             if($transaction->getTransactionTypeId() == Transaction::TYPE_RECEIVER){
-              $transaction->setAmount($response->monto);
+              if(is_numeric($response->monto)){
+                $transaction->setAmount($response->monto);
+              }
             }
             break;
           case self::STATUS_API_REJECTED:
@@ -382,9 +380,6 @@ class Saturno extends Provider
         if($currentTransactionStatusId != $transaction->getTransactionStatusId()){
           if($transaction->getTransactionStatusId() == Transaction::STATUS_APPROVED || $transaction->getTransactionStatusId() == Transaction::STATUS_REJECTED){
             $transaction->update();
-            if($transaction->getTransactionStatusId() == Transaction::STATUS_APPROVED){
-
-            }
           }
         }
 
