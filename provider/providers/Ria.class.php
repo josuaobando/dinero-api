@@ -20,7 +20,10 @@ class Ria extends Provider
   const STATUS_API_PENDING = 'pending';
   const STATUS_API_APPROVED = 'approved';
   const STATUS_API_REJECTED = 'rejected';
+  const STATUS_API_CANCELED = 'cancelled';
   const STATUS_API_ERROR = 'error';
+  const RESPONSE_ERROR = 'fail';
+  const RESPONSE_SUCCESS = '0';
 
   /**
    * new Transaction instance
@@ -34,38 +37,37 @@ class Ria extends Provider
    * get receiver for the customer
    *
    * @return Person
+   *
+   * @throws APIBlackListException|APILimitException|APIPersonException
    */
   public function receiver()
   {
-    try{
-      $customer = Session::getCustomer();
-      $transaction = Session::getTransaction();
+    $customer = Session::getCustomer();
+    $transaction = Session::getTransaction();
 
-      //transaction
-      $params = array();
-      $params['ctacte'] = $transaction->getUsername();
-      $params['firstname'] = $customer->getFirstName();
-      $params['lastname'] = $customer->getLastName();
-      $params['city'] = $customer->getStateName();
-      $params['state'] = $customer->getState();
-      $params['country'] = $customer->getCountry();
-      $params['monto'] = $transaction->getAmount();
+    //transaction
+    $request = array();
+    $request['ctacte'] = $transaction->getUsername();
+    $request['firstname'] = $customer->getFirstName();
+    $request['lastname'] = $customer->getLastName();
+    $request['city'] = $customer->getStateName();
+    $request['state'] = $customer->getState();
+    $request['country'] = $customer->getCountry();
+    $request['monto'] = $transaction->getAmount();
 
-      //execute request
-      $this->request = $params;
-      $this->execute('GetName');
-      $response = $this->getResponse();
-      if($this->apiStatus == self::REQUEST_ERROR){
-        return null;
-      }
+    //execute request
+    $this->request = $request;
+    $this->execute('GetName');
+    $response = $this->getResponse();
 
+    if($response && $response instanceof stdClass){
       if($this->apiStatus == self::STATUS_API_REQUESTED){
 
         $name = trim($response->recibe);
         $personalId = Encrypt::generateMD5($name);
 
         $person = new Person();
-        $person->setPersonLisId(CoreConfig::AGENCY_ID_SATURNO_RIA);
+        $person->setPersonLisId(self::AGENCY_ID);
         $person->setCountry('CR');
         $person->setCountryId(52);
         $person->setCountryName('Costa Rica');
@@ -94,37 +96,31 @@ class Ria extends Provider
         $transaction->setApiTransactionId($this->apiTransactionId);
 
         return Session::setPerson($person);
-
-      }elseif($this->apiStatus == self::STATUS_API_ERROR){
+      }elseif($this->apiStatus == self::STATUS_API_ERROR || $this->apiCode != self::RESPONSE_SUCCESS){
 
         if(stripos($this->apiMessage, 'No Names Available') !== false){
 
           $subject = "No deposit names available";
-          $body = "There are no deposit names available in Saturn agency";
+          $body = "There are no deposit names available in Nicaragua agency";
           $bodyTemplate = MailManager::getEmailTemplate('default', array('body' => $body));
           $recipients = array('To' => 'mgoficinasf0117@outlook.com', 'Cc' => CoreConfig::MAIL_DEV);
           MailManager::sendEmail($recipients, $subject, $bodyTemplate);
-
           Log::custom(__CLASS__, $body);
-          $this->apiMessage = 'We cannot give this Customer a name';
-          return null;
+
+          throw new APIPersonException('We cannot give a Receiver for this Customer (Sender)');
         }elseif(stripos(strtolower($this->apiMessage), 'black') && stripos(strtolower($this->apiMessage), 'list')){
-          $this->apiMessage = 'The Customer has been blacklisted';
-          return null;
+          $this->apiMessage = 'The Customer (Sender) has been blacklisted';
+          throw new APIBlackListException($this->apiMessage);
         }elseif(stripos(strtolower($this->apiMessage), 'limit') && stripos(strtolower($this->apiMessage), 'reached')){
-          $this->apiMessage = 'Limits: The Customer has exceeded the limits in MG';
-          return null;
+          $this->apiMessage = 'Limits: The Customer (Sender) has exceeded the limits in MG';
+          throw new APILimitException($this->apiMessage);
         }
 
-        $this->apiMessage = 'We cannot give this Customer a name';
-        Log::custom(__CLASS__, "Unmapped message" . "\n Response: \n\n" . Util::objToStr($response));
       }
-
-    }catch(Exception $ex){
-      ExceptionManager::handleException($ex);
     }
 
-    return null;
+    Log::custom(__CLASS__, "Invalid Object Response" . "\n Request: \n\n" . $this->getLastRequest() . "\n Response: \n\n" . Util::objToStr($response));
+    $this->apiMessage = 'We cannot give a Receiver for this Customer (Sender)';
   }
 
   /**
@@ -143,64 +139,62 @@ class Ria extends Provider
    * Submit or Re-Submit transaction
    *
    * @return bool
+   *
+   * @throws APIException
    */
   public function confirm()
   {
-    try{
-      $customer = Session::getCustomer();
-      $transaction = Session::getTransaction();
-      $apiTransactionId = $transaction->getApiTransactionId();
-      $transactionStatus = $transaction->getTransactionStatusId();
-      $isSubmit = ($transactionStatus == Transaction::STATUS_REQUESTED);
+    $customer = Session::getCustomer();
+    $transaction = Session::getTransaction();
+    $apiTransactionId = $transaction->getApiTransactionId();
+    $transactionStatus = $transaction->getTransactionStatusId();
+    $isSubmit = ($transactionStatus == Transaction::STATUS_REQUESTED);
 
-      //transaction
-      $params = array();
-      $params['trans'] = $apiTransactionId;
-      $params['monto'] = $transaction->getAmount();
-      if(!$isSubmit){
-        $params['envia'] = $customer->getCustomer();
-      }
-      $params['documento'] = $transaction->getControlNumber();
+    //transaction
+    $params = array();
+    $params['trans'] = $apiTransactionId;
+    $params['monto'] = $transaction->getAmount();
+    if(!$isSubmit){
+      $params['envia'] = $customer->getCustomer();
+    }
+    $params['documento'] = $transaction->getControlNumber();
+    $method = ($isSubmit) ? 'SubmitDeposit' : 'EditDeposit';
 
-      $method = ($isSubmit) ? 'SubmitDeposit' : 'EditDeposit';
-      //execute request
-      $this->request = $params;
-      $this->execute($method);
-      $response = $this->getResponse();
+    //execute request
+    $this->request = $params;
+    $this->execute($method);
+    $response = $this->getResponse();
 
-      if($this->apiStatus == self::STATUS_API_PENDING){
-        return true;
-      }elseif($this->apiStatus == self::STATUS_API_ERROR || $this->apiStatus == self::REQUEST_ERROR){
+    if($this->apiStatus == self::STATUS_API_PENDING){
 
-        try{
-          if($isSubmit){
-            $subject = "Problem submit transaction";
-            $body = "Trans Id: $apiTransactionId";
-          }else{
-            $subject = "Problem re-submit transaction";
-            $body = "Trans Id: $apiTransactionId";
-          }
+      $transaction->setApiTransactionId($this->apiTransactionId);
+      return true;
 
-          $body .= "<br>" . "Status: $response->status";
-          $body .= "<br><br>" . "Comentario: $response->comentario";
-          $body .= "<br><br>" . "Request:";
-          $body .= "<br><br>" . $this->getLastRequest();
-          $body .= "<br><br>" . "Response:";
-          $body .= "<br><br>" . Util::objToStr($response);
+    }elseif($this->apiStatus == self::STATUS_API_ERROR || $this->apiCode != self::RESPONSE_SUCCESS){
 
-          $bodyTemplate = MailManager::getEmailTemplate('default', array('body' => $body));
-          MailManager::sendEmail(MailManager::getRecipients(), $subject, $bodyTemplate);
-
-          return false;
-        }catch(WSException $ex){
-          ExceptionManager::handleException($ex);
-        }
+      if($isSubmit){
+        $subject = "Problem submit transaction";
+      }else{
+        $subject = "Problem re-submit transaction";
       }
 
-    }catch(Exception $ex){
-      ExceptionManager::handleException($ex);
+      $body = "Trans Id: $apiTransactionId";
+
+      $body .= "<br>" . "Status: $response->status";
+      $body .= "<br>" . "lStatus: $response->lstatus";
+      $body .= "<br>" . "Comentario: $response->comentario";
+      $body .= "<br><br>" . "Request:";
+      $body .= "<br><br>" . $this->getLastRequest();
+      $body .= "<br><br>" . "Response:";
+      $body .= "<br><br>" . Util::objToStr($response);
+      $bodyTemplate = MailManager::getEmailTemplate('default', array('body' => $body));
+      MailManager::sendEmail(MailManager::getRecipients(), $subject, $bodyTemplate);
+
+      Log::custom(__CLASS__, $body);
+      throw new APIException("$subject. Please try again in a few minutes!");
     }
 
+    Log::custom(__CLASS__, "Invalid Object Response" . "\n Request: \n\n" . $this->getLastRequest() . "\n Response: \n\n" . Util::objToStr($response));
     return false;
   }
 
@@ -225,44 +219,56 @@ class Ria extends Provider
       $this->execute('getDeposit');
       $response = $this->getResponse();
 
-      //validate trackId
-      if($this->apiTransactionId != $transaction->getApiTransactionId()){
-        Log::custom(__CLASS__, "Transaction ID mismatch" . "\n Request: \n\n" . $this->getLastRequest() . "\n Response: \n\n" . Util::objToStr($response));
-        return false;
-      }
+      if($response && $response instanceof stdClass){
 
-      switch($this->apiStatus){
-        case self::STATUS_API_APPROVED:
-          $transaction->setTransactionStatusId(Transaction::STATUS_APPROVED);
-          $transaction->setReason('Ok');
-          $transaction->setAmount($response->monto);
-          break;
-        case self::STATUS_API_REJECTED:
-          $transaction->setTransactionStatusId(Transaction::STATUS_REJECTED);
-          $transaction->setReason($this->apiMessage);
-          break;
-        case self::STATUS_API_PENDING:
-          $transaction->setTransactionStatusId(Transaction::STATUS_SUBMITTED);
-          break;
-        case self::STATUS_API_REQUESTED:
-          $transaction->setTransactionStatusId(Transaction::STATUS_REQUESTED);
-          break;
-        default:
-          Log::custom(__CLASS__, "Invalid Object Response" . "\n Request: \n\n" . $this->getLastRequest() . "\n Response: \n\n" . Util::objToStr($response));
+        //validate trackId
+        if($this->apiTransactionId != $transaction->getApiTransactionId()){
+          Log::custom(__CLASS__, "Transaction ID mismatch" . "\n Request: \n\n" . $this->getLastRequest() . "\n Response: \n\n" . Util::objToStr($response));
           return false;
-      }
-
-      //update transaction
-      if($currentTransactionStatusId != $transaction->getTransactionStatusId()){
-        if($transaction->getTransactionStatusId() == Transaction::STATUS_APPROVED || $transaction->getTransactionStatusId() == Transaction::STATUS_REJECTED){
-          $transaction->update();
         }
+
+        switch($this->apiStatus){
+          case self::STATUS_API_APPROVED:
+            $transaction->setTransactionStatusId(Transaction::STATUS_APPROVED);
+            $transaction->setReason('Ok');
+            //only change amount in deposits
+            if($transaction->getTransactionTypeId() == Transaction::TYPE_RECEIVER){
+              if(is_numeric($response->monto)){
+                $transaction->setAmount($response->monto);
+              }
+            }
+            if((strtolower($this->apiMessage) == 'ninguno') || strlen($this->apiMessage)){
+              $transaction->setReason($this->apiMessage);
+            }
+            break;
+          case self::STATUS_API_REJECTED:
+          case self::STATUS_API_CANCELED:
+            $transaction->setTransactionStatusId(Transaction::STATUS_REJECTED);
+            $transaction->setReason($this->apiMessage);
+            break;
+          case self::STATUS_API_PENDING:
+            $transaction->setTransactionStatusId(Transaction::STATUS_SUBMITTED);
+            break;
+          case self::STATUS_API_REQUESTED:
+            $transaction->setTransactionStatusId(Transaction::STATUS_REQUESTED);
+            break;
+          default:
+            Log::custom(__CLASS__, "Invalid Object Response" . "\n Request: \n\n" . $this->getLastRequest() . "\n Response: \n\n" . Util::objToStr($response));
+            return false;
+        }
+
+        //update transaction
+        if($currentTransactionStatusId != $transaction->getTransactionStatusId()){
+          if($transaction->getTransactionStatusId() == Transaction::STATUS_APPROVED || $transaction->getTransactionStatusId() == Transaction::STATUS_REJECTED){
+            $transaction->update();
+          }
+        }
+
       }
 
     }catch(Exception $ex){
       ExceptionManager::handleException($ex);
     }
-
   }
 
   /**
@@ -308,11 +314,13 @@ class Ria extends Provider
         $this->apiStatus = strtolower($response->status);
         $this->apiMessage = $response->comentario;
       }else{
-        $this->apiCode = self::REQUEST_ERROR;
+        $this->apiCode = self::RESPONSE_ERROR;
         $this->apiMessage = 'At this time, we can not carry out. Please try again in a few minutes!';
         Log::custom(__CLASS__, "Invalid Object Response" . "\n Request: \n\n" . $this->getLastRequest() . "\n Response: \n\n" . Util::objToStr($response));
       }
     }catch(Exception $ex){
+      $this->apiCode = self::RESPONSE_ERROR;
+      $this->apiMessage = 'At this time, we can not carry out. Please try again in a few minutes!';
       ExceptionManager::handleException($ex);
     }
   }

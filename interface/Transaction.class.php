@@ -452,7 +452,7 @@ class Transaction
   public function create()
   {
     $this->transactionId = $this->tblTransaction->insert(
-      $this->companyId, $this->providerId, $this->transactionTypeId, $this->transactionStatusId,
+      $this->transactionTypeId, $this->transactionStatusId,
       $this->agencyTypeId, $this->customerId, $this->personId, $this->username, $this->amount, $this->fee,
       $this->agencyId, $this->accountId, $this->merchantId, $this->apiTransactionId);
   }

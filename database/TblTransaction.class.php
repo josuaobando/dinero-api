@@ -29,8 +29,6 @@ class TblTransaction extends Db
   /**
    * insert a new transaction
    *
-   * @param int $companyId
-   * @param int $providerId
    * @param int $transactionTypeId
    * @param int $transactionStatusId
    * @param int $agencyTypeId
@@ -46,13 +44,11 @@ class TblTransaction extends Db
    *
    * @return int
    */
-  public function insert($companyId, $providerId, $transactionTypeId, $transactionStatusId, $agencyTypeId, $customerId, $personId, $username, $amount, $fee, $agencyId, $accountId, $reference, $apiTransactionId)
+  public function insert($transactionTypeId, $transactionStatusId, $agencyTypeId, $customerId, $personId, $username, $amount, $fee, $agencyId, $accountId, $reference, $apiTransactionId)
   {
-    $sql = "CALL spTransaction_Insert('{companyId}', '{providerId}', '{transactionTypeId}', '{transactionStatusId}', '{agencyTypeId}', '{agencyId}', '{customerId}', '{personId}', '{username}', '{amount}', '{fee}', '{accountId}', '{reference}', '{apiTransactionId}', @TransactionId)";
+    $sql = "CALL spTransaction_Insert('{transactionTypeId}', '{transactionStatusId}', '{agencyTypeId}', '{agencyId}', '{customerId}', '{personId}', '{username}', '{amount}', '{fee}', '{accountId}', '{reference}', '{apiTransactionId}', @TransactionId)";
 
     $params = array();
-    $params['companyId'] = $companyId;
-    $params['providerId'] = $providerId;
     $params['transactionTypeId'] = $transactionTypeId;
     $params['transactionTypeId'] = $transactionTypeId;
     $params['transactionStatusId'] = $transactionStatusId;

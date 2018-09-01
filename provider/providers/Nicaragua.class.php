@@ -96,7 +96,7 @@ class Nicaragua extends Provider
         $transaction->setApiTransactionId($this->apiTransactionId);
 
         return Session::setPerson($person);
-      }elseif($this->apiStatus == self::RESPONSE_ERROR || $this->apiCode != self::RESPONSE_SUCCESS){
+      }elseif($this->apiStatus == self::STATUS_API_ERROR || $this->apiCode != self::RESPONSE_SUCCESS){
 
         if(stripos($this->apiMessage, 'No Names Available') !== false){
 
@@ -107,6 +107,7 @@ class Nicaragua extends Provider
           MailManager::sendEmail($recipients, $subject, $bodyTemplate);
           Log::custom(__CLASS__, $body);
 
+          throw new APIPersonException('We cannot give a Receiver for this Customer (Sender)');
         }elseif(stripos(strtolower($this->apiMessage), 'black') && stripos(strtolower($this->apiMessage), 'list')){
           $this->apiMessage = 'The Customer (Sender) has been blacklisted';
           throw new APIBlackListException($this->apiMessage);
@@ -169,7 +170,7 @@ class Nicaragua extends Provider
       $transaction->setApiTransactionId($this->apiTransactionId);
       return true;
 
-    }elseif($this->apiStatus == self::STATUS_API_ERROR || $this->apiCode == self::REQUEST_ERROR){
+    }elseif($this->apiStatus == self::STATUS_API_ERROR || $this->apiCode != self::RESPONSE_SUCCESS){
 
       if($isSubmit){
         $subject = "Problem submit transaction";
@@ -253,7 +254,6 @@ class Nicaragua extends Provider
             break;
           default:
             Log::custom(__CLASS__, "Invalid Object Response" . "\n Request: \n\n" . $this->getLastRequest() . "\n Response: \n\n" . Util::objToStr($response));
-
             return false;
         }
 
@@ -269,7 +269,6 @@ class Nicaragua extends Provider
     }catch(Exception $ex){
       ExceptionManager::handleException($ex);
     }
-
   }
 
   /**
