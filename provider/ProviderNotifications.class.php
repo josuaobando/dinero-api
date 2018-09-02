@@ -62,7 +62,7 @@ class ProviderNotifications
           }
         }
       }else{
-        $send = $provider->sendSMS($message, $recipients[0]);
+        $send = $provider->sendSMS($message, $recipients);
         if(!$send){
           $error = $provider->getApiMessage();
           Log::custom(__CLASS__, "The sms notification '$message' could not be sent $error");

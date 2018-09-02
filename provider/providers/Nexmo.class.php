@@ -32,27 +32,21 @@ class Nexmo extends Provider
    */
   public function sendSMS($message, $recipient)
   {
-    try{
-      //credentials params
-      $params = array();
-      $params['to'] = $recipient;
-      $params['text'] = $message;
+    //credentials params
+    $params = array();
+    $params['to'] = $recipient;
+    $params['text'] = $message;
 
-      //execute request
-      $this->request = $params;
-      $this->execute();
-      $response = $this->getResponse();
+    //execute request
+    $this->request = $params;
+    $this->execute();
+    $response = $this->getResponse();
 
-      //get response
-      $this->response = $response;
-      $this->unpack($response);
+    //get response
+    $this->response = $response;
+    $this->unpack($response);
 
-      return in_array($this->getApiStatus(), self::REQUEST_SUCCESS);
-    }catch(APIException $ex){
-      ExceptionManager::handleException($ex);
-    }
-
-    return false;
+    return in_array($this->getApiStatus(), self::REQUEST_SUCCESS);
   }
 
   /**
@@ -106,6 +100,8 @@ class Nexmo extends Provider
         Log::custom(__CLASS__, "Invalid Object Response"."\n Request: \n\n".$this->getLastRequest()."\n Response: \n\n".Util::objToStr($response));
       }
     }catch(Exception $ex){
+      $this->apiCode = self::REQUEST_ERROR;
+      $this->apiMessage = 'At this time, we can not carry out. Please try again in a few minutes!';
       ExceptionManager::handleException($ex);
     }
   }

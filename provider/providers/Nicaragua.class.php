@@ -38,7 +38,7 @@ class Nicaragua extends Provider
    *
    * @return Person
    *
-   * @throws APIBlackListException|APILimitException
+   * @throws APIBlackListException|APILimitException|APIPersonException
    */
   public function receiver()
   {
