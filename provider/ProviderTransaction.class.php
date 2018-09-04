@@ -92,7 +92,16 @@ class ProviderTransaction
           if($person && $person->getPersonId()){
             break;
           }
-        }catch(CustomerBlackListException | P2PException | APIBlackListException | APIPersonException $exception){
+        }catch(CustomerBlackListException $exception){
+          $providerException = $exception;
+          continue;
+        }catch(P2PException $exception){
+          $providerException = $exception;
+          continue;
+        }catch(APIBlackListException $exception){
+          $providerException = $exception;
+          continue;
+        }catch(APIPersonException $exception){
           $providerException = $exception;
           continue;
         }catch(Exception $exception){
@@ -196,7 +205,16 @@ class ProviderTransaction
           if($person && $person->getPersonId()){
             break;
           }
-        }catch(CustomerBlackListException | P2PException | APIBlackListException | APIPersonException $exception){
+        }catch(CustomerBlackListException $exception){
+          $providerException = $exception;
+          continue;
+        }catch(P2PException $exception){
+          $providerException = $exception;
+          continue;
+        }catch(APIBlackListException $exception){
+          $providerException = $exception;
+          continue;
+        }catch(APIPersonException $exception){
           $providerException = $exception;
           continue;
         }catch(Exception $exception){
