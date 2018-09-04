@@ -328,11 +328,17 @@ class Manager
    */
   public function sender($wsRequest)
   {
-    $agencyTypeId = $wsRequest->getParam('type');
-    if(CoreConfig::SATURNO_ACTIVE && $agencyTypeId == Transaction::AGENCY_TYPE_MG){
-      return $this->startAPITransaction($wsRequest, Transaction::TYPE_SENDER);
+    //@todo: temporally
+    if(CoreConfig::USED_PROVIDERS){
+      $providerTransaction = new ProviderTransaction($wsRequest);
+      return $providerTransaction->sender();
     }else{
-      return $this->startTransaction($wsRequest, Transaction::TYPE_SENDER);
+      $agencyTypeId = $wsRequest->getParam('type');
+      if(CoreConfig::SATURNO_ACTIVE && $agencyTypeId == Transaction::AGENCY_TYPE_MG){
+        return $this->startAPITransaction($wsRequest, Transaction::TYPE_SENDER);
+      }else{
+        return $this->startTransaction($wsRequest, Transaction::TYPE_SENDER);
+      }
     }
   }
 
