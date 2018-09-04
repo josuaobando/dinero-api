@@ -201,7 +201,7 @@ class ProviderTransaction
       if(class_exists($providerClassName)){
         try{
           $provider = new $providerClassName();
-          $person = $provider->receiver();
+          $person = $provider->sender();
           if($person && $person->getPersonId()){
             break;
           }
