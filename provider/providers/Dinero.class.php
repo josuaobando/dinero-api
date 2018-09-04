@@ -62,14 +62,6 @@ class Dinero extends Provider
     $customer = Session::getCustomer();
     $transaction = Session::getTransaction();
 
-    if(CoreConfig::SATURNO_ACTIVE){
-      if($customer->getIsAPI()){
-        throw new P2PException("Redirect to API...");
-      }else{
-        throw new P2PException("Due to external factors, we cannot give this Customer a name.");
-      }
-    }
-
     //validate if customer is blacklisted
     $customer->isBlacklisted();
 
