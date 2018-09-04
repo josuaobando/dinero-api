@@ -39,13 +39,9 @@ class ProviderTransaction
   /**
    * get a receiver from API
    *
-   * @return WSResponseOk
+   * @return WSResponse
    *
-   * @throws APIBlackListException
-   * @throws APIException
-   * @throws Exception
-   * @throws P2PException
-   * @throws TransactionException
+   * @throws APIBlackListException|APIException|Exception|P2PException|TransactionException
    */
   public function receiver()
   {
@@ -72,9 +68,11 @@ class ProviderTransaction
 
     //validate if need to create the customer
     $customer->validateFromRequest($account, $this->wsRequest);
-    $lastTransaction = $customer->getLastTransaction($transaction->getTransactionTypeId());
+    $customer->getLastTransaction($transaction->getTransactionTypeId());
     $transaction->setCustomerId($customer->getCustomerId());
-    $transaction->setAgencyId($lastTransaction->getAgencyId());
+    //default values
+    $transaction->setAgencyId($customer->getLastTransaction()->getAgencyId());
+    $transaction->setProviderId($customer->getLastTransaction()->getProviderId());
 
     //evaluate limits
     $limit = new Limit($transaction, $customer);
@@ -94,7 +92,7 @@ class ProviderTransaction
           if($person && $person->getPersonId()){
             break;
           }
-        }catch(CustomerBlackListException | APIBlackListException | P2PException | APIPersonException $exception){
+        }catch(CustomerBlackListException | P2PException | APIBlackListException | APIPersonException $exception){
           $providerException = $exception;
           continue;
         }catch(Exception $exception){
@@ -106,8 +104,10 @@ class ProviderTransaction
     if(!$person || !$person->getPersonId()){
       if($providerException){
         throw $providerException;
-      }else{
+      }elseif($provider->getApiMessage()){
         throw new APIException($provider->getApiMessage());
+      }else{
+        throw new TransactionException('We cannot give a Receiver for this Customer (Sender)');
       }
     }
 
@@ -145,7 +145,7 @@ class ProviderTransaction
    *
    * @return WSResponse
    *
-   * @throws APIException|TransactionException|Exception
+   * @throws APIBlackListException|APIException|Exception|P2PException|TransactionException
    */
   public function sender()
   {
@@ -172,9 +172,11 @@ class ProviderTransaction
 
     //validate if need to create the customer
     $customer->validateFromRequest($account, $this->wsRequest);
-    $lastTransaction = $customer->getLastTransaction($transaction->getTransactionTypeId());
+    $customer->getLastTransaction($transaction->getTransactionTypeId());
     $transaction->setCustomerId($customer->getCustomerId());
-    $transaction->setAgencyId($lastTransaction->getAgencyId());
+    //default values
+    $transaction->setAgencyId($customer->getLastTransaction()->getAgencyId());
+    $transaction->setProviderId($customer->getLastTransaction()->getProviderId());
 
     //evaluate limits
     $limit = new Limit($transaction, $customer);
@@ -194,7 +196,7 @@ class ProviderTransaction
           if($person && $person->getPersonId()){
             break;
           }
-        }catch(CustomerBlackListException | APIBlackListException | P2PException $exception){
+        }catch(CustomerBlackListException | P2PException | APIBlackListException | APIPersonException $exception){
           $providerException = $exception;
           continue;
         }catch(Exception $exception){
@@ -206,8 +208,10 @@ class ProviderTransaction
     if(!$person || !$person->getPersonId()){
       if($providerException){
         throw $providerException;
-      }else{
+      }elseif($provider->getApiMessage()){
         throw new APIException($provider->getApiMessage());
+      }else{
+        throw new TransactionException('We cannot give a Sender for this Customer (Receiver)');
       }
     }
 
@@ -317,8 +321,11 @@ class ProviderTransaction
     $transactionId = $this->wsRequest->requireNumericAndPositive('transaction_id');
     $transaction = Session::getTransaction();
     $transaction->restore($transactionId);
-    $provider = $transaction->getProvider();
-    $provider->status();
+
+    if($webRequest){
+      $provider = $transaction->getProvider();
+      $provider->status();
+    }
 
     $wsResponse = new WSResponseOk();
     $wsResponse->addElement('transaction', $transaction);

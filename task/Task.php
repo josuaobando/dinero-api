@@ -105,6 +105,9 @@ class Task
    */
   public function check()
   {
+    if(Util::isDEV()){
+      return true;
+    }
     //we get the current day
     $currentDateTime = getdate(time());
     $currentMinutes = $currentDateTime['minutes'];

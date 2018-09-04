@@ -33,6 +33,10 @@ class Customer
   private $stateName;
   private $phone;
   private $isAPI;
+  /**
+   * @var Transaction
+   */
+  private $lastTransaction;
 
   /**
    * @return int
@@ -508,19 +512,24 @@ class Customer
   }
 
   /**
-   * @param $transactionTypeId
+   * get the las proceed transaction
+   *
+   * @param null $transactionTypeId
    *
    * @return Transaction
    */
-  public function getLastTransaction($transactionTypeId)
+  public function getLastTransaction($transactionTypeId = null)
   {
-    $transaction = new Transaction();
+    if(!$transactionTypeId){
+      return $this->lastTransaction;
+    }
+    $this->lastTransaction = new Transaction();
     $customerTransaction = $this->tblCustomer->getLastTransaction($this->customerId, $this->agencyTypeId, $transactionTypeId);
     if($customerTransaction){
       $transactionId = $customerTransaction['Transaction_Id'];
-      $transaction->restore($transactionId);
+      $this->lastTransaction->restore($transactionId);
     }
-    return $transaction;
+    return $this->lastTransaction;
   }
 }
 

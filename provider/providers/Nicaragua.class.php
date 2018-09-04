@@ -36,14 +36,16 @@ class Nicaragua extends Provider
   /**
    * get receiver for the customer
    *
-   * @return Person
-   *
-   * @throws APIBlackListException|APILimitException|APIPersonException
+   * @throws APIBlackListException|APILimitException|APIPersonException|LimitException
    */
   public function receiver()
   {
     $customer = Session::getCustomer();
     $transaction = Session::getTransaction();
+
+    if($transaction->getAmount() < 60){
+      throw new LimitException("Limits: The minimum allowed amount is: 60 USD");
+    }
 
     //transaction
     $request = array();
@@ -140,7 +142,7 @@ class Nicaragua extends Provider
    *
    * @return bool
    *
-   * @throws APIException
+   * @throws APIException|LimitException
    */
   public function confirm()
   {
@@ -149,6 +151,10 @@ class Nicaragua extends Provider
     $apiTransactionId = $transaction->getApiTransactionId();
     $transactionStatus = $transaction->getTransactionStatusId();
     $isSubmit = ($transactionStatus == Transaction::STATUS_REQUESTED);
+
+    if($transaction->getAmount() < 60){
+      throw new LimitException("Limits: The minimum allowed amount is: 60 USD");
+    }
 
     //transaction
     $params = array();
