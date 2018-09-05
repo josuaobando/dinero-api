@@ -246,7 +246,7 @@ class Nicaragua extends Provider
               }
             }
             if((strtolower($this->apiMessage) == 'ninguno') || strlen($this->apiMessage)){
-              $transaction->setReason($this->apiMessage);
+              $transaction->setNote($this->apiMessage);
             }
             break;
           case self::STATUS_API_REJECTED:
