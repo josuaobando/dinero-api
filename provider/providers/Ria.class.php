@@ -38,12 +38,18 @@ class Ria extends Provider
    *
    * @return Person
    *
-   * @throws APIBlackListException|APILimitException|APIPersonException
+   * @throws APIBlackListException|APILimitException|APIPersonException|LimitException
    */
   public function receiver()
   {
     $customer = Session::getCustomer();
     $transaction = Session::getTransaction();
+
+    if($transaction->getAmount() < 60){
+      throw new LimitException("Limits: The minimum allowed amount is: 60 USD");
+    }elseif($transaction->getAmount() > 450){
+      throw new LimitException("Limits: The maximum allowed amount is: 450 USD");
+    }
 
     //transaction
     $request = array();
@@ -101,7 +107,7 @@ class Ria extends Provider
         if(stripos($this->apiMessage, 'No Names Available') !== false){
 
           $subject = "No deposit names available";
-          $body = "There are no deposit names available in Nicaragua agency";
+          $body = "There are no deposit names available in Ria-Saturno agency";
           $bodyTemplate = MailManager::getEmailTemplate('default', array('body' => $body));
           $recipients = array('To' => 'mgoficinasf0117@outlook.com', 'Cc' => CoreConfig::MAIL_DEV);
           MailManager::sendEmail($recipients, $subject, $bodyTemplate);
@@ -140,7 +146,7 @@ class Ria extends Provider
    *
    * @return bool
    *
-   * @throws APIException
+   * @throws APIException|LimitException
    */
   public function confirm()
   {
@@ -149,6 +155,12 @@ class Ria extends Provider
     $apiTransactionId = $transaction->getApiTransactionId();
     $transactionStatus = $transaction->getTransactionStatusId();
     $isSubmit = ($transactionStatus == Transaction::STATUS_REQUESTED);
+
+    if($transaction->getAmount() < 60){
+      throw new LimitException("Limits: The minimum allowed amount is: 60 USD");
+    }elseif($transaction->getAmount() > 450){
+      throw new LimitException("Limits: The maximum allowed amount is: 450 USD");
+    }
 
     //transaction
     $params = array();
@@ -167,7 +179,9 @@ class Ria extends Provider
 
     if($this->apiStatus == self::STATUS_API_PENDING){
 
-      $transaction->setApiTransactionId($this->apiTransactionId);
+      if($this->apiTransactionId){
+        $transaction->setApiTransactionId($this->apiTransactionId);
+      }
       return true;
 
     }elseif($this->apiStatus == self::STATUS_API_ERROR || $this->apiCode != self::RESPONSE_SUCCESS){

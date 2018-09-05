@@ -173,7 +173,9 @@ class Nicaragua extends Provider
 
     if($this->apiStatus == self::STATUS_API_PENDING){
 
-      $transaction->setApiTransactionId($this->apiTransactionId);
+      if($this->apiTransactionId){
+        $transaction->setApiTransactionId($this->apiTransactionId);
+      }
       return true;
 
     }elseif($this->apiStatus == self::STATUS_API_ERROR || $this->apiCode != self::RESPONSE_SUCCESS){
