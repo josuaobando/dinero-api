@@ -8,7 +8,7 @@ class Util
 
   const REGEX_NUMERIC = '^[0-9]+$';
   const REGEX_ALPHANIMERIC = '^[-a-zA-Z0-9ñÑáóéíóúÁÉÍÓÚ ,.-]+$';
-  const FORMAT_DATE_DISPLAY = 'd F H:i:s';
+  const FORMAT_DATE_DISPLAY = 'd M H:i:s';
 
   /**
    * check if the environment is development

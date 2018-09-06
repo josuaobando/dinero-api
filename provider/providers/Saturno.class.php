@@ -331,7 +331,7 @@ class Saturno extends Provider
             $transaction->setTransactionStatusId(Transaction::STATUS_APPROVED);
             $transaction->setReason('Ok');
             if((strtolower($this->apiMessage) != 'ninguno') && strlen($this->apiMessage)){
-              $transaction->setReason($this->apiMessage);
+              $transaction->setNote($this->apiMessage);
             }
 
             //only change amount in deposits
