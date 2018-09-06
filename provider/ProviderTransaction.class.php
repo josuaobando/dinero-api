@@ -132,7 +132,7 @@ class ProviderTransaction
       //extra information
       if($transaction->getAgencyTypeId() == Transaction::AGENCY_TYPE_RIA){
         $transaction->setReason('EasyPay-Phillgus');
-        if($transaction->getAgencyId() == CoreConfig::AGENCY_ID_SATURNO_RIA){
+        if($transaction->getProviderId() != Dinero::PROVIDER_ID){
           $transaction->setReason('TeleDolar');
         }
       }

@@ -330,7 +330,7 @@ class Saturno extends Provider
             }
             $transaction->setTransactionStatusId(Transaction::STATUS_APPROVED);
             $transaction->setReason('Ok');
-            if((strtolower($this->apiMessage) == 'ninguno') || strlen($this->apiMessage)){
+            if((strtolower($this->apiMessage) != 'ninguno') && strlen($this->apiMessage)){
               $transaction->setReason($this->apiMessage);
             }
 

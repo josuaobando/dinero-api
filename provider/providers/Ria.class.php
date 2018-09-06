@@ -251,7 +251,7 @@ class Ria extends Provider
                 $transaction->setAmount($response->monto);
               }
             }
-            if((strtolower($this->apiMessage) == 'ninguno') || strlen($this->apiMessage)){
+            if((strtolower($this->apiMessage) != 'ninguno') && strlen($this->apiMessage)){
               $transaction->setReason($this->apiMessage);
             }
             break;

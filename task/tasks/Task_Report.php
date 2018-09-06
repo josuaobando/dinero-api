@@ -30,7 +30,7 @@ class Task_Report extends Task
 
     foreach($this->transactions as $group => $transactions){
       if(is_array($transactions) && count($transactions) > 0){
-        if($group == 'Saturno-Payouts'){
+        if($group == 'MG-Saturno-Payouts'){
           $this->reportPayouts($group, $transactions);
         }else{
           $this->report($group, $transactions);
