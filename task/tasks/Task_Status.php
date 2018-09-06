@@ -30,14 +30,9 @@ class Task_Status extends Task
       $transaction->restore($transactionId);
       $transaction->setModifiedBy($account->getAccountId());
 
-      if(CoreConfig::USED_PROVIDERS){
-        $provider = $transaction->getProvider();
-        $provider->status();
-      }else{
-        $transactionAPI = new TransactionAPI();
-        $transactionAPI->status();
-      }
-
+      //check status
+      $provider = $transaction->getProvider();
+      $provider->status();
     }
   }
 

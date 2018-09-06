@@ -47,11 +47,12 @@ function name($wsRequest)
     $account->authenticateAPI($apiUser, $apiPass);
 
     if($account->isAuthenticated()){
-      $manager = new Manager($account);
-      $wsResponse = $manager->receiver($wsRequest);
+      $providerTransaction = new ProviderTransaction($wsRequest);
+      $wsResponse = $providerTransaction->receiver();
     }else{
       $wsResponse = new WSResponseError("authentication failed");
     }
+
   }catch(SessionException $ex){
     $wsResponse = new WSResponseError("authentication failed");
   }catch(InvalidParameterException $ex){
@@ -82,12 +83,13 @@ function sender($wsRequest)
     $account->authenticateAPI($apiUser, $apiPass);
 
     if($account->isAuthenticated()){
-      $manager = new Manager($account);
-      $wsResponse = $manager->sender($wsRequest);
+      $providerTransaction = new ProviderTransaction($wsRequest);
+      $wsResponse = $providerTransaction->sender();
       $wsResponse->removeElement('sender');
     }else{
       $wsResponse = new WSResponseError("authentication failed");
     }
+
   }catch(SessionException $ex){
     $wsResponse = new WSResponseError("authentication failed");
   }catch(InvalidParameterException $ex){
@@ -118,11 +120,12 @@ function confirm($wsRequest)
     $account->authenticateAPI($apiUser, $apiPass);
 
     if($account->isAuthenticated()){
-      $manager = new Manager($account);
-      $wsResponse = $manager->confirm($wsRequest);
+      $providerTransaction = new ProviderTransaction($wsRequest);
+      $wsResponse = $providerTransaction->confirm();
     }else{
       $wsResponse = new WSResponseError("authentication failed");
     }
+
   }catch(SessionException $ex){
     $wsResponse = new WSResponseError("authentication failed");
   }catch(InvalidParameterException $ex){
@@ -153,8 +156,8 @@ function information($wsRequest)
     $account->authenticateAPI($apiUser, $apiPass);
     if($account->isAuthenticated()){
 
-      $manager = new Manager($account);
-      $wsResponse = $manager->information($wsRequest);
+      $providerTransaction = new ProviderTransaction($wsRequest);
+      $wsResponse = $providerTransaction->status($webRequest);
 
     }else{
       $wsResponse = new WSResponseError("authentication failed");
