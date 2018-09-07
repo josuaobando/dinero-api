@@ -113,6 +113,9 @@ class Nicaragua extends Provider
         }elseif(stripos(strtolower($this->apiMessage), 'black') && stripos(strtolower($this->apiMessage), 'list')){
           $this->apiMessage = 'The Customer (Sender) has been blacklisted';
           throw new APIBlackListException($this->apiMessage);
+        }elseif(stripos(strtolower($this->apiMessage), 'lista') && stripos(strtolower($this->apiMessage), 'negra')){
+          $this->apiMessage = 'The Customer (Sender) has been blacklisted';
+          throw new APIBlackListException($this->apiMessage);
         }elseif(stripos(strtolower($this->apiMessage), 'limit') && stripos(strtolower($this->apiMessage), 'reached')){
           $this->apiMessage = 'Limits: The Customer (Sender) has exceeded the limits in MG';
           throw new APILimitException($this->apiMessage);
