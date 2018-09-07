@@ -484,7 +484,7 @@ class Stickiness
             break;
           case self::STATUS_CODE_LINKED_OTHER_COMPANY:
             ExceptionManager::handleException(new P2PException("The Person [$this->person] is linked to another Customer [$this->customer]. " . __FUNCTION__));
-            throw new TransactionException("Due to external factors, we cannot give this Customer a Name.");
+            throw new P2PException("The Customer is linked to another Person.");
             break;
           case self::STATUS_CODE_LINKED_OTHER:
           case self::STATUS_CODE_LINKED_OTHER_CUSTOMER:
