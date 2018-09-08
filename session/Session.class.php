@@ -147,12 +147,14 @@ class Session
   /**
    * get transaction
    *
-   * @return Transaction
+   * @param bool $crate
+   *
+   * @return mixed|Transaction
    */
-  public static function getTransaction()
+  public static function getTransaction($crate = false)
   {
     $transactionSession = self::getSessionObject(self::SID_TRANSACTION);
-    if(!$transactionSession){
+    if(!$transactionSession || $crate){
       $transaction = new Transaction();
       self::storeSessionObject(self::SID_TRANSACTION, $transaction, true);
     }else{

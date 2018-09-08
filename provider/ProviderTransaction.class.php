@@ -30,10 +30,12 @@ class ProviderTransaction
       $tblSystem = TblSystem::getInstance();
       $this->providers = $tblSystem->getAgencyProviders($agencyTypeId);
       if(!$this->providers){
-        throw new TransactionException("The Transaction not has been created. Please, try later!");
+        throw new TransactionException("At this time, we can not process your request. Please, try later!");
       }
     }
     $this->wsRequest = $wsRequest;
+    //clean session object
+    Session::getTransaction(true);
   }
 
   /**
@@ -359,6 +361,87 @@ class ProviderTransaction
     }else{
       return $wsResponse;
     }
+  }
+
+  /**
+   * update transaction data
+   *
+   * @return int
+   *
+   * @throws InvalidStateException+
+   */
+  public function transactionUpdate()
+  {
+    $account = Session::getAccount();
+    $transactionId = $this->wsRequest->requireNumericAndPositive("transactionId");
+    $transactionTypeId = $this->wsRequest->requireNumericAndPositive("transactionTypeId");
+    $statusId = $this->wsRequest->requireNumericAndPositive("status");
+    $reason = $this->wsRequest->getParam("reason", "");
+    $note = $this->wsRequest->getParam("note", "");
+    $amount = $this->wsRequest->requireNumericAndPositive("amount");
+    $fee = $this->wsRequest->getParam("fee");
+
+    if($transactionTypeId == Transaction::TYPE_SENDER && $statusId == Transaction::STATUS_REJECTED){
+      $controlNumber = $this->wsRequest->getParam("controlNumber", '');
+    }else{
+      $controlNumber = $this->wsRequest->requireNumericAndPositive("controlNumber");
+    }
+
+    //restore and load transaction information
+    $transaction = Session::getTransaction();
+    $transaction->restore($transactionId);
+    if(!$transaction->getTransactionId()){
+      throw new InvalidStateException("The transaction [$transactionId] has not been restored, please check!");
+    }
+
+    if($transaction->getProviderId() != Dinero::PROVIDER_ID){
+      throw new InvalidStateException("Transaction cannot be Modify!");
+    }
+
+    //get current status
+    $currentStatusId = $transaction->getTransactionStatusId();
+
+    //set new values
+    $transaction->setTransactionStatusId($statusId);
+    $transaction->setReason($reason);
+    $transaction->setNote($note);
+    $transaction->setAmount($amount);
+    $transaction->setFee($fee);
+    $transaction->setControlNumber($controlNumber);
+    $transaction->setModifiedBy($account->getAccountId());
+
+    //validate if is update transaction
+    if($currentStatusId != Transaction::STATUS_APPROVED && $statusId == Transaction::STATUS_APPROVED){
+
+      $stickiness = new Stickiness();
+      $stickiness->restoreByTransactionId($transaction->getTransactionId());
+      if($stickiness->getStickinessId()){
+
+        //restore stickiness transaction
+        $stickinessTransaction = new StickinessTransaction();
+        $stickinessTransaction->setTransactionId($transaction->getTransactionId());
+        $stickinessTransaction->restore();
+
+        if($stickinessTransaction->getStickinessTransactionId() && !$stickinessTransaction->getAuthCode()){
+          //Completed to API Controller
+          $stickiness->setControlNumber($controlNumber);
+          $stickiness->complete();
+
+          //update stickiness transaction
+          $stickinessTransaction->setVerification($stickiness->getVerification());
+          $stickinessTransaction->setVerificationId($stickiness->getVerificationId());
+          $stickinessTransaction->setAuthCode($stickiness->getAuthCode());
+          $stickinessTransaction->update();
+        }
+
+      }
+
+    }
+
+    //update transaction after the validation of the data
+    $update = $transaction->update();
+
+    return $update;
   }
 
 }

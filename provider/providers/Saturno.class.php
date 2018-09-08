@@ -438,12 +438,12 @@ class Saturno extends Provider
         $this->apiMessage = $response->comentario;
       }else{
         $this->apiCode = self::RESPONSE_ERROR;
-        $this->apiMessage = 'At this time, we can not carry out. Please try again in a few minutes!';
+        $this->apiMessage = 'At this time, we can not process your request. Please try again in a few minutes!';
         Log::custom(__CLASS__, "Invalid Object Response" . "\n Request: \n\n" . $this->getLastRequest() . "\n Response: \n\n" . Util::objToStr($response));
       }
     }catch(Exception $ex){
       $this->apiCode = self::RESPONSE_ERROR;
-      $this->apiMessage = 'At this time, we can not carry out. Please try again in a few minutes!';
+      $this->apiMessage = 'At this time, we can not process your request. Please try again in a few minutes!';
       ExceptionManager::handleException($ex);
     }
   }
