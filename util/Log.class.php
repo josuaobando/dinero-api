@@ -107,8 +107,6 @@ class Log
       return;
     }
 
-    $datetime = date('Y-m-d H:i:s');
-
     //replace variables if there is any
     if($args && is_array($args)){
       foreach($args as $key => $value){
@@ -116,6 +114,8 @@ class Log
       }
     }
 
+    $datetime = date('Y-m-d H:i:s');
+    $message = str_replace("<br>", '\n', $message);
     $content = Log::$format;
     $content = str_replace("%{datetime}", $datetime, $content);
     $content = str_replace("%{message}", $message, $content);
