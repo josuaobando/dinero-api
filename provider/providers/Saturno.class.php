@@ -23,6 +23,7 @@ class Saturno extends Provider
   const STATUS_API_CANCELED = 'cancelled';
   const STATUS_API_ERROR = 'error';
   const RESPONSE_ERROR = 'fail';
+  const RESPONSE_SUCCESS = '0';
 
   /**
    * new Transaction instance
@@ -185,7 +186,7 @@ class Saturno extends Provider
           return Session::setPerson($person);
         }
 
-      }elseif($this->apiStatus == self::STATUS_API_ERROR || $this->apiCode == self::STATUS_API_ERROR){
+      }elseif($this->apiStatus == self::STATUS_API_ERROR || $this->apiCode != self::RESPONSE_SUCCESS){
 
         if(stripos($this->apiMessage, 'No Names Available') !== false || stripos($this->apiMessage, 'No Payouts Names Available') !== false){
 
