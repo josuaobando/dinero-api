@@ -170,7 +170,23 @@ class TblSystem extends Db
    */
   public function getTransactionAttempts()
   {
-    $sql = "CALL spTransaction_Attempts()";
+    $sql = "CALL spReport_Attempts()";
+
+    $rows = array();
+    $params = array();
+    $this->executeQuery($sql, $rows, $params);
+
+    return $rows;
+  }
+
+  /**
+   * get declined transactions
+   *
+   * @return array
+   */
+  public function getTransactionDeclined()
+  {
+    $sql = "CALL spReport_Declined()";
 
     $rows = array();
     $params = array();
