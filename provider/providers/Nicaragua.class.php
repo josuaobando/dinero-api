@@ -43,8 +43,8 @@ class Nicaragua extends Provider
     $customer = Session::getCustomer();
     $transaction = Session::getTransaction();
 
-    if($transaction->getAmount() < 60){
-      throw new LimitException("Limits: The minimum allowed amount is: 60 USD");
+    if($transaction->getAmount() < 50){
+      throw new LimitException("Limits: The minimum allowed amount is: 50 USD");
     }
 
     //transaction
@@ -155,8 +155,8 @@ class Nicaragua extends Provider
     $transactionStatus = $transaction->getTransactionStatusId();
     $isSubmit = ($transactionStatus == Transaction::STATUS_REQUESTED);
 
-    if($transaction->getAmount() < 60){
-      throw new LimitException("Limits: The minimum allowed amount is: 60 USD");
+    if($transaction->getAmount() < 50){
+      throw new LimitException("Limits: The minimum allowed amount is: 50 USD");
     }
 
     //transaction
