@@ -103,6 +103,16 @@ class System
     return $this->tblSystem->getTransactionAttempts();
   }
 
+  /**
+   * get declined transactions
+   *
+   * @return array
+   */
+  public function transactionDeclined()
+  {
+    return $this->tblSystem->getTransactionDeclined();
+  }
+
 }
 
 ?>

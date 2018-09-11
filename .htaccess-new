@@ -1,4 +1,4 @@
-php_value include_path ".;C:\PHP\PEAR;J:\Proyect\DineroSeguroHF\Core"
+php_value include_path ".;J:\Proyect\DineroSeguroHF\Core"
 
 php_flag short_open_tag on
 php_flag display_errors on
