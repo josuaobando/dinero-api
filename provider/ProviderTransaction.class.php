@@ -278,8 +278,10 @@ class ProviderTransaction
     }
 
     if($transaction->getTransactionStatusId() != Transaction::STATUS_REQUESTED && $transaction->getTransactionStatusId() != Transaction::STATUS_REJECTED){
-      if($transaction->getTransactionStatusId() == Transaction::STATUS_CANCELED){
+      if($transaction->getTransactionStatusId() == Transaction::STATUS_CANCELED && $transaction->getProviderId() != Dinero::PROVIDER_ID){
         throw new TransactionException("The transaction has expired. Valid time is 48 hours to confirm.");
+      }elseif($transaction->getTransactionStatusId() == Transaction::STATUS_CANCELED && $transaction->getProviderId() == Dinero::PROVIDER_ID){
+        throw new TransactionException("The transaction has expired.");
       }else{
         throw new TransactionException("Transaction cannot be confirmed since the current status is: " . $transaction->getTransactionStatus());
       }
