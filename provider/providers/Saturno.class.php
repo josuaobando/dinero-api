@@ -202,6 +202,7 @@ class Saturno extends Provider
           MailManager::sendEmail($recipients, $subject, $bodyTemplate);
           Log::custom(__CLASS__, $body);
 
+          throw new APIPersonException('We cannot give a Sender for this Customer (Receiver)');
         }elseif((stripos(strtolower($this->apiMessage), 'black') && stripos(strtolower($this->apiMessage), 'list')) || (stripos($this->apiMessage, 'Black List'))){
           $this->apiMessage = 'The Customer (Receiver) has been blacklisted';
           return null;
