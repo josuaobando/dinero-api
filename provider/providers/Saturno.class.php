@@ -114,7 +114,7 @@ class Saturno extends Provider
       }else{
         if((stripos(strtolower($this->apiMessage), 'black') && stripos(strtolower($this->apiMessage), 'list')) || (stripos($this->apiMessage, 'Black List'))){
           $this->apiMessage = 'The Customer (Receiver) has been blacklisted';
-          return null;
+          throw new APIBlackListException($this->apiMessage);
         }
       }
     }
@@ -127,9 +127,9 @@ class Saturno extends Provider
   /**
    * get sender name
    *
-   * @return null|Person
+   * @return null
    *
-   * @throws APILimitException
+   * @throws APILimitException|APIPersonException|APIBlackListException
    */
   public function sender()
   {
@@ -205,7 +205,7 @@ class Saturno extends Provider
           throw new APIPersonException('We cannot give a Sender for this Customer (Receiver)');
         }elseif((stripos(strtolower($this->apiMessage), 'black') && stripos(strtolower($this->apiMessage), 'list')) || (stripos($this->apiMessage, 'Black List'))){
           $this->apiMessage = 'The Customer (Receiver) has been blacklisted';
-          return null;
+          throw new APIBlackListException($this->apiMessage);
         }elseif(stripos(strtolower($this->apiMessage), 'limit') && stripos(strtolower($this->apiMessage), 'reached')){
           $this->apiMessage = 'Limits: The Customer (Receiver) has exceeded the limits in MG';
           throw new APILimitException($this->apiMessage);
