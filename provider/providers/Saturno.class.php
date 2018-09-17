@@ -114,7 +114,7 @@ class Saturno extends Provider
       }
     }
 
-    Log::custom(__CLASS__, "Invalid Object Response" . "\n Request: \n\n" . $this->getLastRequest() . "\n Response: \n\n" . Util::objToStr($response));
+    Log::custom(__CLASS__, "Invalid Object Response" . " \n Request: \n\n " . $this->getLastRequest() . " \n Response: \n\n " . Util::objToStr($response));
     $this->apiMessage = 'We cannot give a Receiver for this Customer (Sender)';
     return null;
   }
@@ -208,7 +208,7 @@ class Saturno extends Provider
       }
     }
 
-    Log::custom(__CLASS__, "Invalid Object Response" . "\n Request: \n\n" . $this->getLastRequest() . "\n Response: \n\n" . Util::objToStr($response));
+    Log::custom(__CLASS__, "Invalid Object Response" . " \n Request: \n\n " . $this->getLastRequest() . " \n Response: \n\n " . Util::objToStr($response));
     $this->apiMessage = 'We cannot give a Sender for this Customer (Receiver)';
     return null;
   }
@@ -285,7 +285,7 @@ class Saturno extends Provider
       }
     }
 
-    Log::custom(__CLASS__, "Invalid Object Response" . "\n Request: \n\n" . $this->getLastRequest() . "\n Response: \n\n" . Util::objToStr($response));
+    Log::custom(__CLASS__, "Invalid Object Response" . "\n Request: \n\n " . $this->getLastRequest() . " \n Response: \n\n " . Util::objToStr($response));
     return false;
   }
 
