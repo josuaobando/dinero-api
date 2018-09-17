@@ -15,7 +15,7 @@ class RequestException extends Exception
   const ERROR_P2P = 500;
   const ERROR_API = 600;
   const ERROR_API_BLACKLIST = 610;
-  const ERROR_API_PERSON = 610;
+  const ERROR_API_PERSON = 620;
   const ERROR_API_LIMIT = 630;
 
   protected $description = "Alert";
