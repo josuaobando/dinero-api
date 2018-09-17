@@ -103,7 +103,7 @@ class Saturno extends Provider
           Log::custom(__CLASS__, $body);
 
           throw new APIPersonException('We cannot give a Receiver for this Customer (Sender)');
-        }elseif(stripos(strtolower($this->apiMessage), 'black') && stripos(strtolower($this->apiMessage), 'list') || stripos($this->apiMessage, 'Black List')){
+        }elseif((stripos(strtolower($this->apiMessage), 'black') && stripos(strtolower($this->apiMessage), 'list')) || (stripos($this->apiMessage, 'Black List'))){
           $this->apiMessage = 'The Customer (Sender) has been blacklisted';
           throw new APIBlackListException($this->apiMessage);
         }elseif(stripos(strtolower($this->apiMessage), 'limit') && stripos(strtolower($this->apiMessage), 'reached')){
@@ -111,6 +111,11 @@ class Saturno extends Provider
           throw new APILimitException($this->apiMessage);
         }
 
+      }else{
+        if((stripos(strtolower($this->apiMessage), 'black') && stripos(strtolower($this->apiMessage), 'list')) || (stripos($this->apiMessage, 'Black List'))){
+          $this->apiMessage = 'The Customer (Receiver) has been blacklisted';
+          return null;
+        }
       }
     }
 
@@ -197,7 +202,7 @@ class Saturno extends Provider
           MailManager::sendEmail($recipients, $subject, $bodyTemplate);
           Log::custom(__CLASS__, $body);
 
-        }elseif(stripos(strtolower($this->apiMessage), 'black') && stripos(strtolower($this->apiMessage), 'list') || stripos($this->apiMessage, 'Black List')){
+        }elseif((stripos(strtolower($this->apiMessage), 'black') && stripos(strtolower($this->apiMessage), 'list')) || (stripos($this->apiMessage, 'Black List'))){
           $this->apiMessage = 'The Customer (Receiver) has been blacklisted';
           return null;
         }elseif(stripos(strtolower($this->apiMessage), 'limit') && stripos(strtolower($this->apiMessage), 'reached')){
@@ -205,6 +210,11 @@ class Saturno extends Provider
           throw new APILimitException($this->apiMessage);
         }
 
+      }else{
+        if((stripos(strtolower($this->apiMessage), 'black') && stripos(strtolower($this->apiMessage), 'list')) || (stripos($this->apiMessage, 'Black List'))){
+          $this->apiMessage = 'The Customer (Receiver) has been blacklisted';
+          return null;
+        }
       }
     }
 
