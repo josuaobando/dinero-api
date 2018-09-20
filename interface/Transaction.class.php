@@ -106,6 +106,11 @@ class Transaction
   private $apiTransactionId;
 
   /**
+   * @var string
+   */
+  private $information;
+
+  /**
    * Transaction Type
    */
   const TYPE_RECEIVER = 1;
@@ -447,6 +452,14 @@ class Transaction
   }
 
   /**
+   * @param string $information
+   */
+  public function setInformation($information)
+  {
+    $this->information = $information;
+  }
+
+  /**
    * create new transaction and load the Transaction ID
    */
   public function create()
@@ -562,6 +575,7 @@ class Transaction
     $data['notes'] = (!$this->reason) ? "" : $this->reason;
     $data['controlNumber'] = (!$this->controlNumber) ? "" : $this->controlNumber;
     $data['merchantId'] = (!$this->merchantId) ? "" : $this->merchantId;
+    $data['information'] = $this->information;
 
     return $data;
   }

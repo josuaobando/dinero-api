@@ -133,9 +133,9 @@ class ProviderTransaction
 
       //extra information
       if($transaction->getAgencyTypeId() == Transaction::AGENCY_TYPE_RIA){
-        $transaction->setReason('EasyPay-Phillgus');
+        $transaction->setInformation('EasyPay-Phillgus');
         if($transaction->getProviderId() != Dinero::PROVIDER_ID){
-          $transaction->setReason('TeleDolar');
+          $transaction->setInformation('TeleDolar');
         }
       }
 
