@@ -36,16 +36,12 @@ class Nicaragua extends Provider
   /**
    * get receiver for the customer
    *
-   * @throws APIBlackListException|APILimitException|APIPersonException|LimitException
+   * @throws APIBlackListException|APILimitException|APIPersonException
    */
   public function receiver()
   {
     $customer = Session::getCustomer();
     $transaction = Session::getTransaction();
-
-    if($transaction->getAmount() < 50){
-      throw new LimitException("Limits: The minimum allowed amount is: 50 USD");
-    }
 
     //transaction
     $request = array();
@@ -117,7 +113,7 @@ class Nicaragua extends Provider
           $this->apiMessage = 'The Customer (Sender) has been blacklisted';
           throw new APIBlackListException($this->apiMessage);
         }elseif(stripos(strtolower($this->apiMessage), 'limit') && stripos(strtolower($this->apiMessage), 'reached')){
-          $this->apiMessage = 'Limits: The Customer (Sender) has exceeded the limits in MG';
+          $this->apiMessage = 'The Customer (Sender) has exceeded the limits in MG';
           throw new APILimitException($this->apiMessage);
         }elseif($this->apiMessage){
           throw new APIException($this->apiMessage);
@@ -156,10 +152,6 @@ class Nicaragua extends Provider
     $apiTransactionId = $transaction->getApiTransactionId();
     $transactionStatus = $transaction->getTransactionStatusId();
     $isSubmit = ($transactionStatus == Transaction::STATUS_REQUESTED);
-
-    if($transaction->getAmount() < 50){
-      throw new LimitException("Limits: The minimum allowed amount is: 50 USD");
-    }
 
     //transaction
     $params = array();

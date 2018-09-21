@@ -38,7 +38,7 @@ class Ria extends Provider
    *
    * @return Person
    *
-   * @throws APIBlackListException|APILimitException|APIPersonException|LimitException
+   * @throws APIBlackListException|APIException|APILimitException|APIPersonException
    */
   public function receiver()
   {
@@ -46,9 +46,9 @@ class Ria extends Provider
     $transaction = Session::getTransaction();
 
     if($transaction->getAmount() < 60){
-      throw new LimitException("Limits: The minimum allowed amount is: 60 USD");
+      throw new APILimitException("The minimum allowed amount is: 60 USD");
     }elseif($transaction->getAmount() > 450){
-      throw new LimitException("Limits: The maximum allowed amount is: 450 USD");
+      throw new APILimitException("The maximum allowed amount is: 450 USD");
     }
 
     //transaction
@@ -121,7 +121,7 @@ class Ria extends Provider
           $this->apiMessage = 'The Customer (Sender) has been blacklisted';
           throw new APIBlackListException($this->apiMessage);
         }elseif(stripos(strtolower($this->apiMessage), 'limit') && stripos(strtolower($this->apiMessage), 'reached')){
-          $this->apiMessage = 'Limits: The Customer (Sender) has exceeded the limits in MG';
+          $this->apiMessage = 'The Customer (Sender) has exceeded the limits in MG';
           throw new APILimitException($this->apiMessage);
         }elseif($this->apiMessage){
           throw new APIException($this->apiMessage);
@@ -162,9 +162,9 @@ class Ria extends Provider
     $isSubmit = ($transactionStatus == Transaction::STATUS_REQUESTED);
 
     if($transaction->getAmount() < 60){
-      throw new LimitException("Limits: The minimum allowed amount is: 60 USD");
+      throw new LimitException("The minimum allowed amount is: 60 USD");
     }elseif($transaction->getAmount() > 450){
-      throw new LimitException("Limits: The maximum allowed amount is: 450 USD");
+      throw new LimitException("The maximum allowed amount is: 450 USD");
     }
 
     //transaction
