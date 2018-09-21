@@ -177,12 +177,12 @@ class Limit
     switch($limitType){
       case self::LIMIT_TYPE_MIN:
         if($limitValue > $this->transaction->getAmount()){
-          throw new LimitException("The minimum allowed amount is $limitValue USD");
+          throw new LimitException("The minimum allowed amount is $$limitValue");
         }
         break;
       case self::LIMIT_TYPE_MAX:
         if($limitValue < $this->transaction->getAmount()){
-          throw new LimitException("The maximum allowed amount is $limitValue USD");
+          throw new LimitException("The maximum allowed amount is $$limitValue");
         }
         break;
       case self::LIMIT_TYPE_COUNT:
