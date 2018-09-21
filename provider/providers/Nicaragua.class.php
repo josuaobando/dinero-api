@@ -119,6 +119,8 @@ class Nicaragua extends Provider
         }elseif(stripos(strtolower($this->apiMessage), 'limit') && stripos(strtolower($this->apiMessage), 'reached')){
           $this->apiMessage = 'Limits: The Customer (Sender) has exceeded the limits in MG';
           throw new APILimitException($this->apiMessage);
+        }elseif($this->apiMessage){
+          throw new APIException($this->apiMessage);
         }
 
       }
