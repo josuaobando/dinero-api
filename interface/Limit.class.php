@@ -119,21 +119,21 @@ class Limit
             $dailyAmount = $this->stats['DailyAmount'];
             if($dailyAmount && ($dailyAmount + $transactionAmount) > $limitValue){
               $balance = $limitValue - $dailyAmount;
-              throw new LimitException("The maximum allowed amount (Daily) is: $limitValue USD. Available: $$balance");
+              throw new LimitException("The maximum allowed amount (Daily) is $$limitValue. Available: $$balance");
             }
             break;
           case self::LIMIT_INTERVAL_WEEKLY:
             $weeklyAmount = $this->stats['WeeklyAmount'];
             if($weeklyAmount && ($weeklyAmount + $transactionAmount) > $limitValue){
               $balance = $limitValue - $weeklyAmount;
-              throw new LimitException("The maximum allowed amount (Weekly) is: $limitValue USD. Available: $$balance");
+              throw new LimitException("The maximum allowed amount (Weekly) is $$limitValue. Available: $$balance");
             }
             break;
           case self::LIMIT_INTERVAL_MONTHLY:
             $monthlyAmount = $this->stats['MonthlyAmount'];
             if($monthlyAmount && ($monthlyAmount + $transactionAmount) > $limitValue){
               $balance = $limitValue - $monthlyAmount;
-              throw new LimitException("The maximum allowed amount (Monthly) is: $limitValue USD. Available: $$balance");
+              throw new LimitException("The maximum allowed amount (Monthly) is $$limitValue. Available: $$balance");
             }
             break;
         }
@@ -177,12 +177,12 @@ class Limit
     switch($limitType){
       case self::LIMIT_TYPE_MIN:
         if($limitValue > $this->transaction->getAmount()){
-          throw new LimitException("The minimum allowed amount is: $limitValue USD");
+          throw new LimitException("The minimum allowed amount is $limitValue USD");
         }
         break;
       case self::LIMIT_TYPE_MAX:
         if($limitValue < $this->transaction->getAmount()){
-          throw new LimitException("The maximum allowed amount is: $limitValue USD");
+          throw new LimitException("The maximum allowed amount is $limitValue USD");
         }
         break;
       case self::LIMIT_TYPE_COUNT:
