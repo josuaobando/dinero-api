@@ -393,11 +393,6 @@ class Customer
     $customerNameSimilar = null;
     $customerNameRequest = strtoupper($this->getCustomer());
 
-    //validate if customer is blacklisted
-    if(!CoreConfig::USED_PROVIDERS){
-      $this->isBlacklisted();
-    }
-
     //validate if exist a similar customer
     if(CoreConfig::CUSTOMER_SIMILAR_PERCENT_ACTIVE){
       $similarList = $this->tblCustomer->getSimilar($companyId, $this->agencyTypeId, $this->firstName, $this->lastName);
@@ -422,9 +417,7 @@ class Customer
     if($this->customerId){
       //add log if customer has similar name
       Log::custom('Similar', "Request: $customerNameRequest Register: $customerNameSimilar Percent: $maxPercent");
-      if(!CoreConfig::USED_PROVIDERS){
-        $this->isBlacklisted($customerNameSimilar);
-      }
+      $this->isBlacklisted($customerNameSimilar);
     }else{
       //if not have register, check customer from request
       $customerData = $this->tblCustomer->validate($companyId, $accountId, $this->agencyTypeId, $this->firstName, $this->lastName, $this->countryId, $this->stateId, $this->phone);
@@ -453,10 +446,6 @@ class Customer
    */
   public function isBlacklisted($customerName = null)
   {
-    if($this->getIsAPI()){
-      return;
-    }
-
     $customerName = ($customerName) ? $customerName : $this->getCustomer();
     $customerName = strtoupper($customerName);
     $similarList = $this->tblCustomer->getSimilarSearchBlacklisted($this->agencyTypeId, $customerName);

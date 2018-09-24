@@ -45,6 +45,9 @@ class Saturno extends Provider
     $customer = Session::getCustomer();
     $transaction = Session::getTransaction();
 
+    //validate if customer is blacklisted
+    $customer->isBlacklisted();
+
     //transaction
     $request = array();
     $request['sendername'] = $customer->getCustomer();
