@@ -100,7 +100,7 @@ class Saturno extends Provider
 
           $subject = "No deposit names available";
           $body = "There are no deposit names available in Saturn agency";
-          $bodyTemplate = MailManager::getEmailTemplate('default', array('body' => $body));
+          $bodyTemplate = MailManager::getEmailTemplate('default', array('body' => $body, 'message' => $this->apiMessage));
           $recipients = array('To' => 'mgoficinasf0117@outlook.com', 'Cc' => CoreConfig::MAIL_DEV);
           MailManager::sendEmail($recipients, $subject, $bodyTemplate);
           Log::custom(__CLASS__, $body);
@@ -200,7 +200,7 @@ class Saturno extends Provider
 
           $subject = "No payouts names available";
           $body = "There are no payouts names available in Saturn agency";
-          $bodyTemplate = MailManager::getEmailTemplate('default', array('body' => $body));
+          $bodyTemplate = MailManager::getEmailTemplate('default', array('body' => $body, 'message' => $this->apiMessage));
           $recipients = array('To' => 'mgoficinasf0117@outlook.com', 'Cc' => CoreConfig::MAIL_DEV);
           MailManager::sendEmail($recipients, $subject, $bodyTemplate);
           Log::custom(__CLASS__, $body);

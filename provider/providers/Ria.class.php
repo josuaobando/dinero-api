@@ -111,7 +111,7 @@ class Ria extends Provider
 
           $subject = "No deposit names available";
           $body = "There are no deposit names available in Ria-Saturno agency";
-          $bodyTemplate = MailManager::getEmailTemplate('default', array('body' => $body));
+          $bodyTemplate = MailManager::getEmailTemplate('default', array('body' => $body, 'message' => $this->apiMessage));
           $recipients = array('To' => 'mgoficinasf0117@outlook.com', 'Cc' => CoreConfig::MAIL_DEV);
           MailManager::sendEmail($recipients, $subject, $bodyTemplate);
           Log::custom(__CLASS__, $body);

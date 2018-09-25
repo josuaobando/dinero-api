@@ -478,9 +478,9 @@ AKAM;
     if(is_array($tags) && count($tags) > 0){
       foreach($tags as $key => $value){
         //If value is Empty don't replace
-        if($value){
-          $template = preg_replace("/\{" . "@$key@" . "\}/", $value, $template);
-        }
+        //if($value){
+        $template = preg_replace("/\{" . "@$key@" . "\}/", $value, $template);
+        //}
       }
     }
 
