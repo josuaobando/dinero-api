@@ -98,7 +98,7 @@ class Transaction
   /**
    * @var string
    */
-  private $merchantId;
+  private $merchantTransId;
 
   /**
    * @var string
@@ -280,9 +280,9 @@ class Transaction
   /**
    * @return string
    */
-  public function getMerchantId()
+  public function getMerchantTransId()
   {
-    return $this->merchantId;
+    return $this->merchantTransId;
   }
 
   /**
@@ -436,11 +436,11 @@ class Transaction
   }
 
   /**
-   * @param string $merchantId
+   * @param string $merchantTransId
    */
-  public function setMerchantId($merchantId)
+  public function setMerchantTransId($merchantTransId)
   {
-    $this->merchantId = $merchantId;
+    $this->merchantTransId = $merchantTransId;
   }
 
   /**
@@ -467,7 +467,7 @@ class Transaction
     $this->transactionId = $this->tblTransaction->insert(
       $this->transactionTypeId, $this->transactionStatusId,
       $this->agencyTypeId, $this->customerId, $this->personId, $this->username, $this->amount, $this->fee,
-      $this->agencyId, $this->accountId, $this->merchantId, $this->apiTransactionId);
+      $this->agencyId, $this->accountId, $this->merchantTransId, $this->apiTransactionId);
   }
 
   /**
@@ -504,7 +504,7 @@ class Transaction
     $this->API = $transactionData['API'];
     $this->reason = $transactionData['Reason'];
     $this->note = $transactionData['Note'];
-    $this->merchantId = $transactionData['Reference'];
+    $this->merchantTransId = $transactionData['Reference'];
     $this->apiTransactionId = $transactionData['ApiTransactionId'];
   }
 
@@ -574,7 +574,7 @@ class Transaction
     $data['fee'] = $this->fee;
     $data['notes'] = (!$this->reason) ? "" : $this->reason;
     $data['controlNumber'] = (!$this->controlNumber) ? "" : $this->controlNumber;
-    $data['merchantId'] = (!$this->merchantId) ? "" : $this->merchantId;
+    $data['merchantTransId'] = (!$this->merchantTransId) ? "" : $this->merchantTransId;
     $data['information'] = $this->information;
 
     return $data;

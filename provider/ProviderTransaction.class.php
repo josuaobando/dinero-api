@@ -57,16 +57,16 @@ class ProviderTransaction
     $transaction->setTransactionStatusId(Transaction::STATUS_REQUESTED);
 
     //transaction request
-    $merchantId = trim($this->wsRequest->getParam('merchantId'));
     $amount = $this->wsRequest->requireNumericAndPositive('amount');
     $username = trim($this->wsRequest->requireNotNullOrEmpty('uid'));
     $agencyTypeId = $this->wsRequest->requireNumericAndPositive('type');
+    $merchantTransId = trim($this->wsRequest->getParam('merchantTransId'));
 
     $transaction->setFee(0);
     $transaction->setAmount($amount);
     $transaction->setUsername($username);
-    $transaction->setMerchantId($merchantId);
     $transaction->setAgencyTypeId($agencyTypeId);
+    $transaction->setMerchantTransId($merchantTransId);
 
     //validate if need to create the customer
     $customer->validateFromRequest($account, $this->wsRequest);
@@ -173,16 +173,16 @@ class ProviderTransaction
     $transaction->setTransactionStatusId(Transaction::STATUS_SUBMITTED);
 
     //transaction request
-    $merchantId = trim($this->wsRequest->getParam('merchantId'));
     $amount = $this->wsRequest->requireNumericAndPositive('amount');
     $username = trim($this->wsRequest->requireNotNullOrEmpty('uid'));
     $agencyTypeId = $this->wsRequest->requireNumericAndPositive('type');
+    $merchantTransId = trim($this->wsRequest->getParam('merchantTransId'));
 
     $transaction->setFee(0);
     $transaction->setAmount($amount);
     $transaction->setUsername($username);
-    $transaction->setMerchantId($merchantId);
     $transaction->setAgencyTypeId($agencyTypeId);
+    $transaction->setMerchantTransId($merchantTransId);
 
     //validate if need to create the customer
     $customer->validateFromRequest($account, $this->wsRequest);

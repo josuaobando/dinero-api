@@ -39,12 +39,12 @@ class TblTransaction extends Db
    * @param float $fee
    * @param int $agencyId
    * @param int $accountId
-   * @param string $reference
+   * @param string $merchantTransId
    * @param int $apiTransactionId
    *
    * @return int
    */
-  public function insert($transactionTypeId, $transactionStatusId, $agencyTypeId, $customerId, $personId, $username, $amount, $fee, $agencyId, $accountId, $reference, $apiTransactionId)
+  public function insert($transactionTypeId, $transactionStatusId, $agencyTypeId, $customerId, $personId, $username, $amount, $fee, $agencyId, $accountId, $merchantTransId, $apiTransactionId)
   {
     $sql = "CALL spTransaction_Insert('{transactionTypeId}', '{transactionStatusId}', '{agencyTypeId}', '{agencyId}', '{customerId}', '{personId}', '{username}', '{amount}', '{fee}', '{accountId}', '{reference}', '{apiTransactionId}', @TransactionId)";
 
@@ -60,7 +60,7 @@ class TblTransaction extends Db
     $params['amount'] = $amount;
     $params['fee'] = $fee;
     $params['accountId'] = $accountId;
-    $params['reference'] = $reference;
+    $params['reference'] = $merchantTransId;
     $params['apiTransactionId'] = $apiTransactionId;
 
     $this->setOutputParams(array('TransactionId'));
