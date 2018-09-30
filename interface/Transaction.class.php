@@ -575,7 +575,7 @@ class Transaction
     $data['notes'] = (!$this->reason) ? "" : $this->reason;
     $data['controlNumber'] = (!$this->controlNumber) ? "" : $this->controlNumber;
     $data['merchantTransId'] = (!$this->merchantTransId) ? "" : $this->merchantTransId;
-    $data['information'] = $this->information;
+    $data['information'] = (!$this->information) ? "" : $this->information;
 
     return $data;
   }

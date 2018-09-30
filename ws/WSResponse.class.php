@@ -5,10 +5,10 @@
  */
 class WSResponse
 {
-  protected $state = null;
-  protected $code = null;
-  protected $userMessage = null;
-  protected $systemMessage = null;
+  protected $state = "";
+  protected $code = "";
+  protected $userMessage = "";
+  protected $systemMessage = "";
 
   const STATE_OK = "1";
   const STATE_ERROR = "2";
