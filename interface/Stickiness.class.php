@@ -13,25 +13,37 @@ class Stickiness
   /**
    * #1: There was an issue with the authentication process or there was an invalid state in the execution.
    *
-   * #2: Receiver already linked to other company
+   * #2: [Rejected] Receiver already linked to other company
    */
   const STATUS_CODE_LINKED_OTHER_COMPANY = '2';
   /**
-   * Already linked to a one of your receivers
+   * [Rejected] Already linked to a one of your receivers
+   *
+   * @TODO: review
    */
   const STATUS_CODE_LINKED = '3';
   /**
-   * Already linked to a one of your pending receivers
+   * [Pending] Already linked to a one of your pending receivers
    */
   const STATUS_CODE_LINKED_PENDING = '4';
   /**
-   * [Rejected] Already linked to other company
+   * [Rejected] Already linked to other receiver (company)
    */
   const STATUS_CODE_LINKED_OTHER = '5';
   /**
    * [Rejected] This receiver is not linked to this sender
+   *
+   * @TODO: review
    */
   const STATUS_CODE_LINKED_OTHER_CUSTOMER = '6';
+  /**
+   * [Rejected] Max # of transaction per month exceeded
+   */
+  const STATUS_CODE_LIMIT_TRANSACTIONS = '7';
+  /**
+   * [Rejected] Max amount per month exceeded
+   */
+  const STATUS_CODE_LIMIT_AMOUNT = '8';
 
   /**
    * Pending Stickiness
@@ -439,18 +451,22 @@ class Stickiness
   /**
    * The web service checks if the sender is still available for new receiver's, is already linked to a receiver or is linked to a different merchant or company.
    *
-   * @throws P2PException
+   * @throws P2PException|P2PLimitException
    */
   public function register()
   {
     if(CoreConfig::WS_STICKINESS_ACTIVE && $this->checkConnection()){
       $result = null;
       try{
+
+        $transaction = Session::getTransaction();
+
         $params = $this->authParams();
         //required param
         $params['sender'] = $this->customer;
         $params['receiver'] = $this->person;
         $params['receiverId'] = $this->personalId;
+        $params['amount'] = $transaction->getAmount();
 
         $wsConnector = new WS();
         $wsConnector->setReader(new Reader_Json());
@@ -491,6 +507,12 @@ class Stickiness
             $this->rejectProvider();
             throw new P2PException("The Customer is linked to another Agency (Merchant).");
             break;
+          case self::STATUS_CODE_LIMIT_TRANSACTIONS:
+            throw new P2PLimitException("Max # of transaction per month exceeded");
+            break;
+          case self::STATUS_CODE_LIMIT_AMOUNT:
+            throw new P2PLimitException("Max amount per month exceeded");
+            break;
           default:
             ExceptionManager::handleException(new P2PException("Invalid Response Code >> Code: $resultCode  Message: $resultCodeMessage : (" . __FUNCTION__ . ")"));
             throw new TransactionException("Due to external factors, we cannot give this Customer a Name.");
@@ -509,18 +531,23 @@ class Stickiness
 
   /**
    * The web service confirms or completes the transaction, in this service is where the sender gets linked to the receiver.
+   *
+   * @throws P2PException|P2PLimitException
    */
   public function complete()
   {
     if(CoreConfig::WS_STICKINESS_ACTIVE && $this->checkConnection()){
       $result = null;
       try{
+        $transaction = Session::getTransaction();
+
         $params = $this->authParams();
         //required param
         $params['verificationId'] = $this->verificationId;
         $params['receiver'] = $this->person;
         $params['receiverId'] = $this->personalId;
         $params['controlNumber'] = $this->controlNumber;
+        $params['amountConfirmed'] = $transaction->getAmount();
 
         $apiURL = $this->agencyP2P_Url;
         $wsConnector = new WS();
@@ -559,6 +586,12 @@ class Stickiness
           case self::STATUS_CODE_LINKED_OTHER_CUSTOMER:
             $this->rejectProvider();
             throw new P2PException("Customer is linked with another Merchant or Person. Reject this transaction.");
+            break;
+          case self::STATUS_CODE_LIMIT_TRANSACTIONS:
+            throw new P2PLimitException("Max # of transaction per month exceeded. Reject this transaction.");
+            break;
+          case self::STATUS_CODE_LIMIT_AMOUNT:
+            throw new P2PLimitException("Max amount per month exceeded. Reject this transaction.");
             break;
           default:
             ExceptionManager::handleException(new P2PException("Invalid Response Code >> Code: $resultCode  Message: $resultCodeMessage : (" . __FUNCTION__ . ")"));

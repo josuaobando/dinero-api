@@ -100,6 +100,9 @@ class ProviderTransaction
         }catch(P2PException $exception){
           $providerException = $exception;
           continue;
+        }catch(P2PLimitException $exception){
+          $providerException = $exception;
+          continue;
         }catch(APIBlackListException $exception){
           $providerException = $exception;
           continue;
@@ -214,6 +217,9 @@ class ProviderTransaction
           $providerException = $exception;
           continue;
         }catch(P2PException $exception){
+          $providerException = $exception;
+          continue;
+        }catch(P2PLimitException $exception){
           $providerException = $exception;
           continue;
         }catch(APIBlackListException $exception){
