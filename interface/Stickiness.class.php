@@ -467,6 +467,7 @@ class Stickiness
         $params['receiver'] = $this->person;
         $params['receiverId'] = $this->personalId;
         $params['amount'] = $transaction->getAmount();
+        $params['account'] = $transaction->getUsername();
 
         $wsConnector = new WS();
         $wsConnector->setReader(new Reader_Json());
