@@ -30,7 +30,7 @@ class ProviderNotifications
 
       $bodyEmail = $body;
       if($template && $template != 'default'){
-        $bodyEmail = MailManager::getEmailTemplate($template, array('body' => $body));
+        $bodyEmail = MailManager::getEmailTemplate($template, array('body' => $body, 'message' => ''));
       }
 
       $send = MailManager::sendEmail($recipients, $subject, $bodyEmail);
