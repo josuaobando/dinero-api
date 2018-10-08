@@ -28,9 +28,9 @@ class Account
   private $username;
 
   /**
-   * @var fullname
+   * @var name
    */
-  private $fullName;
+  private $name;
 
   /**
    * password
@@ -109,7 +109,7 @@ class Account
     $this->accountId = $accountData['Account_Id'];
     $this->username = $accountData['Username'];
     $this->password = $accountData['Password'];
-    $this->fullName = $accountData['FullName'];
+    $this->name = $accountData['Name'];
     $this->apiUser = $accountData['API_User'];
     $this->apiPass = $accountData['API_Pass'];
 
@@ -225,15 +225,11 @@ class Account
   public function toArray()
   {
     $data = array();
-
     $data['username'] = $this->username;
-    $data['authenticated'] = $this->authenticated;
-
     if($this->authenticated){
-      $data['fullName'] = $this->fullName;
+      $data['name'] = $this->name;
       $data['permission'] = $this->permission;
     }
-
     return $data;
   }
 
