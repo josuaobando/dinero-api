@@ -228,6 +228,9 @@ class ProviderTransaction
         }catch(APIPersonException $exception){
           $providerException = $exception;
           continue;
+        }catch(APILimitException $exception){
+          $providerException = $exception;
+          continue;
         }catch(Exception $exception){
           throw $exception;
         }

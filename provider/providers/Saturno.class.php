@@ -210,14 +210,14 @@ class Saturno extends Provider
           $this->apiMessage = 'The Customer (Receiver) has been blacklisted';
           throw new APIBlackListException($this->apiMessage);
         }elseif(stripos(strtolower($this->apiMessage), 'limit') && stripos(strtolower($this->apiMessage), 'reached')){
-          $this->apiMessage = 'The Customer (Receiver) has exceeded the limits in MG';
+          $this->apiMessage = 'The Customer (Receiver) has exceeded the limits';
           throw new APILimitException($this->apiMessage);
         }
 
       }else{
         if((stripos(strtolower($this->apiMessage), 'black') && stripos(strtolower($this->apiMessage), 'list')) || (stripos($this->apiMessage, 'Black List'))){
           $this->apiMessage = 'The Customer (Receiver) has been blacklisted';
-          return null;
+          throw new APIBlackListException($this->apiMessage);
         }
       }
     }
