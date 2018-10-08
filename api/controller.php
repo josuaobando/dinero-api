@@ -84,6 +84,22 @@ function ctrl_getAgencies()
 }
 
 /**
+ * get transactions
+ */
+function ctrl_transactions()
+{
+  require_once('api/client.php');
+}
+
+/**
+ * get report data
+ */
+function ctrl_report()
+{
+  require_once('api/client.php');
+}
+
+/**
  * start controller
  */
 startController();
