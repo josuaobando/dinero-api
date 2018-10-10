@@ -94,6 +94,29 @@ class System
   }
 
   /**
+   * get transactions by filters
+   *
+   * @param $statusId
+   * @param $transactionTypeId
+   * @param $filterAgencyType
+   * @param $filterAgencyId
+   * @param $accountId
+   * @param $beginDate
+   * @param $endDate
+   * @param $controlNumber
+   * @param $customer
+   * @param $transactionId
+   * @param $reference
+   * @param $currentPage
+   *
+   * @return array
+   */
+  public function report($statusId, $transactionTypeId, $filterAgencyType, $filterAgencyId, $accountId, $beginDate, $endDate, $controlNumber, $customer, $transactionId, $reference, $currentPage)
+  {
+    return $this->tblSystem->getTransactionsReport($statusId, $transactionTypeId, $filterAgencyType, $filterAgencyId, $accountId, $beginDate, $endDate, $controlNumber, $customer, $transactionId, $reference, $currentPage, 9999);
+  }
+
+  /**
    * get attempts transactions
    *
    * @return array

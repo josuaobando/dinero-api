@@ -23,11 +23,17 @@ function authenticate($wsRequest)
       $wsResponse->addElement('account', $account);
       $wsResponse->addElement('token', Session::$sid);
     }else{
-      $wsResponse = new WSResponseError('Invalid information!');
+      if($account->getAccountId()){
+        $wsResponse = new WSResponseError('Invalid information!', 'authenticate.reject');
+      }else{
+        $wsResponse = new WSResponseError('Invalid information!', 'authenticate.fail');
+      }
     }
 
   }catch(InvalidParameterException $ex){
-    $wsResponse = new WSResponseError($ex->getMessage());
+    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception.parameter');
+  }catch(Exception $ex){
+    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception');
   }
 
   return $wsResponse;
@@ -48,9 +54,9 @@ function getCountries($wsRequest)
     $wsResponse = new WSResponseOk();
     $wsResponse->addElement('countries', $countries);
   }catch(SessionException $ex){
-    $wsResponse = new WSResponseError($ex->getMessage());
+    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.session.expired');
   }catch(Exception $ex){
-    $wsResponse = new WSResponseError($ex->getMessage());
+    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception');
   }
 
   return $wsResponse;
@@ -71,9 +77,9 @@ function getAgencies($wsRequest)
     $wsResponse = new WSResponseOk();
     $wsResponse->addElement('agencies', $agencies);
   }catch(SessionException $ex){
-    $wsResponse = new WSResponseError($ex->getMessage());
+    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.session.expired');
   }catch(Exception $ex){
-    $wsResponse = new WSResponseError($ex->getMessage());
+    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception');
   }
 
   return $wsResponse;
@@ -96,11 +102,11 @@ function transactions($wsRequest)
     $wsResponse = new WSResponseOk();
     $wsResponse->addElement('transactions', $transactions);
   }catch(InvalidParameterException $ex){
-    $wsResponse = new WSResponseError($ex->getMessage());
+    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception.parameter');
   }catch(SessionException $ex){
-    $wsResponse = new WSResponseError($ex->getMessage());
+    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.session.expired');
   }catch(Exception $ex){
-    $wsResponse = new WSResponseError($ex->getMessage());
+    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception');
   }
 
   return $wsResponse;
@@ -116,7 +122,6 @@ function report($wsRequest)
   try{
     $account = Session::getAccount();
 
-    $currentPage = $wsRequest->getParam("currentPage", "1");
     $beginDate = $wsRequest->getParam("beginDate", "");
     $endDate = $wsRequest->getParam("endDate", "");
     $statusId = $wsRequest->getParam("statusId", "3");
@@ -145,7 +150,7 @@ function report($wsRequest)
     }
 
     $system = new System();
-    $dataReport = $system->transactionsReport($statusId, $transactionType, $agencyType, $agencyId, $account->getAccountId(), $beginDate, $endDate, $controlNumber, $username, $transactionId, $merchantTransId, $currentPage);
+    $dataReport = $system->report($statusId, $transactionType, $agencyType, $agencyId, $account->getAccountId(), $beginDate, $endDate, $controlNumber, $username, $transactionId, $merchantTransId, 0);
     $transactions = $dataReport['transactions'];
     $summary = $dataReport['summary'];
     $total = $dataReport['total'][0]['total'];
@@ -155,9 +160,9 @@ function report($wsRequest)
     $wsResponse->addElement('summary', $summary);
     $wsResponse->addElement('total', $total);
   }catch(SessionException $ex){
-    $wsResponse = new WSResponseError($ex->getMessage());
+    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.session.expired');
   }catch(Exception $ex){
-    $wsResponse = new WSResponseError($ex->getMessage());
+    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception');
   }
 
   return $wsResponse;

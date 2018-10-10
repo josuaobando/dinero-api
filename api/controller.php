@@ -35,11 +35,11 @@ function startController()
           exit();
         }else{
           //this section is to handle the invalid function error
-          $wsResponse = new WSResponseError("invalid.action.$action");
+          $wsResponse = new WSResponseError("Invalid action ('$action')", "invalid.action");
         }
       }else{
         //this section is to handle the invalid function error
-        $wsResponse = new WSResponseError('session.expired');
+        $wsResponse = new WSResponseError('Session has expired', 'session.expired');
       }
     }elseif($action === 'authenticate'){
       //call the proper function
@@ -49,12 +49,12 @@ function startController()
         exit();
       }else{
         //this section is to handle the invalid function error
-        $wsResponse = new WSResponseError("invalid.action.authenticate");
+        $wsResponse = new WSResponseError("Invalid action ('$action')", "invalid.action");
       }
     }
 
   }else{
-    $wsResponse = new WSResponseError("invalid.action.empty");
+    $wsResponse = new WSResponseError('Action is empty', "invalid.action.empty");
   }
 
   //set the header of the response

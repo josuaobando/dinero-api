@@ -6,9 +6,14 @@
 class WSResponseOk extends WSResponse
 {
 
-  public function __construct()
+  /**
+   * WSResponseOk constructor.
+   *
+   * @param string $systemMessage
+   */
+  public function __construct($systemMessage = "")
   {
-    parent::__construct();
+    parent::__construct($systemMessage);
   }
 
 }
