@@ -38,7 +38,7 @@ class Saturno extends Provider
    *
    * @return Person
    *
-   * @throws APIBlackListException|APILimitException|APIPersonException
+   * @throws APIBlackListException|APILimitException|APIPersonException|APIException
    */
   public function receiver()
   {
@@ -112,6 +112,8 @@ class Saturno extends Provider
         }elseif(stripos(strtolower($this->apiMessage), 'limit') && stripos(strtolower($this->apiMessage), 'reached')){
           $this->apiMessage = 'The Customer (Sender) has exceeded the limits in MG';
           throw new APILimitException($this->apiMessage);
+        }elseif($this->apiMessage){
+          throw new APIException($this->apiMessage);
         }
 
       }else{
@@ -123,8 +125,7 @@ class Saturno extends Provider
     }
 
     Log::custom(__CLASS__, "Invalid Object Response" . " \n Request: \n\n " . $this->getLastRequest() . " \n Response: \n\n " . Util::objToStr($response));
-    $this->apiMessage = 'We cannot give a Receiver for this Customer (Sender)';
-    return null;
+    throw new APIException('We cannot give a Receiver for this Customer (Sender)');
   }
 
   /**
@@ -132,7 +133,7 @@ class Saturno extends Provider
    *
    * @return null
    *
-   * @throws APILimitException|APIPersonException|APIBlackListException
+   * @throws APILimitException|APIPersonException|APIBlackListException|APIException
    */
   public function sender()
   {
@@ -194,7 +195,7 @@ class Saturno extends Provider
           return Session::setPerson($person);
         }
 
-      }elseif($this->apiStatus == self::STATUS_API_ERROR || $this->apiCode != self::RESPONSE_SUCCESS){
+      }elseif($this->apiStatus == self::STATUS_API_ERROR || $this->apiCode == self::RESPONSE_ERROR){
 
         if(stripos($this->apiMessage, 'No Names Available') !== false || stripos($this->apiMessage, 'No Payouts Names Available') !== false){
 
@@ -212,6 +213,8 @@ class Saturno extends Provider
         }elseif(stripos(strtolower($this->apiMessage), 'limit') && stripos(strtolower($this->apiMessage), 'reached')){
           $this->apiMessage = 'The Customer (Receiver) has exceeded the limits';
           throw new APILimitException($this->apiMessage);
+        }elseif($this->apiMessage){
+          throw new APIException($this->apiMessage);
         }
 
       }else{
@@ -223,8 +226,7 @@ class Saturno extends Provider
     }
 
     Log::custom(__CLASS__, "Invalid Object Response" . " \n Request: \n\n " . $this->getLastRequest() . " \n Response: \n\n " . Util::objToStr($response));
-    $this->apiMessage = 'We cannot give a Sender for this Customer (Receiver)';
-    return null;
+    throw new APIException('We cannot give a Receiver for this Customer (Sender)');
   }
 
   /**

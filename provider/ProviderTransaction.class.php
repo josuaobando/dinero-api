@@ -112,6 +112,9 @@ class ProviderTransaction
         }catch(APILimitException $exception){
           $providerException = $exception;
           continue;
+        }catch(APIException $exception){
+          $providerException = $exception;
+          continue;
         }catch(Exception $exception){
           throw $exception;
         }
@@ -229,6 +232,9 @@ class ProviderTransaction
           $providerException = $exception;
           continue;
         }catch(APILimitException $exception){
+          $providerException = $exception;
+          continue;
+        }catch(APIException $exception){
           $providerException = $exception;
           continue;
         }catch(Exception $exception){
