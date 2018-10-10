@@ -25,22 +25,30 @@ function startController()
     //get session id
     $sessionId = $wsRequest->getParam('token');
     if($sessionId){
-      Session::startSession($sessionId);
-      $account = Session::getAccount();
-      if($account->isAuthenticated()){
-        //call the proper function
-        if(function_exists($prefix . $action)){
-          //call the function and exit since the function will do the whole work
-          call_user_func($prefix . $action);
-          exit();
+
+      try{
+        Session::startSession($sessionId);
+        $account = Session::getAccount();
+        if($account->isAuthenticated()){
+          //call the proper function
+          if(function_exists($prefix . $action)){
+            //call the function and exit since the function will do the whole work
+            call_user_func($prefix . $action);
+            exit();
+          }else{
+            //this section is to handle the invalid function error
+            $wsResponse = new WSResponseError("Invalid action ('$action')", "invalid.action");
+          }
         }else{
           //this section is to handle the invalid function error
-          $wsResponse = new WSResponseError("Invalid action ('$action')", "invalid.action");
+          $wsResponse = new WSResponseError('Session has expired', 'invalid.session.expired');
         }
-      }else{
-        //this section is to handle the invalid function error
-        $wsResponse = new WSResponseError('Session has expired', 'session.expired');
+      }catch(SessionException $ex){
+        $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.session.expired');
+      }catch(Exception $ex){
+        $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception');
       }
+
     }elseif($action === 'authenticate'){
       //call the proper function
       if(function_exists($prefix . $action)){
