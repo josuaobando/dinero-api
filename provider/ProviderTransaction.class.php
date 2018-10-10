@@ -386,9 +386,9 @@ class ProviderTransaction
   /**
    * update transaction data
    *
-   * @return int
+   * @return int|bool
    *
-   * @throws InvalidStateException+
+   * @throws InvalidStateException|*
    */
   public function transactionUpdate()
   {
@@ -414,10 +414,6 @@ class ProviderTransaction
       throw new InvalidStateException("The transaction [$transactionId] has not been restored, please check!");
     }
 
-    if($transaction->getProviderId() != Dinero::PROVIDER_ID){
-      throw new InvalidStateException("Transaction cannot be Modify!");
-    }
-
     //get current status
     $currentStatusId = $transaction->getTransactionStatusId();
 
@@ -429,6 +425,19 @@ class ProviderTransaction
     $transaction->setFee($fee);
     $transaction->setControlNumber($controlNumber);
     $transaction->setModifiedBy($account->getAccountId());
+
+    //validate to provider
+    if($transaction->getProviderId() != Dinero::PROVIDER_ID){
+      if($currentStatusId == Transaction::STATUS_REJECTED && $statusId == Transaction::STATUS_SUBMITTED && $account->getAccountId() == '1'){
+        $provider = $transaction->getProvider();
+        $confirm = $provider->confirm();
+        if(!$confirm){
+          throw new TransactionException("Transaction cannot be confirmed. Please try again in a few minutes!");
+        }
+      }else{
+        throw new InvalidStateException("Transaction cannot be Modify!");
+      }
+    }
 
     //validate if is update transaction
     if($currentStatusId != Transaction::STATUS_APPROVED && $statusId == Transaction::STATUS_APPROVED){
