@@ -16,17 +16,32 @@ function startController()
   }
 
   //prefix in order to avoid a conflict with the function names in the webservices
-  $prefix = "ctrl_";
+  $prefix = "f_";
 
   //check if the requested function is valid
   $action = $wsRequest->getParam('f');
+  if(!empty($action)){
 
-  //get session id
-  $sessionId = $wsRequest->getParam('token');
-  if($sessionId){
-    Session::startSession($sessionId);
-    $account = Session::getAccount();
-    if($account->isAuthenticated()){
+    //get session id
+    $sessionId = $wsRequest->getParam('token');
+    if($sessionId){
+      Session::startSession($sessionId);
+      $account = Session::getAccount();
+      if($account->isAuthenticated()){
+        //call the proper function
+        if(function_exists($prefix . $action)){
+          //call the function and exit since the function will do the whole work
+          call_user_func($prefix . $action);
+          exit();
+        }else{
+          //this section is to handle the invalid function error
+          $wsResponse = new WSResponseError("invalid.action.$action");
+        }
+      }else{
+        //this section is to handle the invalid function error
+        $wsResponse = new WSResponseError('session.expired');
+      }
+    }elseif($action === 'authenticate'){
       //call the proper function
       if(function_exists($prefix . $action)){
         //call the function and exit since the function will do the whole work
@@ -34,22 +49,12 @@ function startController()
         exit();
       }else{
         //this section is to handle the invalid function error
-        $wsResponse = new WSResponseError("Invalid function in controller($action)");
+        $wsResponse = new WSResponseError("invalid.action.authenticate");
       }
-    }else{
-      //this section is to handle the invalid function error
-      $wsResponse = new WSResponseError('Session has expired');
     }
-  }elseif($action === 'authenticate'){
-    //call the proper function
-    if(function_exists($prefix . $action)){
-      //call the function and exit since the function will do the whole work
-      call_user_func($prefix . $action);
-      exit();
-    }else{
-      //this section is to handle the invalid function error
-      $wsResponse = new WSResponseError("Invalid function in controller($action)");
-    }
+
+  }else{
+    $wsResponse = new WSResponseError("invalid.action.empty");
   }
 
   //set the header of the response
@@ -62,7 +67,7 @@ function startController()
 /**
  * login account
  */
-function ctrl_authenticate()
+function f_authenticate()
 {
   require_once('api/client.php');
 }
@@ -70,7 +75,7 @@ function ctrl_authenticate()
 /**
  * get countries
  */
-function ctrl_getCountries()
+function f_getCountries()
 {
   require_once('api/client.php');
 }
@@ -78,7 +83,7 @@ function ctrl_getCountries()
 /**
  * get agencies
  */
-function ctrl_getAgencies()
+function f_getAgencies()
 {
   require_once('api/client.php');
 }
@@ -86,7 +91,7 @@ function ctrl_getAgencies()
 /**
  * get transactions
  */
-function ctrl_transactions()
+function f_transactions()
 {
   require_once('api/client.php');
 }
@@ -94,7 +99,7 @@ function ctrl_transactions()
 /**
  * get report data
  */
-function ctrl_report()
+function f_report()
 {
   require_once('api/client.php');
 }
