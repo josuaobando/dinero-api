@@ -15,6 +15,9 @@ function startController()
     $wsRequest->overwriteRequest($_REQUEST);
   }
 
+  //prefix in order to avoid a conflict with the function names in the webservices
+  $prefix = "f_";
+
   //check if the requested function is valid
   $action = $wsRequest->getParam('f');
   if(!empty($action)){
@@ -28,9 +31,9 @@ function startController()
         $account = Session::getAccount();
         if($account->isAuthenticated()){
           //call the proper function
-          if(function_exists($action)){
+          if(function_exists($prefix . $action)){
             //call the function and exit since the function will do the whole work
-            call_user_func($action);
+            call_user_func($prefix . $action);
             exit();
           }else{
             //this section is to handle the invalid function error
@@ -48,9 +51,9 @@ function startController()
 
     }elseif($action === 'authenticate'){
       //call the proper function
-      if(function_exists($action)){
+      if(function_exists($prefix . $action)){
         //call the function and exit since the function will do the whole work
-        call_user_func($action);
+        call_user_func($prefix . $action);
         exit();
       }else{
         //this section is to handle the invalid function error
@@ -72,7 +75,7 @@ function startController()
 /**
  * login account
  */
-function authenticate()
+function f_authenticate()
 {
   require_once('api/client.php');
 }
@@ -80,7 +83,7 @@ function authenticate()
 /**
  * get countries
  */
-function getCountries()
+function f_getCountries()
 {
   require_once('api/client.php');
 }
@@ -88,7 +91,7 @@ function getCountries()
 /**
  * get agencies
  */
-function getAgencies()
+function f_getAgencies()
 {
   require_once('api/client.php');
 }
@@ -96,7 +99,7 @@ function getAgencies()
 /**
  * get transactions
  */
-function transactions()
+function f_transactions()
 {
   require_once('api/client.php');
 }
@@ -104,7 +107,7 @@ function transactions()
 /**
  * get report data
  */
-function report()
+function f_report()
 {
   require_once('api/client.php');
 }
