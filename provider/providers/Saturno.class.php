@@ -23,7 +23,7 @@ class Saturno extends Provider
   const STATUS_API_CANCELED = 'cancelled';
   const STATUS_API_ERROR = 'error';
   const RESPONSE_ERROR = 'fail';
-  const RESPONSE_SUCCESS = '0';
+  const RESPONSE_SUCCESS = 0;
 
   /**
    * new Transaction instance
@@ -94,7 +94,7 @@ class Saturno extends Provider
         $transaction->setProviderId(self::PROVIDER_ID);
 
         return Session::setPerson($person);
-      }elseif($this->apiStatus == self::STATUS_API_ERROR || $this->apiCode == self::RESPONSE_ERROR){
+      }elseif($this->apiStatus == self::STATUS_API_ERROR || $this->apiCode == self::RESPONSE_ERROR || $this->apiCode > self::RESPONSE_SUCCESS){
 
         if(stripos($this->apiMessage, 'No Names Available') !== false){
 
@@ -195,7 +195,7 @@ class Saturno extends Provider
           return Session::setPerson($person);
         }
 
-      }elseif($this->apiStatus == self::STATUS_API_ERROR || $this->apiCode == self::RESPONSE_ERROR){
+      }elseif($this->apiStatus == self::STATUS_API_ERROR || $this->apiCode == self::RESPONSE_ERROR || $this->apiCode > self::RESPONSE_SUCCESS){
 
         if(stripos($this->apiMessage, 'No Names Available') !== false || stripos($this->apiMessage, 'No Payouts Names Available') !== false){
 
@@ -226,7 +226,7 @@ class Saturno extends Provider
     }
 
     Log::custom(__CLASS__, "Invalid Object Response" . " \n Request: \n\n " . $this->getLastRequest() . " \n Response: \n\n " . Util::objToStr($response));
-    throw new APIException('We cannot give a Receiver for this Customer (Sender)');
+    throw new APIException('We cannot give a Sender for this Customer (Receiver)');
   }
 
   /**
