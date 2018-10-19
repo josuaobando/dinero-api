@@ -127,7 +127,7 @@ function report($wsRequest)
     $statusId = $wsRequest->getParam("statusId", "3");
     $statusId = ($statusId == "-1") ? "0" : $statusId;
     $transactionType = $wsRequest->getParam("transactionType", "0");
-    $agencyType = $wsRequest->getParam("agencyType", "0");
+    $agencyType = $wsRequest->getParam("agencyTypeId", "0");
     $agencyId = $wsRequest->getParam("agencyId", "0");
     $username = $wsRequest->getParam("username", "");
 
