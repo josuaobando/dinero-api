@@ -159,6 +159,8 @@ function report($wsRequest)
     $wsResponse->addElement('transactions', $transactions);
     $wsResponse->addElement('summary', $summary);
     $wsResponse->addElement('total', $total);
+  }catch(InvalidParameterException $ex){
+    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception.parameter');
   }catch(SessionException $ex){
     $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.session.expired');
   }catch(Exception $ex){
