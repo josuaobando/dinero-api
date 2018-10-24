@@ -386,32 +386,32 @@ class ProviderTransaction
   /**
    * update transaction data
    *
-   * @return int|bool
+   * @return int
    *
-   * @throws InvalidStateException|*
+   * @throws InvalidStateException|TransactionException
    */
   public function transactionUpdate()
   {
     $account = Session::getAccount();
     $transactionId = $this->wsRequest->requireNumericAndPositive("transactionId");
-    $transactionTypeId = $this->wsRequest->requireNumericAndPositive("transactionTypeId");
     $statusId = $this->wsRequest->requireNumericAndPositive("status");
+    $amount = $this->wsRequest->requireNumericAndPositive("amount");
     $reason = $this->wsRequest->getParam("reason", "");
     $note = $this->wsRequest->getParam("note", "");
-    $amount = $this->wsRequest->requireNumericAndPositive("amount");
-    $fee = $this->wsRequest->getParam("fee");
-
-    if($transactionTypeId == Transaction::TYPE_SENDER && $statusId == Transaction::STATUS_REJECTED){
-      $controlNumber = $this->wsRequest->getParam("controlNumber", '');
-    }else{
-      $controlNumber = $this->wsRequest->requireNumericAndPositive("controlNumber");
-    }
+    $fee = $this->wsRequest->getParam("fee", 0);
 
     //restore and load transaction information
     $transaction = Session::getTransaction();
     $transaction->restore($transactionId);
     if(!$transaction->getTransactionId()){
       throw new InvalidStateException("The transaction [$transactionId] has not been restored, please check!");
+    }
+
+    $transactionTypeId = $transaction->getTransactionTypeId();
+    if($transactionTypeId == Transaction::TYPE_SENDER && $statusId == Transaction::STATUS_REJECTED){
+      $controlNumber = $this->wsRequest->getParam("controlNumber", '');
+    }else{
+      $controlNumber = $this->wsRequest->requireNumericAndPositive("controlNumber");
     }
 
     //get current status

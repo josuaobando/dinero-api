@@ -113,6 +113,14 @@ function f_report()
 }
 
 /**
+ * update transaction
+ */
+function f_transactionUpdate()
+{
+  require_once('api/client.php');
+}
+
+/**
  * start controller
  */
 startController();
