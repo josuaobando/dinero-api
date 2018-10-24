@@ -121,6 +121,14 @@ function f_transactionUpdate()
 }
 
 /**
+ * get transaction data
+ */
+function f_transaction()
+{
+  require_once('api/client.php');
+}
+
+/**
  * start controller
  */
 startController();

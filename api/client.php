@@ -144,6 +144,7 @@ function report($wsRequest)
         $wsResponse->addElement('transactions', array());
         $wsResponse->addElement('summary', array());
         $wsResponse->addElement('total', 0);
+
         return $wsResponse;
       }
 
@@ -182,15 +183,37 @@ function transactionUpdate($wsRequest)
 
     $providerTransaction = new ProviderTransaction($wsRequest);
     $update = $providerTransaction->transactionUpdate();
-    if($update){
-      $transactionId = $wsRequest->requireNumericAndPositive("transactionId");
-      $tblTransaction = TblTransaction::getInstance();
-      $transactionData = $tblTransaction->getTransaction($transactionId);
-    }
 
     $wsResponse = new WSResponseOk();
     $wsResponse->addElement('update', $update);
-    $wsResponse->addElement('transactionData', $transactionData);
+  }catch(InvalidParameterException $ex){
+    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception.parameter');
+  }catch(SessionException $ex){
+    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.session.expired');
+  }catch(Exception $ex){
+    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception');
+  }
+
+  return $wsResponse;
+}
+
+/**
+ * @param WSRequest $wsRequest
+ *
+ * @return WSResponseError|WSResponseOk
+ */
+function transaction($wsRequest)
+{
+  try{
+    Session::getAccount();
+
+    $transactionId = $wsRequest->requireNumericAndPositive("transactionId");
+
+    $tblTransaction = TblTransaction::getInstance();
+    $transactionData = $tblTransaction->getTransaction($transactionId);
+
+    $wsResponse = new WSResponseOk();
+    $wsResponse->addElement('transaction', $transactionData);
   }catch(InvalidParameterException $ex){
     $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception.parameter');
   }catch(SessionException $ex){
