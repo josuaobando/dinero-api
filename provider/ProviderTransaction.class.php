@@ -411,7 +411,11 @@ class ProviderTransaction
     if($transactionTypeId == Transaction::TYPE_SENDER && $statusId == Transaction::STATUS_REJECTED){
       $controlNumber = $this->wsRequest->getParam("controlNumber", '');
     }else{
-      $controlNumber = $this->wsRequest->requireNumericAndPositive("controlNumber");
+      if($statusId == Transaction::STATUS_SUBMITTED || $statusId == Transaction::STATUS_APPROVED){
+        $controlNumber = $this->wsRequest->requireNumericAndPositive("controlNumber");
+      }else{
+        $controlNumber = $this->wsRequest->getParam("controlNumber", '');
+      }
     }
 
     //get current status

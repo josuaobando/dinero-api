@@ -182,9 +182,15 @@ function transactionUpdate($wsRequest)
 
     $providerTransaction = new ProviderTransaction($wsRequest);
     $update = $providerTransaction->transactionUpdate();
+    if($update){
+      $transactionId = $wsRequest->requireNumericAndPositive("transactionId");
+      $tblTransaction = TblTransaction::getInstance();
+      $transactionData = $tblTransaction->getTransaction($transactionId);
+    }
 
     $wsResponse = new WSResponseOk();
     $wsResponse->addElement('update', $update);
+    $wsResponse->addElement('transactionData', $transactionData);
   }catch(InvalidParameterException $ex){
     $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception.parameter');
   }catch(SessionException $ex){
