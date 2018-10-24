@@ -184,7 +184,7 @@ function transactionUpdate($wsRequest)
     $update = $providerTransaction->transactionUpdate();
 
     $wsResponse = new WSResponseOk();
-    $wsResponse->addElement('total', $update);
+    $wsResponse->addElement('update', $update);
   }catch(InvalidParameterException $ex){
     $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception.parameter');
   }catch(SessionException $ex){
