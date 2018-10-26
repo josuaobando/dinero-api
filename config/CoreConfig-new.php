@@ -90,6 +90,16 @@ class CoreConfig
   const MESSAGE_QUEUE_URL = 'http://api.dinerosegurohf:8080/mqueue/ws/mQueueProcessor.php';
 
   /**
+   * message queue service enable flag
+   */
+  const MESSAGE_QUEUE_ENABLE = false;
+
+  /**
+   * message queue service enable flag for wsRequest logs
+   */
+  const MESSAGE_QUEUE_WS_REQUEST_ENABLE = false;
+
+  /**
    * path where all system logs will be stored
    *
    * @var string
