@@ -124,7 +124,7 @@ class Saturno extends Provider
       }
     }
 
-    Log::custom(__CLASS__, "Invalid Object Response" . " \n Request: \n\n " . $this->getLastRequest() . " \n Response: \n\n " . Util::objToStr($response));
+    Log::custom(__CLASS__, "Invalid Object Response >> " . __FUNCTION__ . " >>" . " \n Request: \n\n " . $this->getLastRequest() . " \n Response: \n\n " . Util::objToStr($response));
     throw new APIException('We cannot give a Receiver for this Customer (Sender)');
   }
 
@@ -210,7 +210,7 @@ class Saturno extends Provider
         }elseif((stripos(strtolower($this->apiMessage), 'black') && stripos(strtolower($this->apiMessage), 'list')) || (stripos($this->apiMessage, 'Black List'))){
           $this->apiMessage = 'The Customer (Receiver) has been blacklisted';
           throw new APIBlackListException($this->apiMessage);
-        }elseif(stripos(strtolower($this->apiMessage), 'limit') && stripos(strtolower($this->apiMessage), 'reached')){
+        }elseif(stripos(strtolower($this->apiMessage), 'limit') && stripos(strtolower($this->apiMessage), 'reached') || $this->apiMessage == 'Receiver reached payouts names limit'){
           $this->apiMessage = 'The Customer (Receiver) has exceeded the limits';
           throw new APILimitException($this->apiMessage);
         }elseif($this->apiMessage){
@@ -230,7 +230,7 @@ class Saturno extends Provider
       }
     }
 
-    Log::custom(__CLASS__, "Invalid Object Response" . " \n Request: \n\n " . $this->getLastRequest() . " \n Response: \n\n " . Util::objToStr($response));
+    Log::custom(__CLASS__, "Invalid Object Response >> " . __FUNCTION__ . " >>" . " \n Request: \n\n " . $this->getLastRequest() . " \n Response: \n\n " . Util::objToStr($response));
     throw new APIException('We cannot give a Sender for this Customer (Receiver)');
   }
 
