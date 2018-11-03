@@ -597,7 +597,7 @@ class Stickiness
             throw new P2PException("Customer is linked with another Merchant or Person. Reject this transaction.");
             break;
           case self::STATUS_CODE_LIMIT_TRANSACTIONS:
-            throw new P2PLimitException("Max # of transaction per month exceeded. Reject this transaction.");
+            throw new P2PLimitException("Max # of transactions per month exceeded. Reject this transaction.");
             break;
           case self::STATUS_CODE_LIMIT_AMOUNT:
             throw new P2PLimitException("Max amount per month exceeded. Reject this transaction.");
