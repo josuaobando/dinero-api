@@ -518,7 +518,7 @@ class Stickiness
             throw new P2PLimitException("Max amount per month exceeded");
             break;
           case self::STATUS_CODE_LINKED_OTHER_AGENCY:
-            ExceptionManager::handleException(new P2PException("Customer [$this->customer] already linked to other of yours agencies."));
+            Log::custom(__CLASS__, "Customer [$this->customer] already linked to other of yours agencies or network.");
             throw new P2PException("Customer is linked to another Agency or Network.");
             break;
           default:
