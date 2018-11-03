@@ -1,6 +1,6 @@
 <?php
 
-require_once('system/Startup.class.php');
+require_once('AppManager/Startup.class.php');
 
 /**
  * account login
@@ -22,12 +22,10 @@ function authenticate($wsRequest)
       $wsResponse = new WSResponseOk();
       $wsResponse->addElement('account', $account);
       $wsResponse->addElement('token', Session::$sid);
+    }elseif($account->getAccountId()){
+      $wsResponse = new WSResponseError('Invalid information!', 'authenticate.reject');
     }else{
-      if($account->getAccountId()){
-        $wsResponse = new WSResponseError('Invalid information!', 'authenticate.reject');
-      }else{
-        $wsResponse = new WSResponseError('Invalid information!', 'authenticate.fail');
-      }
+      $wsResponse = new WSResponseError('Invalid information!', 'authenticate.fail');
     }
 
   }catch(InvalidParameterException $ex){
@@ -96,8 +94,8 @@ function transactions($wsRequest)
     $account = Session::getAccount();
 
     $statusId = $wsRequest->requireNotNullOrEmpty('statusId');
-    $system = new System();
-    $transactions = $system->transactions($statusId, $account->getAccountId());
+    $appManager = new AppManager();
+    $transactions = $appManager->transactions($statusId, $account->getAccountId());
 
     $wsResponse = new WSResponseOk();
     $wsResponse->addElement('transactions', $transactions);
@@ -117,7 +115,7 @@ function transactions($wsRequest)
  *
  * @return WSResponseError|WSResponseOk
  */
-function report($wsRequest)
+function transactionReport($wsRequest)
 {
   try{
     $account = Session::getAccount();
@@ -150,8 +148,8 @@ function report($wsRequest)
 
     }
 
-    $system = new System();
-    $dataReport = $system->report($statusId, $transactionType, $agencyType, $agencyId, $account->getAccountId(), $beginDate, $endDate, $controlNumber, $username, $transactionId, $merchantTransId, 0);
+    $appManager = new AppManager();
+    $dataReport = $appManager->transactionReport($statusId, $transactionType, $agencyType, $agencyId, $account->getAccountId(), $beginDate, $endDate, $controlNumber, $username, $transactionId, $merchantTransId, 0);
     $transactions = $dataReport['transactions'];
     $summary = $dataReport['summary'];
     $total = $dataReport['total'][0]['total'];

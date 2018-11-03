@@ -41,7 +41,11 @@ function startController()
           }
         }else{
           //this section is to handle the invalid function error
-          $wsResponse = new WSResponseError('Session has expired', 'invalid.session.expired');
+          if($account->getAccountId()){
+            $wsResponse = new WSResponseError('Invalid Request', 'authenticate.reject');
+          }else{
+            $wsResponse = new WSResponseError('Invalid Request', 'authenticate.fail');
+          }
         }
       }catch(SessionException $ex){
         $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.session.expired');
@@ -107,7 +111,7 @@ function f_transactions()
 /**
  * get report data
  */
-function f_report()
+function f_transactionReport()
 {
   require_once('api/client.php');
 }
