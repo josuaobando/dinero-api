@@ -44,6 +44,12 @@ class Stickiness
    * [Rejected] Max amount per month exceeded
    */
   const STATUS_CODE_LIMIT_AMOUNT = '8';
+  /**
+   * Agency in my company
+   *
+   * [Rejected] Receiver already linked to other of yours agencies
+   */
+  const STATUS_CODE_LINKED_OTHER_AGENCY = '9';
 
   /**
    * Pending Stickiness
@@ -496,17 +502,14 @@ class Stickiness
               $this->createProvider();
             }else{
               $this->rejectProvider();
-              throw new P2PException("The Customer is linked to another Person.");
+              throw new P2PException("Customer is linked to another Person.");
             }
             break;
           case self::STATUS_CODE_LINKED_OTHER_COMPANY:
-            ExceptionManager::handleException(new P2PException("The Person [$this->person] is linked to another Customer [$this->customer]. " . __FUNCTION__));
-            throw new P2PException("The Customer is linked to another Person.");
-            break;
           case self::STATUS_CODE_LINKED_OTHER:
           case self::STATUS_CODE_LINKED_OTHER_CUSTOMER:
             $this->rejectProvider();
-            throw new P2PException("The Customer is linked to another Agency (Merchant).");
+            throw new P2PException("Customer is linked to another Agency (Merchant).");
             break;
           case self::STATUS_CODE_LIMIT_TRANSACTIONS:
             throw new P2PLimitException("Max # of transaction per month exceeded");
@@ -514,12 +517,16 @@ class Stickiness
           case self::STATUS_CODE_LIMIT_AMOUNT:
             throw new P2PLimitException("Max amount per month exceeded");
             break;
+          case self::STATUS_CODE_LINKED_OTHER_AGENCY:
+            ExceptionManager::handleException(new P2PException("Customer [$this->customer] already linked to other of yours agencies."));
+            throw new P2PException("Customer is linked to another Agency or Network.");
+            break;
           default:
             ExceptionManager::handleException(new P2PException("Invalid Response Code >> Code: $resultCode  Message: $resultCodeMessage : (" . __FUNCTION__ . ")"));
-            throw new TransactionException("Due to external factors, we cannot give this Customer a Name.");
+            throw new TransactionException("Due to external factors, we cannot give this customer a name.");
         }
       }else{
-        throw new TransactionException("The Customer cannot be verify.");
+        throw new TransactionException("Customer cannot be verify.");
       }
 
     }else{
@@ -579,10 +586,11 @@ class Stickiness
               $this->createProvider();
             }else{
               $this->rejectProvider();
-              throw new P2PException("The Customer is linked to another Person.");
+              throw new P2PException("Customer is linked to another Person.");
             }
             break;
           case self::STATUS_CODE_LINKED_OTHER:
+          case self::STATUS_CODE_LINKED_OTHER_AGENCY:
           case self::STATUS_CODE_LINKED_OTHER_COMPANY:
           case self::STATUS_CODE_LINKED_OTHER_CUSTOMER:
             $this->rejectProvider();
