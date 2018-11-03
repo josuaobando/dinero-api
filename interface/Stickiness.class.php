@@ -512,7 +512,7 @@ class Stickiness
             throw new P2PException("Customer is linked to another Agency (Merchant).");
             break;
           case self::STATUS_CODE_LIMIT_TRANSACTIONS:
-            throw new P2PLimitException("Max # of transaction per month exceeded");
+            throw new P2PLimitException("Max # of transactions per month exceeded");
             break;
           case self::STATUS_CODE_LIMIT_AMOUNT:
             throw new P2PLimitException("Max amount per month exceeded");
