@@ -1,6 +1,6 @@
 <?php
 
-require_once('AppManager/Startup.class.php');
+require_once('system/Startup.class.php');
 
 /**
  * account login
