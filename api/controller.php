@@ -63,6 +63,8 @@ function startController()
         //this section is to handle the invalid function error
         $wsResponse = new WSResponseError("Invalid action ('$action')", "invalid.action");
       }
+    }else{
+      $wsResponse = new WSResponseError('Invalid Request', 'invalid.session.empty');
     }
 
   }else{
