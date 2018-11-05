@@ -22,9 +22,12 @@ function authenticate($wsRequest)
       $wsResponse = new WSResponseOk();
       $wsResponse->addElement('account', $account);
       $wsResponse->addElement('token', Session::$sid);
+      $account->sessionTracker($wsRequest, Session::$sid, 'authenticate.success');
     }elseif($account->getAccountId()){
+      $account->sessionTracker($wsRequest, Session::$sid, 'authenticate.reject');
       $wsResponse = new WSResponseError('Invalid information!', 'authenticate.reject');
     }else{
+      $account->sessionTracker($wsRequest, Session::$sid, 'authenticate.fail');
       $wsResponse = new WSResponseError('Invalid information!', 'authenticate.fail');
     }
 

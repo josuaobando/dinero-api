@@ -106,6 +106,41 @@ class TblAccount extends Db
     return $r;
   }
 
+  /**
+   * @param $host
+   * @param $referer
+   * @param $remoteAddr
+   * @param $protocol
+   * @param $agent
+   * @param $platform
+   * @param $account
+   * @param $token
+   * @param $activity
+   *
+   * @return int
+   */
+  public function sessionTracker($host, $referer, $remoteAddr, $protocol, $agent, $platform, $account, $token, $activity)
+  {
+    $sql = "CALL spSessionTracker_Insert('{host}', '{referer}', '{remoteAddr}', '{protocol}', '{agent}', '{platform}', '{account}', '{token}', '{activity}', @SessionTrackerId)";
+
+    $params = array();
+    $params['host'] = $host;
+    $params['referer'] = $referer;
+    $params['remoteAddr'] = $remoteAddr;
+    $params['protocol'] = $protocol;
+    $params['agent'] = $agent;
+    $params['platform'] = $platform;
+    $params['account'] = $account;
+    $params['token'] = $token;
+    $params['activity'] = $activity;
+
+    $this->setOutputParams(array('SessionTrackerId'));
+    $this->executeUpdate($sql, $params);
+    $output = $this->getOutputResults();
+
+    return $output['SessionTrackerId'];
+  }
+
 }
 
 ?>

@@ -61,6 +61,11 @@ class Account
   private $authenticated = false;
 
   /**
+   * @var
+   */
+  private $sessionTrackerId;
+
+  /**
    * user permission
    *
    * @var array
@@ -168,6 +173,14 @@ class Account
   }
 
   /**
+   * @return string
+   */
+  public function getSessionTrackerId()
+  {
+    return $this->sessionTrackerId;
+  }
+
+  /**
    * authenticate account
    *
    * @param string $password
@@ -198,6 +211,37 @@ class Account
   public function isAuthenticated()
   {
     return $this->authenticated;
+  }
+
+  /**
+   * @param WSRequest $wsRequest
+   * @param string $token
+   * @param string $activity
+   */
+  public function sessionTracker($wsRequest, $token, $activity)
+  {
+    try{
+      $host = $_SERVER['HTTP_HOST'];
+      $agent = $_SERVER['HTTP_USER_AGENT'];
+      $protocol = $_SERVER['SERVER_PROTOCOL'];
+
+      $referer = $wsRequest->getParam('referrer', $_SERVER['HTTP_REFERER']);
+      $platform = $wsRequest->getParam('platform', '');
+      $remoteAddr = $wsRequest->getParam('remoteIP', '');
+
+      if(empty($remoteAddr)){
+        if($_SERVER['REMOTE_ADDR'] == '127.0.0.1'){
+          $remoteAddr = isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
+        }else{
+          $remoteAddr = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] . "," : "") . $_SERVER['REMOTE_ADDR'];
+        }
+      }
+
+      $this->sessionTrackerId = $this->tblAccount->sessionTracker($host, $referer, $remoteAddr, $protocol, $agent, $platform, $this->username, $token, $activity);
+    }
+    catch(Exception $exception){
+      ExceptionManager::handleException($exception);
+    }
   }
 
   /**
