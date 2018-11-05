@@ -87,6 +87,14 @@ function f_authenticate()
 }
 
 /**
+ * logout account
+ */
+function f_logout()
+{
+  require_once('api/client.php');
+}
+
+/**
  * get countries
  */
 function f_getCountries()

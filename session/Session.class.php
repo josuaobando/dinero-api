@@ -42,6 +42,20 @@ class Session
   }
 
   /**
+   * destroy session
+   *
+   * @return bool
+   */
+  public static function destroySession()
+  {
+    if(session_id()){
+      return session_destroy();
+    }
+
+    return false;
+  }
+
+  /**
    * retrieve object from user session
    *
    * @param string $id

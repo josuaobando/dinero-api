@@ -41,6 +41,24 @@ function authenticate($wsRequest)
 }
 
 /**
+ * @param WSRequest $wsRequest
+ *
+ * @return WSResponseError|WSResponseOk
+ */
+function logout($wsRequest)
+{
+  try{
+    $destroy = Session::destroySession();
+    $wsResponse = new WSResponseOk();
+    $wsResponse->addElement('logout', $destroy);
+  }catch(Exception $ex){
+    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception');
+  }
+
+  return $wsResponse;
+}
+
+/**
  * get countries
  *
  * @param WSRequest $wsRequest
