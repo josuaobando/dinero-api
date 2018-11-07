@@ -108,7 +108,7 @@ class TblAccount extends Db
 
   /**
    * @param $host
-   * @param $referer
+   * @param $referrer
    * @param $remoteAddr
    * @param $protocol
    * @param $agent
@@ -119,13 +119,13 @@ class TblAccount extends Db
    *
    * @return int
    */
-  public function sessionTracker($host, $referer, $remoteAddr, $protocol, $agent, $platform, $account, $token, $activity)
+  public function sessionTracker($host, $referrer, $remoteAddr, $protocol, $agent, $platform, $account, $token, $activity)
   {
-    $sql = "CALL spSessionTracker_Insert('{host}', '{referer}', '{remoteAddr}', '{protocol}', '{agent}', '{platform}', '{account}', '{token}', '{activity}', @SessionTrackerId)";
+    $sql = "CALL spSessionTracker_Insert('{host}', '{referrer}', '{remoteAddr}', '{protocol}', '{agent}', '{platform}', '{account}', '{token}', '{activity}', @SessionTrackerId)";
 
     $params = array();
     $params['host'] = $host;
-    $params['referer'] = $referer;
+    $params['referrer'] = $referrer;
     $params['remoteAddr'] = $remoteAddr;
     $params['protocol'] = $protocol;
     $params['agent'] = $agent;

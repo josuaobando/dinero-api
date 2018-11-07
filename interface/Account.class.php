@@ -225,7 +225,7 @@ class Account
       $agent = $_SERVER['HTTP_USER_AGENT'];
       $protocol = $_SERVER['SERVER_PROTOCOL'];
 
-      $referer = $wsRequest->getParam('referrer', $_SERVER['HTTP_REFERER']);
+      $referrer = $wsRequest->getParam('referrer', $_SERVER['HTTP_REFERER']);
       $platform = $wsRequest->getParam('platform', '');
       $remoteAddr = $wsRequest->getParam('remoteIP', '');
 
@@ -237,7 +237,7 @@ class Account
         }
       }
 
-      $this->sessionTrackerId = $this->tblAccount->sessionTracker($host, $referer, $remoteAddr, $protocol, $agent, $platform, $this->username, $token, $activity);
+      $this->sessionTrackerId = $this->tblAccount->sessionTracker($host, $referrer, $remoteAddr, $protocol, $agent, $platform, $this->username, $token, $activity);
     }
     catch(Exception $exception){
       ExceptionManager::handleException($exception);
