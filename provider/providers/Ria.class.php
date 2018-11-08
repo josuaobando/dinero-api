@@ -48,7 +48,9 @@ class Ria extends Provider
     //validate if customer is blacklisted
     $customer->isBlacklisted();
 
-    if($transaction->getAmount() > 500){
+    if($transaction->getAmount() < 60){
+      throw new APILimitException("The minimum allowed amount is: 60 USD");
+    }elseif($transaction->getAmount() > 500){
       throw new APILimitException("The maximum allowed amount is: 500 USD");
     }
 
