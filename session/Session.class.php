@@ -34,7 +34,7 @@ class Session
       $sessionId = Encrypt::genKey();
     }else{
       $sessionTracker = new SessionTracker($sessionId);
-      $sessionTracker->update();
+      $update = $sessionTracker->update();
     }
 
     self::$sid = $sessionId;

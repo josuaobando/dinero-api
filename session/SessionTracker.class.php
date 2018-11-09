@@ -52,9 +52,9 @@ class SessionTracker
    */
   public function __construct($token = null, $init = false)
   {
+    $this->token = $token;
+    $this->tblSession = TblSession::getInstance();
     if($token && $init){
-      $this->token = $token;
-      $this->tblSession = TblSession::getInstance();
       $session = $this->tblSession->get($token);
       if($session && count($session) > 0){
         $this->ip = $session['RemoteAddr'];
