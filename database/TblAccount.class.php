@@ -153,10 +153,10 @@ class TblAccount extends Db
     $params = array();
     $params['account'] = $account;
 
-    $rows = array();
-    $this->executeQuery($sql, $rows, $params);
+    $row = array();
+    $this->executeSingleQuery($sql, $row, $params);
 
-    return $rows;
+    return $row;
   }
 
   /**

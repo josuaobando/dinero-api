@@ -237,7 +237,7 @@ class Account
   {
     try{
       $session = $this->tblAccount->sessionTrackerCheck($this->username);
-      if($session){
+      if($session && count($session) > 0){
         return false;
       }
     }catch(Exception $exception){
