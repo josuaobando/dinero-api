@@ -54,6 +54,9 @@ function authenticate($wsRequest)
 function logout($wsRequest)
 {
   try{
+    $account = Session::getAccount();
+    $account->sessionTrackerClose();
+
     $destroy = Session::destroySession();
     $wsResponse = new WSResponseOk();
     $wsResponse->addElement('logout', $destroy);

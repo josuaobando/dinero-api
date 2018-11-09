@@ -159,6 +159,21 @@ class TblAccount extends Db
     return $rows;
   }
 
+  /**
+   * @param $sessionTrackerId
+   *
+   * @return int
+   */
+  public function sessionTrackerClose($sessionTrackerId)
+  {
+    $sql = "CALL spSessionTracker_Close('{sessionTrackerId}')";
+
+    $params = array();
+    $params['sessionTrackerId'] = $sessionTrackerId;
+
+    return $this->executeUpdate($sql, $params);
+  }
+
 }
 
 ?>

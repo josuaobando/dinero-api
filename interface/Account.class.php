@@ -280,6 +280,19 @@ class Account
   }
 
   /**
+   * @return int
+   */
+  public function sessionTrackerClose()
+  {
+    try{
+      return $this->tblAccount->sessionTrackerClose($this->sessionTrackerId);
+    }
+    catch(Exception $exception){
+      ExceptionManager::handleException($exception);
+    }
+  }
+
+  /**
    * serialize object
    *
    * @return array
