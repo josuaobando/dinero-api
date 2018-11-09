@@ -22,12 +22,18 @@ function authenticate($wsRequest)
       $wsResponse = new WSResponseOk();
       $wsResponse->addElement('account', $account);
       $wsResponse->addElement('token', Session::$sid);
-      $account->sessionTracker($wsRequest, Session::$sid, 'authenticate.success');
+
+      if($account->sessionTrackerCheck()){
+        $account->sessionTracker($wsRequest, Session::$sid, 'authenticate.success');
+      }else{
+        $account->sessionTracker($wsRequest, '', 'authenticate.active');
+        $wsResponse = new WSResponseError('Invalid information!', 'authenticate.active');
+      }
     }elseif($account->getAccountId()){
-      $account->sessionTracker($wsRequest, Session::$sid, 'authenticate.reject');
+      $account->sessionTracker($wsRequest, '', 'authenticate.reject');
       $wsResponse = new WSResponseError('Invalid information!', 'authenticate.reject');
     }else{
-      $account->sessionTracker($wsRequest, Session::$sid, 'authenticate.fail');
+      $account->sessionTracker($wsRequest, '', 'authenticate.fail');
       $wsResponse = new WSResponseError('Invalid information!', 'authenticate.fail');
     }
 

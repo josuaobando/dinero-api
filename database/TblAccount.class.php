@@ -141,6 +141,24 @@ class TblAccount extends Db
     return $output['SessionTrackerId'];
   }
 
+  /**
+   * @param $account
+   *
+   * @return array
+   */
+  public function sessionTrackerCheck($account)
+  {
+    $sql = "CALL spSessionTracker_Check('{account}')";
+
+    $params = array();
+    $params['account'] = $account;
+
+    $rows = array();
+    $this->executeQuery($sql, $rows, $params);
+
+    return $rows;
+  }
+
 }
 
 ?>

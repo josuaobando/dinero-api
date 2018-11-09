@@ -214,6 +214,41 @@ class Account
   }
 
   /**
+   * Change Password
+   *
+   * @param string $newPassword
+   *
+   * @return bool
+   */
+  public function changePassword($newPassword)
+  {
+    $r = $this->tblAccount->changePassword($this->accountId, $newPassword);
+    if($r){
+      $this->password = $newPassword;
+    }
+
+    return $r;
+  }
+
+  /**
+   * @return bool
+   */
+  public function sessionTrackerCheck()
+  {
+    try{
+      $session = $this->tblAccount->sessionTrackerCheck($this->username);
+      if($session){
+        return false;
+      }
+    }
+    catch(Exception $exception){
+      ExceptionManager::handleException($exception);
+    }
+
+    return true;
+  }
+
+  /**
    * @param WSRequest $wsRequest
    * @param string $token
    * @param string $activity
@@ -242,23 +277,6 @@ class Account
     catch(Exception $exception){
       ExceptionManager::handleException($exception);
     }
-  }
-
-  /**
-   * Change Password
-   *
-   * @param string $newPassword
-   *
-   * @return bool
-   */
-  public function changePassword($newPassword)
-  {
-    $r = $this->tblAccount->changePassword($this->accountId, $newPassword);
-    if($r){
-      $this->password = $newPassword;
-    }
-
-    return $r;
   }
 
   /**
