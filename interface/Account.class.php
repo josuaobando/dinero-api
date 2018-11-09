@@ -240,8 +240,7 @@ class Account
       if($session){
         return false;
       }
-    }
-    catch(Exception $exception){
+    }catch(Exception $exception){
       ExceptionManager::handleException($exception);
     }
 
@@ -273,8 +272,7 @@ class Account
       }
 
       $this->sessionTrackerId = $this->tblAccount->sessionTracker($host, $referrer, $remoteAddr, $protocol, $agent, $platform, $this->username, $token, $activity);
-    }
-    catch(Exception $exception){
+    }catch(Exception $exception){
       ExceptionManager::handleException($exception);
     }
   }
@@ -285,9 +283,21 @@ class Account
   public function sessionTrackerClose()
   {
     try{
-      return $this->tblAccount->sessionTrackerClose($this->sessionTrackerId);
+      return $this->tblAccount->sessionTrackerClose($this->sessionTrackerId, '');
+    }catch(Exception $exception){
+      ExceptionManager::handleException($exception);
     }
-    catch(Exception $exception){
+  }
+
+  /**
+   * @param $token
+   * @return int
+   */
+  public function sessionClose($token)
+  {
+    try{
+      return $this->tblAccount->sessionTrackerClose(0, $token);
+    }catch(Exception $exception){
       ExceptionManager::handleException($exception);
     }
   }

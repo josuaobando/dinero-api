@@ -161,15 +161,16 @@ class TblAccount extends Db
 
   /**
    * @param $sessionTrackerId
-   *
+   * @param $token
    * @return int
    */
-  public function sessionTrackerClose($sessionTrackerId)
+  public function sessionTrackerClose($sessionTrackerId, $token)
   {
-    $sql = "CALL spSessionTracker_Close('{sessionTrackerId}')";
+    $sql = "CALL spSessionTracker_Close('{sessionTrackerId}', '{token}')";
 
     $params = array();
     $params['sessionTrackerId'] = $sessionTrackerId;
+    $params['token'] = $token;
 
     return $this->executeUpdate($sql, $params);
   }

@@ -48,6 +48,8 @@ function startController()
           }
         }
       }catch(SessionException $ex){
+        $account = new Account();
+        $account->sessionClose($sessionId);
         $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.session.expired');
       }catch(Exception $ex){
         $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception');
