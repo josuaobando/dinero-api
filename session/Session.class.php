@@ -32,6 +32,9 @@ class Session
   {
     if(!$sessionId){
       $sessionId = Encrypt::genKey();
+    }else{
+      $sessionTracker = new SessionTracker($sessionId);
+      $sessionTracker->update();
     }
 
     self::$sid = $sessionId;

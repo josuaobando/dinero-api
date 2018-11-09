@@ -17,23 +17,23 @@ function authenticate($wsRequest)
 
     $account = Session::getAccount($username);
     $account->authenticate($password);
+    $sessionTracker = new SessionTracker(Session::$sid);
 
     if($account->isAuthenticated()){
       $wsResponse = new WSResponseOk();
       $wsResponse->addElement('account', $account);
       $wsResponse->addElement('token', Session::$sid);
-
-      if($account->sessionTrackerCheck()){
-        $account->sessionTracker($wsRequest, Session::$sid, 'authenticate.success');
+      if(!$sessionTracker->active($username)){
+        $sessionTracker->add($wsRequest, 'authenticate.success');
       }else{
-        $account->sessionTracker($wsRequest, '', 'authenticate.active');
+        $sessionTracker->add($wsRequest, 'authenticate.active');
         $wsResponse = new WSResponseError('Invalid information!', 'authenticate.active');
       }
     }elseif($account->getAccountId()){
-      $account->sessionTracker($wsRequest, '', 'authenticate.reject');
+      $sessionTracker->add($wsRequest, 'authenticate.reject');
       $wsResponse = new WSResponseError('Invalid information!', 'authenticate.reject');
     }else{
-      $account->sessionTracker($wsRequest, '', 'authenticate.fail');
+      $sessionTracker->add($wsRequest, 'authenticate.fail');
       $wsResponse = new WSResponseError('Invalid information!', 'authenticate.fail');
     }
 
@@ -54,8 +54,8 @@ function authenticate($wsRequest)
 function logout($wsRequest)
 {
   try{
-    $account = Session::getAccount();
-    $account->sessionTrackerClose();
+    $sessionTracker = new SessionTracker(Session::$sid);
+    $sessionTracker->close();
 
     $destroy = Session::destroySession();
     $wsResponse = new WSResponseOk();
