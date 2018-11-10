@@ -30,14 +30,22 @@ function startController()
         Session::startSession($sessionId);
         $account = Session::getAccount();
         if($account->isAuthenticated()){
-          //call the proper function
-          if(function_exists($prefix . $action)){
-            //call the function and exit since the function will do the whole work
-            call_user_func($prefix . $action);
-            exit();
+          $sessionTracker = new SessionTracker($sessionId, true);
+          if($sessionTracker->active()){
+            //update bd session active
+            $sessionTracker->update();
+            //call the proper function
+            if(function_exists($prefix . $action)){
+              //call the function and exit since the function will do the whole work
+              call_user_func($prefix . $action);
+              exit();
+            }else{
+              //this section is to handle the invalid function error
+              $wsResponse = new WSResponseError("Invalid action ('$action')", "invalid.action");
+            }
           }else{
-            //this section is to handle the invalid function error
-            $wsResponse = new WSResponseError("Invalid action ('$action')", "invalid.action");
+            Session::destroySession();
+            $wsResponse = new WSResponseError('Invalid Request', 'invalid.session.expired');
           }
         }else{
           //this section is to handle the invalid function error
@@ -140,6 +148,22 @@ function f_transactionUpdate()
  * get transaction data
  */
 function f_transaction()
+{
+  require_once('api/client.php');
+}
+
+/**
+ * get attempts transaction
+ */
+function f_attempts()
+{
+  require_once('api/client.php');
+}
+
+/**
+ * get transaction rejected
+ */
+function f_rejections()
 {
   require_once('api/client.php');
 }

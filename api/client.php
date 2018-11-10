@@ -23,7 +23,7 @@ function authenticate($wsRequest)
       $wsResponse = new WSResponseOk();
       $wsResponse->addElement('account', $account);
       $wsResponse->addElement('token', Session::$sid);
-      if(!$sessionTracker->active($username)){
+      if(!$sessionTracker->activeByUsername($username)){
         $sessionTracker->add($wsRequest, 'authenticate.success');
       }else{
         $sessionTracker->add($wsRequest, 'authenticate.active');
@@ -129,6 +129,56 @@ function transactions($wsRequest)
 
     $wsResponse = new WSResponseOk();
     $wsResponse->addElement('transactions', $transactions);
+  }catch(InvalidParameterException $ex){
+    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception.parameter');
+  }catch(SessionException $ex){
+    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.session.expired');
+  }catch(Exception $ex){
+    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception');
+  }
+
+  return $wsResponse;
+}
+
+/**
+ * @param WSRequest $wsRequest
+ *
+ * @return WSResponseError|WSResponseOk
+ */
+function attempts($wsRequest)
+{
+  try{
+    Session::getAccount();
+    $appManager = new AppManager();
+    $attempts = $appManager->transactionAttempts();
+
+    $wsResponse = new WSResponseOk();
+    $wsResponse->addElement('attempts', $attempts);
+  }catch(InvalidParameterException $ex){
+    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception.parameter');
+  }catch(SessionException $ex){
+    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.session.expired');
+  }catch(Exception $ex){
+    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception');
+  }
+
+  return $wsResponse;
+}
+
+/**
+ * @param WSRequest $wsRequest
+ *
+ * @return WSResponseError|WSResponseOk
+ */
+function rejections($wsRequest)
+{
+  try{
+    Session::getAccount();
+    $appManager = new AppManager();
+    $rejections = $appManager->transactionDeclined();
+
+    $wsResponse = new WSResponseOk();
+    $wsResponse->addElement('rejections', $rejections);
   }catch(InvalidParameterException $ex){
     $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception.parameter');
   }catch(SessionException $ex){

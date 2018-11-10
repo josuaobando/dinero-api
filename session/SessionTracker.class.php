@@ -66,6 +66,10 @@ class SessionTracker
     }
   }
 
+  public function active(){
+    return ($this->sessionTrackerId > 0);
+  }
+
   /**
    * @param WSRequest $wsRequest
    * @param string $activity
@@ -116,7 +120,7 @@ class SessionTracker
    *
    * @return bool
    */
-  public function active($username)
+  public function activeByUsername($username)
   {
     $tblSession = TblSession::getInstance();
     $session = $tblSession->check($username);
