@@ -62,11 +62,9 @@ class Dinero extends Provider
     $customer = Session::getCustomer();
     $transaction = Session::getTransaction();
 
-    /*
     if($customer->getIsAPI()){
       throw new P2PException("Redirect to API...");
     }
-    */
 
     //validate if customer is blacklisted
     $customer->isBlacklisted();
