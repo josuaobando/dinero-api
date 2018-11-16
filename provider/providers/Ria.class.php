@@ -128,7 +128,7 @@ class Ria extends Provider
           $this->apiMessage = 'The Customer (Sender) has exceeded the limits in Ria';
           throw new APILimitException($this->apiMessage);
         }elseif(stripos(strtoupper($this->apiMessage), 'ERROR DE CREDENCIALES Y FALTA DE INFORMACION')){
-          $this->apiMessage = 'The Customer (Sender) has exceeded the limits in Ria';
+          $this->apiMessage = 'The minimum allowed amount is $60 USD and maximum allowed amount is $460 USD';
           throw new APILimitException($this->apiMessage);
         }elseif($this->apiMessage){
           throw new APIException($this->apiMessage);
