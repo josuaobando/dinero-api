@@ -26,6 +26,11 @@ class Saturno extends Provider
   const RESPONSE_SUCCESS = 0;
 
   /**
+   * @var bool
+   */
+  private $attempt = false;
+
+  /**
    * new Transaction instance
    */
   public function __construct()
@@ -440,6 +445,17 @@ class Saturno extends Provider
       $this->unpack($response);
     }catch(WSException $ex){
       ExceptionManager::handleException($ex);
+      $this->apiCode = self::RESPONSE_ERROR;
+      $this->apiMessage = 'At this time, we can not process your request. Please try again in a few minutes!';
+
+      //re-try
+      if($ex->getMessage() == 'Unexpected end of file from server' && !$this->attempt){
+        if($method == 'SubmitPayout' || $method == 'EditarDeposito' || $method == 'SubmitDeposito'){
+          sleep(5);
+          $this->attempt = true;
+          $this->execute($method);
+        }
+      }
     }
   }
 
