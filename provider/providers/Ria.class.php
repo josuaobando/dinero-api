@@ -47,12 +47,13 @@ class Ria extends Provider
 
     //validate if customer is blacklisted
     $customer->isBlacklisted();
-
-    if($transaction->getAmount() < 60){
-      throw new APILimitException("The minimum allowed amount is: 60 USD");
-    }elseif($transaction->getAmount() > 460){
-      throw new APILimitException("The maximum allowed amount is: 460 USD");
-    }
+    /*
+        if($transaction->getAmount() < 60){
+          throw new APILimitException("The minimum allowed amount is: 60 USD");
+        }elseif($transaction->getAmount() > 460){
+          throw new APILimitException("The maximum allowed amount is: 460 USD");
+        }
+    */
 
     //transaction
     $request = array();
@@ -124,7 +125,10 @@ class Ria extends Provider
           $this->apiMessage = 'The Customer (Sender) has been blacklisted';
           throw new APIBlackListException($this->apiMessage);
         }elseif(stripos(strtolower($this->apiMessage), 'limit') && stripos(strtolower($this->apiMessage), 'reached')){
-          $this->apiMessage = 'The Customer (Sender) has exceeded the limits in MG';
+          $this->apiMessage = 'The Customer (Sender) has exceeded the limits in Ria';
+          throw new APILimitException($this->apiMessage);
+        }elseif(stripos(strtoupper($this->apiMessage), 'ERROR DE CREDENCIALES Y FALTA DE INFORMACION')){
+          $this->apiMessage = 'The Customer (Sender) has exceeded the limits in Ria';
           throw new APILimitException($this->apiMessage);
         }elseif($this->apiMessage){
           throw new APIException($this->apiMessage);
