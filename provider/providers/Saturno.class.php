@@ -449,6 +449,7 @@ class Saturno extends Provider
       $this->apiMessage = 'At this time, we can not process your request. Please try again in a few minutes!';
 
       //re-try
+      /*
       if($ex->getMessage() == 'Unexpected end of file from server' && !$this->attempt){
         if($method == 'SubmitPayout' || $method == 'EditarDeposito' || $method == 'SubmitDeposito'){
           sleep(5);
@@ -456,6 +457,7 @@ class Saturno extends Provider
           $this->execute($method);
         }
       }
+      */
     }
   }
 
