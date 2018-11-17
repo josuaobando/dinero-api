@@ -127,7 +127,8 @@ class Ria extends Provider
         }elseif(stripos(strtolower($this->apiMessage), 'limit') && stripos(strtolower($this->apiMessage), 'reached')){
           $this->apiMessage = 'The Customer (Sender) has exceeded the limits in Ria';
           throw new APILimitException($this->apiMessage);
-        }elseif(stripos(strtoupper($this->apiMessage), 'ERROR DE CREDENCIALES Y FALTA DE INFORMACION')){
+        }elseif($this->apiCode == 111){
+          //ERROR DE CREDENCIALES Y FALTA DE INFORMACION
           $this->apiMessage = 'The minimum allowed amount is $60 USD and maximum allowed amount is $460 USD';
           throw new APILimitException($this->apiMessage);
         }elseif($this->apiMessage){
@@ -322,6 +323,8 @@ class Ria extends Provider
       $this->response = $response;
       $this->unpack($response);
     }catch(WSException $ex){
+      $this->apiCode = self::RESPONSE_ERROR;
+      $this->apiMessage = 'At this time, we can not process your request. Please try again in a few minutes!';
       ExceptionManager::handleException($ex);
     }
   }
