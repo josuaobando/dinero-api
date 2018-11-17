@@ -450,7 +450,8 @@ class Saturno extends Provider
 
       //re-try
       if($ex->getMessage() == 'Unexpected end of file from server' && !$this->attempt){
-        if($method == 'SubmitPayout' || $method == 'EditarDeposito' || $method == 'SubmitDeposito'){
+        if($method == 'SubmitPayout' || $method == 'EditarDeposito' || $method == 'SubmitDeposito' || $method == 'ObtenerNombre'){
+          Log::custom(__CLASS__, "Execute Attempt \n Request: \n " . $this->getLastRequest() . "\n");
           sleep(5);
           $this->attempt = true;
           $this->execute($method);
