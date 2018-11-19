@@ -108,7 +108,7 @@ class TblApp extends Db
    * @param $statusId
    * @param $transactionTypeId
    * @param $filterAgencyType
-   * @param $filterAgencyId
+   * @param $agencyList
    * @param $accountId
    * @param $beginDate
    * @param $endDate
@@ -121,15 +121,15 @@ class TblApp extends Db
    *
    * @return array
    */
-  public function transactionReport($statusId, $transactionTypeId, $filterAgencyType, $filterAgencyId, $accountId, $beginDate, $endDate, $controlNumber, $customer, $transactionId, $reference, $currentPage, $pageSize)
+  public function transactionReport($statusId, $transactionTypeId, $filterAgencyType, $agencyList, $accountId, $beginDate, $endDate, $controlNumber, $customer, $transactionId, $reference, $currentPage, $pageSize)
   {
-    $sql = "CALL spApp_Report_Transactions('{statusId}', '{transactionTypeId}', '{agencyType}', '{agencyId}', '{accountId}', '{beginDate}', '{endDate}', '{controlNumber}', '{customer}', '{transactionId}', '{reference}', '{pageStart}', '{pageSize}')";
+    $sql = "CALL spApp_Report_Transactions('{statusId}', '{transactionTypeId}', '{agencyType}', '{agencyList}', '{accountId}', '{beginDate}', '{endDate}', '{controlNumber}', '{customer}', '{transactionId}', '{reference}', '{pageStart}', '{pageSize}')";
 
     $params = array();
     $params['statusId'] = $statusId;
     $params['transactionTypeId'] = $transactionTypeId;
     $params['agencyType'] = $filterAgencyType;
-    $params['agencyId'] = $filterAgencyId;
+    $params['agencyList'] = $agencyList;
     $params['accountId'] = $accountId;
     $params['beginDate'] = $beginDate;
     $params['endDate'] = $endDate;
