@@ -26,9 +26,10 @@ class Task_Report extends Task
     $this->transactions['MG-Saturno-Payouts'] = $this->tblTask->getReportTransactions(Transaction::AGENCY_TYPE_MG, Saturno::AGENCY_ID, Transaction::TYPE_SENDER);
     $this->transactions['MG-Billing'] = $this->tblTask->getReportTransactions(Transaction::AGENCY_TYPE_MG, BillingPayments::AGENCY_ID, Transaction::TYPE_RECEIVER);
     $this->transactions['MG-Billing-Payouts'] = $this->tblTask->getReportTransactions(Transaction::AGENCY_TYPE_MG, BillingPayments::AGENCY_ID, Transaction::TYPE_SENDER);
+    $this->transactions['RIA-Saturno'] = $this->tblTask->getReportTransactions(Transaction::AGENCY_TYPE_RIA, Ria::AGENCY_ID);
+
     $this->transactions['MG'] = $this->tblTask->getReportTransactions(Transaction::AGENCY_TYPE_MG);
     $this->transactions['RIA'] = $this->tblTask->getReportTransactions(Transaction::AGENCY_TYPE_RIA);
-    $this->transactions['RIA-Saturno'] = $this->tblTask->getReportTransactions(Transaction::AGENCY_TYPE_RIA, Ria::AGENCY_ID);
 
     foreach($this->transactions as $group => $transactions){
       if(is_array($transactions) && count($transactions) > 0){
