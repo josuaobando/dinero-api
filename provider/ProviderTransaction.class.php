@@ -362,10 +362,10 @@ class ProviderTransaction
     $transaction = Session::getTransaction();
     $transaction->restore($transactionId);
 
-    //if($webRequest){
+    if($webRequest){
       $provider = $transaction->getProvider();
       $provider->status();
-    //}
+    }
 
     $wsResponse = new WSResponseOk();
     $wsResponse->addElement('transaction', $transaction);

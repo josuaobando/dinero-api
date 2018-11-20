@@ -202,7 +202,7 @@ function transactionReport($wsRequest)
 
     $beginDate = $wsRequest->getParam("beginDate", "");
     $endDate = $wsRequest->getParam("endDate", "");
-    $statusId = $wsRequest->getParam("statusId", "3");
+    $statusId = $wsRequest->getParam("statusId");
     $statusId = ($statusId == "-1") ? "0" : $statusId;
     $transactionType = $wsRequest->getParam("transactionTypeId", "0");
     $agencyType = $wsRequest->getParam("agencyTypeId", "0");
