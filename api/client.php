@@ -209,6 +209,11 @@ function transactionReport($wsRequest)
     $agencyId = $wsRequest->getParam("agencyId", "0");
     $username = $wsRequest->getParam("username", "");
 
+    $agencyList = $wsRequest->getParam("agencies");
+    if (is_array($agencyList)){
+      $agencyList = implode(",", $agencyList);
+    }
+
     //specific
     $typeFilter = $wsRequest->getParam("filterType", '1');
     if($typeFilter == '2'){
@@ -229,7 +234,7 @@ function transactionReport($wsRequest)
     }
 
     $appManager = new AppManager();
-    $dataReport = $appManager->transactionReport($statusId, $transactionType, $agencyType, $agencyId, $account->getAccountId(), $beginDate, $endDate, $controlNumber, $username, $transactionId, $merchantTransId, 0);
+    $dataReport = $appManager->transactionReport($statusId, $transactionType, $agencyType, $agencyList, $account->getAccountId(), $beginDate, $endDate, $controlNumber, $username, $transactionId, $merchantTransId, 0);
     $transactions = $dataReport['transactions'];
     $summary = $dataReport['summary'];
     $total = $dataReport['total'][0]['total'];
