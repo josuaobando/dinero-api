@@ -315,7 +315,7 @@ class BillingPayments extends Provider
             }
             $transaction->setTransactionStatusId(Transaction::STATUS_APPROVED);
             $transaction->setReason('Ok');
-            $transaction->setNote($response->comments);
+            $transaction->setNote($response->feedback);
 
             //only change amount in deposits
             if($transaction->getTransactionTypeId() == Transaction::TYPE_RECEIVER){
