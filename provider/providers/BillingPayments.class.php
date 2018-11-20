@@ -104,7 +104,7 @@ class BillingPayments extends Provider
       }
     }
 
-    Log::custom(__CLASS__, "Invalid Object Response >> " . __FUNCTION__ . " >>" . " \n Request: \n\n " . $this->getLastRequest() . " \n Response: \n\n " . Util::objToStr($response));
+    Log::custom(__CLASS__, "Invalid Object Response >> ".__FUNCTION__." >>"." \n Request: \n\n ".$this->getLastRequest()." \n Response: \n\n ".Util::objToStr($response));
     if($this->apiMessage){
       throw new APIException($this->apiMessage);
     }else{
@@ -182,12 +182,13 @@ class BillingPayments extends Provider
 
           $transaction->setAgencyId(self::AGENCY_ID);
           $transaction->setProviderId(self::PROVIDER_ID);
+
           return Session::setPerson($person);
         }
       }
     }
 
-    Log::custom(__CLASS__, "Invalid Object Response >> " . __FUNCTION__ . " >>" . " \n Request: \n\n " . $this->getLastRequest() . " \n Response: \n\n " . Util::objToStr($response));
+    Log::custom(__CLASS__, "Invalid Object Response >> ".__FUNCTION__." >>"." \n Request: \n\n ".$this->getLastRequest()." \n Response: \n\n ".Util::objToStr($response));
     if($this->apiMessage){
       throw new APIException($this->apiMessage);
     }else{
@@ -240,6 +241,7 @@ class BillingPayments extends Provider
       if($this->apiStatus == self::STATUS_API_PENDING){
         $this->apiTransactionId = $response->id;
         $transaction->setApiTransactionId($this->apiTransactionId);
+
         return true;
       }else{
         if($apiTransactionId){
@@ -250,18 +252,19 @@ class BillingPayments extends Provider
           $body = "NameId $nameId";
         }
 
-        $body .= "<br>" . "Status: $response->status";
-        $body .= "<br>" . "Error Message: $response->error_message";
-        $body .= "<br><br>" . "Request:";
-        $body .= "<br><br>" . $this->getLastRequest();
-        $body .= "<br><br>" . "Response:";
-        $body .= "<br><br>" . Util::objToStr($response);
+        $body .= "<br>"."Status: $response->status";
+        $body .= "<br>"."Error Message: $response->error_message";
+        $body .= "<br><br>"."Request:";
+        $body .= "<br><br>".$this->getLastRequest();
+        $body .= "<br><br>"."Response:";
+        $body .= "<br><br>".Util::objToStr($response);
         $bodyTemplate = MailManager::getEmailTemplate('default', array('body' => $body));
         MailManager::sendEmail(MailManager::getRecipients(), $subject, $bodyTemplate);
       }
     }
 
-    Log::custom(__CLASS__, "Invalid Object Response" . "\n Request: \n\n " . $this->getLastRequest() . " \n Response: \n\n " . Util::objToStr($response));
+    Log::custom(__CLASS__, "Invalid Object Response"."\n Request: \n\n ".$this->getLastRequest()." \n Response: \n\n ".Util::objToStr($response));
+
     return false;
   }
 
@@ -290,7 +293,8 @@ class BillingPayments extends Provider
 
         //validate Id
         if($response->id != $transaction->getApiTransactionId()){
-          Log::custom(__CLASS__, "Transaction ID mismatch" . "\n Request: \n\n" . $this->getLastRequest() . "\n Response: \n\n" . Util::objToStr($response));
+          Log::custom(__CLASS__, "Transaction ID mismatch"."\n Request: \n\n".$this->getLastRequest()."\n Response: \n\n".Util::objToStr($response));
+
           return false;
         }
 
@@ -304,7 +308,8 @@ class BillingPayments extends Provider
                   $transaction->setFee($response->fee);
                 }
               }else{
-                Log::custom(__CLASS__, "Transaction without MTCN" . "\n Request: \n\n" . $this->getLastRequest() . "\n Response: \n\n" . Util::objToStr($response));
+                Log::custom(__CLASS__, "Transaction without MTCN"."\n Request: \n\n".$this->getLastRequest()."\n Response: \n\n".Util::objToStr($response));
+
                 return false;
               }
             }
@@ -349,7 +354,8 @@ class BillingPayments extends Provider
             $transaction->setTransactionStatusId(Transaction::STATUS_SUBMITTED);
             break;
           default:
-            Log::custom(__CLASS__, "Invalid Object Response" . "\n Request: \n\n" . $this->getLastRequest() . "\n Response: \n\n" . Util::objToStr($response));
+            Log::custom(__CLASS__, "Invalid Object Response"."\n Request: \n\n".$this->getLastRequest()."\n Response: \n\n".Util::objToStr($response));
+
             return false;
         }
 
@@ -365,6 +371,7 @@ class BillingPayments extends Provider
       return true;
     }catch(Exception $ex){
       ExceptionManager::handleException($ex);
+
       return false;
     }
   }
@@ -389,7 +396,7 @@ class BillingPayments extends Provider
       //make ws request
       $url = $this->getSetting(self::SETTING_URL);
       $this->setReader(new Reader_Obj());
-      $response = $this->execPost($url . $method, $request);
+      $response = $this->execPost($url.$method, $request);
       //get response
       $this->response = $response;
       $this->unpack($response);
@@ -424,7 +431,7 @@ class BillingPayments extends Provider
     }else{
       $this->apiCode = self::RESPONSE_ERROR;
       $this->apiMessage = 'At this time, we can not process your request. Please try again in a few minutes!';
-      Log::custom(__CLASS__, "Invalid Object Response" . "\n Request: \n\n" . $this->getLastRequest() . "\n Response: \n\n" . Util::objToStr($response));
+      Log::custom(__CLASS__, "Invalid Object Response"."\n Request: \n\n".$this->getLastRequest()."\n Response: \n\n".Util::objToStr($response));
     }
   }
 
@@ -441,14 +448,20 @@ class BillingPayments extends Provider
           break;
         case 1001: //No Names Available. Please contact Admin
 
-          $transaction = Session::getTransaction();
-          if($transaction->getTransactionTypeId() == Transaction::TYPE_RECEIVER){
-            $subject = "No deposit names available";
-            $body = "There are no deposit names available in " . __CLASS__ . " agency";
-          }else{
-            $subject = "No payouts names available";
-            $body = "There are no payouts names available in " . __CLASS__ . " agency";
-          }
+          $subject = "No deposit names available";
+          $body = "There are no deposit names available in ".__CLASS__." agency";
+
+          $bodyTemplate = MailManager::getEmailTemplate('default', array('body' => $body, 'message' => $this->apiMessage));
+          $recipients = array('To' => 'mgoficinasf0117@outlook.com', 'Cc' => CoreConfig::MAIL_DEV);
+          MailManager::sendEmail($recipients, $subject, $bodyTemplate);
+          Log::custom(__CLASS__, $body);
+
+          $this->apiMessage = 'We cannot give a Receiver for this Customer';
+          throw new APIPersonException($this->apiMessage);
+          break;
+        case 1037: //No Payouts Names Available. Please contact Admin
+          $subject = "No payouts names available";
+          $body = "There are no payouts names available in ".__CLASS__." agency";
 
           $bodyTemplate = MailManager::getEmailTemplate('default', array('body' => $body, 'message' => $this->apiMessage));
           $recipients = array('To' => 'mgoficinasf0117@outlook.com', 'Cc' => CoreConfig::MAIL_DEV);
