@@ -173,7 +173,7 @@ class Transaction
   }
 
   /**
-   * @return Dinero|Nicaragua|Provider|Ria|Saturno
+   * @return Dinero|Nicaragua|Provider|Ria|Saturno|BillingPayments
    */
   public function getProvider()
   {
@@ -186,6 +186,8 @@ class Transaction
         return new Nicaragua();
       case Ria::PROVIDER_ID:
         return new Ria();
+      case BillingPayments::PROVIDER_ID:
+        return new BillingPayments();
       default:
         return new Provider($this->providerId);
     }

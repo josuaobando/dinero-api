@@ -20,8 +20,9 @@ class Reader_Obj extends Reader
     $simpleXml = simplexml_load_string($data);
     if(!($simpleXml instanceof SimpleXMLElement)){
       return json_decode($data);
+    }else{
+      return json_decode(json_encode($simpleXml));
     }
-    return $simpleXml;
   }
 
 }

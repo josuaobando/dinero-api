@@ -3,32 +3,32 @@
 /**
  * @author Josua
  */
-class Saturno extends Provider
+class BillingPayments extends Provider
 {
 
   /**
    * ID
    */
-  const PROVIDER_ID = 3;
+  const PROVIDER_ID = 6;
 
   /**
    * agency id
    */
-  const AGENCY_ID = 100;
+  const AGENCY_ID = 103;
 
-  const STATUS_API_REQUESTED = 'requested';
   const STATUS_API_PENDING = 'pending';
   const STATUS_API_APPROVED = 'approved';
   const STATUS_API_REJECTED = 'rejected';
   const STATUS_API_CANCELED = 'cancelled';
-  const STATUS_API_ERROR = 'error';
-  const RESPONSE_ERROR = 'fail';
+
+  const RESPONSE_ERROR = -1;
   const RESPONSE_SUCCESS = 0;
 
-  /**
-   * @var bool
-   */
-  private $attempt = false;
+  const METHOD_GET_NAME = 'request_name.php';
+  const METHOD_SUBMIT_DEPOSIT = 'submit_deposit.php';
+  const METHOD_EDIT_DEPOSIT = 'edit_deposit.php';
+  const METHOD_SUBMIT_PAYOUT = 'submit_payout.php';
+  const METHOD_GET_STATUS = 'get_transaction.php';
 
   /**
    * new Transaction instance
@@ -55,20 +55,22 @@ class Saturno extends Provider
 
     //transaction
     $request = array();
-    $request['sendername'] = $customer->getCustomer();
-    $request['senderaccount'] = $transaction->getUsername();
+    $request['processor'] = 'MG';
+    $request['sender_name'] = $customer->getCustomer();
+    $request['sender_account'] = $transaction->getUsername();
     $request['amount'] = $transaction->getAmount();
 
     //execute request
     $this->request = $request;
-    $this->execute('ObtenerNombre');
+    $this->execute(self::METHOD_GET_NAME);
+    $this->checkResponse();
     $response = $this->getResponse();
 
     if($response && $response instanceof stdClass){
-      if($this->apiStatus == self::STATUS_API_REQUESTED){
+      if($this->apiStatus == self::RESPONSE_SUCCESS && $response->name_id){
 
-        $name = $response->recibe;
-        $personalId = $response->nameId;
+        $name = $response->receiver_name;
+        $personalId = $response->name_id;
 
         $person = new Person();
         $person->setPersonLisId(self::AGENCY_ID);
@@ -86,7 +88,7 @@ class Saturno extends Provider
         $person->setTypeId('ID');
         $person->setExpirationDateId('NR');
         $person->setAddress('NR');
-        $person->setCity('San José');
+        $person->setCity($response->receiver_city);
         $person->setBirthDate('NR');
         $person->setMaritalStatus('NR');
         $person->setGender('NR');
@@ -99,38 +101,16 @@ class Saturno extends Provider
         $transaction->setProviderId(self::PROVIDER_ID);
 
         return Session::setPerson($person);
-      }elseif($this->apiStatus == self::STATUS_API_ERROR || $this->apiCode == self::RESPONSE_ERROR || $this->apiCode > self::RESPONSE_SUCCESS){
-
-        if(stripos($this->apiMessage, 'No Names Available') !== false){
-
-          $subject = "No deposit names available";
-          $body = "There are no deposit names available in Saturn agency";
-          $bodyTemplate = MailManager::getEmailTemplate('default', array('body' => $body, 'message' => $this->apiMessage));
-          $recipients = array('To' => 'mgoficinasf0117@outlook.com', 'Cc' => CoreConfig::MAIL_DEV);
-          MailManager::sendEmail($recipients, $subject, $bodyTemplate);
-          Log::custom(__CLASS__, $body);
-
-          throw new APIPersonException('We cannot give a Receiver for this Customer (Sender)');
-        }elseif((stripos(strtolower($this->apiMessage), 'black') && stripos(strtolower($this->apiMessage), 'list')) || (stripos($this->apiMessage, 'Black List'))){
-          $this->apiMessage = 'The Customer (Sender) has been blacklisted';
-          throw new APIBlackListException($this->apiMessage);
-        }elseif(stripos(strtolower($this->apiMessage), 'limit') && stripos(strtolower($this->apiMessage), 'reached')){
-          $this->apiMessage = 'The Customer (Sender) has exceeded the limits';
-          throw new APILimitException($this->apiMessage);
-        }elseif($this->apiMessage){
-          throw new APIException($this->apiMessage);
-        }
-
-      }else{
-        if((stripos(strtolower($this->apiMessage), 'black') && stripos(strtolower($this->apiMessage), 'list')) || (stripos($this->apiMessage, 'Black List'))){
-          $this->apiMessage = 'The Customer (Receiver) has been blacklisted';
-          throw new APIBlackListException($this->apiMessage);
-        }
       }
     }
 
     Log::custom(__CLASS__, "Invalid Object Response >> " . __FUNCTION__ . " >>" . " \n Request: \n\n " . $this->getLastRequest() . " \n Response: \n\n " . Util::objToStr($response));
-    throw new APIException('We cannot give a Receiver for this Customer (Sender)');
+    if($this->apiMessage){
+      throw new APIException($this->apiMessage);
+    }else{
+      $this->apiMessage = 'We cannot give a Receiver for this Customer (Sender)';
+      throw new APIException($this->apiMessage);
+    }
   }
 
   /**
@@ -147,21 +127,26 @@ class Saturno extends Provider
 
     //transaction
     $request = array();
+    $request['processor'] = 'MG';
+    $request['remote_id'] = $transaction->getTransactionId();
     $request['amount'] = $transaction->getAmount();
-    $request['receivername'] = $customer->getCustomer();
-    $request['receivercity'] = $customer->getStateName();
-    $request['receiverstate'] = $customer->getState();
-    $request['receivercountry'] = $customer->getCountry();
+    $request['receiver_account'] = $transaction->getUsername();
+    $request['receiver_name'] = $customer->getCustomer();
+    $request['receiver_city'] = $customer->getStateName();
+    $request['receiver_state'] = $customer->getState();
+    $request['receiver_country'] = $customer->getCountry();
+    $request['comments'] = Util::isDEV() ? 'This is a test' : '';
 
     //execute request
     $this->request = $request;
-    $this->execute('SubmitPayout');
+    $this->execute(self::METHOD_SUBMIT_PAYOUT);
+    $this->checkResponse();
     $response = $this->getResponse();
 
     if($response && $response instanceof stdClass){
       if($this->apiStatus == self::STATUS_API_PENDING){
 
-        $name = trim($response->envia);
+        $name = trim($response->sender_name);
         $personalId = Encrypt::generateMD5($name);
 
         $person = new Person();
@@ -180,7 +165,7 @@ class Saturno extends Provider
         $person->setTypeId('Hash');
         $person->setExpirationDateId('NR');
         $person->setAddress('NR');
-        $person->setCity('San José');
+        $person->setCity($response->sender_city);
         $person->setBirthDate('NR');
         $person->setMaritalStatus('NR');
         $person->setGender('NR');
@@ -188,55 +173,27 @@ class Saturno extends Provider
         $person->setPhone('NR');
         $person->setNameId($personalId);
 
-        if($response->trackId){
+        if($response->id){
           $person->add();
-          $transaction->setApiTransactionId($response->trackId);
-          if(is_numeric($response->cargo)){
-            $transaction->setFee($response->cargo);
+          $transaction->setApiTransactionId($response->id);
+          if(is_numeric($response->charge)){
+            $transaction->setFee($response->charge);
           }
 
           $transaction->setAgencyId(self::AGENCY_ID);
           $transaction->setProviderId(self::PROVIDER_ID);
           return Session::setPerson($person);
         }
-
-      }elseif($this->apiStatus == self::STATUS_API_ERROR || $this->apiCode == self::RESPONSE_ERROR || $this->apiCode > self::RESPONSE_SUCCESS){
-
-        if(stripos($this->apiMessage, 'No Names Available') !== false || stripos($this->apiMessage, 'No Payouts Names Available') !== false){
-
-          $subject = "No payouts names available";
-          $body = "There are no payouts names available in Saturn agency";
-          $bodyTemplate = MailManager::getEmailTemplate('default', array('body' => $body, 'message' => $this->apiMessage));
-          $recipients = array('To' => 'mgoficinasf0117@outlook.com', 'Cc' => CoreConfig::MAIL_DEV);
-          MailManager::sendEmail($recipients, $subject, $bodyTemplate);
-          Log::custom(__CLASS__, $body);
-
-          throw new APIPersonException('We cannot give a Sender for this Customer (Receiver)');
-        }elseif((stripos(strtolower($this->apiMessage), 'black') && stripos(strtolower($this->apiMessage), 'list')) || (stripos($this->apiMessage, 'Black List'))){
-          $this->apiMessage = 'The Customer (Receiver) has been blacklisted';
-          throw new APIBlackListException($this->apiMessage);
-        }elseif(stripos(strtolower($this->apiMessage), 'limit') && stripos(strtolower($this->apiMessage), 'reached') || $this->apiMessage == 'Receiver reached payouts names limit'){
-          $this->apiMessage = 'The Customer (Receiver) has exceeded the limits';
-          throw new APILimitException($this->apiMessage);
-        }elseif($this->apiMessage){
-          throw new APIException($this->apiMessage);
-        }
-
-      }else{
-        if((stripos(strtolower($this->apiMessage), 'black') && stripos(strtolower($this->apiMessage), 'list')) || (stripos($this->apiMessage, 'Black List'))){
-          $this->apiMessage = 'The Customer (Receiver) has been blacklisted';
-          throw new APIBlackListException($this->apiMessage);
-        }elseif(stripos(strtolower($this->apiMessage), 'limit') && stripos(strtolower($this->apiMessage), 'reached') || $this->apiMessage == 'Receiver reached payouts names limit'){
-          $this->apiMessage = 'The Customer (Receiver) has exceeded the limits';
-          throw new APILimitException($this->apiMessage);
-        }elseif($this->apiMessage){
-          throw new APIException($this->apiMessage);
-        }
       }
     }
 
     Log::custom(__CLASS__, "Invalid Object Response >> " . __FUNCTION__ . " >>" . " \n Request: \n\n " . $this->getLastRequest() . " \n Response: \n\n " . Util::objToStr($response));
-    throw new APIException('We cannot give a Sender for this Customer (Receiver)');
+    if($this->apiMessage){
+      throw new APIException($this->apiMessage);
+    }else{
+      $this->apiMessage = 'We cannot give a Receiver for this Customer (Receiver)';
+      throw new APIException($this->apiMessage);
+    }
   }
 
   /**
@@ -257,18 +214,22 @@ class Saturno extends Provider
     //transaction
     $request = array();
     if($apiTransactionId){
-      $request['trackid'] = $apiTransactionId;
+      $request['transaction'] = $apiTransactionId;
     }else{
-      $request['nameid'] = $nameId;
+      $request['remote_id'] = $transaction->getTransactionId();
+      $request['name_id'] = $nameId;
     }
     $request['amount'] = $transaction->getAmount();
-    $request['controlnumber'] = $transaction->getControlNumber();
+    $request['control_number'] = $transaction->getControlNumber();
     //customer
-    $request['sendername'] = $customer->getCustomer();
-    $request['sendercity'] = $customer->getStateName();
-    $request['senderstate'] = $customer->getState();
-    $request['sendercountry'] = $customer->getCountry();
-    $method = ($apiTransactionId) ? 'EditarDeposito' : 'SubmitDeposito';
+    $request['sender_name'] = $customer->getCustomer();
+    $request['sender_account'] = $transaction->getUsername();
+    $request['sender_city'] = $customer->getStateName();
+    $request['sender_state'] = $customer->getState();
+    $request['sender_country'] = $customer->getCountry();
+    $request['comments'] = Util::isDEV() ? 'This is a test' : '';
+
+    $method = ($apiTransactionId) ? self::METHOD_EDIT_DEPOSIT : self::METHOD_SUBMIT_DEPOSIT;
 
     //execute request
     $this->request = $request;
@@ -276,38 +237,27 @@ class Saturno extends Provider
     $response = $this->getResponse();
 
     if($response && $response instanceof stdClass){
-
-      $this->apiMessage = $response->comentario;
-      $this->apiStatus = strtolower($response->status);
-
       if($this->apiStatus == self::STATUS_API_PENDING){
-
-        $this->apiTransactionId = $response->trackId;
+        $this->apiTransactionId = $response->id;
         $transaction->setApiTransactionId($this->apiTransactionId);
         return true;
-
-      }elseif($this->apiStatus == self::STATUS_API_ERROR || $this->apiCode == self::RESPONSE_ERROR){
-
+      }else{
         if($apiTransactionId){
           $subject = "Problem re-submit transaction";
-          $body = "TrackId $apiTransactionId";
+          $body = "Id $apiTransactionId";
         }else{
           $subject = "Problem submit transaction";
-          $body = "Nameid $nameId";
+          $body = "NameId $nameId";
         }
 
         $body .= "<br>" . "Status: $response->status";
-        $body .= "<br>" . "lStatus: $response->lstatus";
-        $body .= "<br>" . "Comentario: $response->comentario";
+        $body .= "<br>" . "Error Message: $response->error_message";
         $body .= "<br><br>" . "Request:";
         $body .= "<br><br>" . $this->getLastRequest();
         $body .= "<br><br>" . "Response:";
         $body .= "<br><br>" . Util::objToStr($response);
         $bodyTemplate = MailManager::getEmailTemplate('default', array('body' => $body));
         MailManager::sendEmail(MailManager::getRecipients(), $subject, $bodyTemplate);
-
-        Log::custom(__CLASS__, $body);
-        throw new APIException("$subject. Please try again in a few minutes!");
       }
     }
 
@@ -329,18 +279,17 @@ class Saturno extends Provider
 
       //transaction
       $request = array();
-      $request['trackid'] = $transaction->getApiTransactionId();
-      $method = ($transaction->getTransactionTypeId() == Transaction::TYPE_SENDER) ? 'GetPayout' : 'GetDeposito';
+      $request['transaction'] = $transaction->getApiTransactionId();
 
       //execute request
       $this->request = $request;
-      $this->execute($method);
+      $this->execute(self::METHOD_GET_STATUS);
       $response = $this->getResponse();
 
       if($response && $response instanceof stdClass){
 
-        //validate trackId
-        if($response->trackId != $transaction->getApiTransactionId()){
+        //validate Id
+        if($response->id != $transaction->getApiTransactionId()){
           Log::custom(__CLASS__, "Transaction ID mismatch" . "\n Request: \n\n" . $this->getLastRequest() . "\n Response: \n\n" . Util::objToStr($response));
           return false;
         }
@@ -348,8 +297,8 @@ class Saturno extends Provider
         switch($this->apiStatus){
           case self::STATUS_API_APPROVED:
             if($transaction->getTransactionTypeId() == Transaction::TYPE_SENDER){
-              if($response->documento){
-                $transaction->setControlNumber($response->documento);
+              if($response->control_number){
+                $transaction->setControlNumber($response->control_number);
               }else{
                 Log::custom(__CLASS__, "Transaction without MTCN" . "\n Request: \n\n" . $this->getLastRequest() . "\n Response: \n\n" . Util::objToStr($response));
                 return false;
@@ -357,14 +306,12 @@ class Saturno extends Provider
             }
             $transaction->setTransactionStatusId(Transaction::STATUS_APPROVED);
             $transaction->setReason('Ok');
-            if((strtolower($this->apiMessage) != 'ninguno') && strlen($this->apiMessage)){
-              $transaction->setNote($this->apiMessage);
-            }
+            $transaction->setNote($response->comments);
 
             //only change amount in deposits
             if($transaction->getTransactionTypeId() == Transaction::TYPE_RECEIVER){
-              if(is_numeric($response->monto)){
-                $transaction->setAmount($response->monto);
+              if(is_numeric($response->amount)){
+                $transaction->setAmount($response->amount);
               }
             }
             break;
@@ -396,9 +343,6 @@ class Saturno extends Provider
             break;
           case self::STATUS_API_PENDING:
             $transaction->setTransactionStatusId(Transaction::STATUS_SUBMITTED);
-            break;
-          case self::STATUS_API_REQUESTED:
-            $transaction->setTransactionStatusId(Transaction::STATUS_REQUESTED);
             break;
           default:
             Log::custom(__CLASS__, "Invalid Object Response" . "\n Request: \n\n" . $this->getLastRequest() . "\n Response: \n\n" . Util::objToStr($response));
@@ -437,9 +381,11 @@ class Saturno extends Provider
       $params['password'] = $this->getSetting(self::SETTING_PASSWORD);
       //request params
       $request = array_merge($params, $this->getRequest());
+
       //make ws request
       $url = $this->getSetting(self::SETTING_URL);
-      $response = $this->execSoapSimple($url, $method, $request, array('uri' => 'http://WS/', 'soapaction' => ''));
+      $this->setReader(new Reader_Obj());
+      $response = $this->execPost($url . $method, $request);
       //get response
       $this->response = $response;
       $this->unpack($response);
@@ -447,30 +393,10 @@ class Saturno extends Provider
       ExceptionManager::handleException($ex);
       $this->apiCode = self::RESPONSE_ERROR;
       $this->apiMessage = 'At this time, we can not process your request. Please try again in a few minutes!';
-
-      //re-try
-      if($ex->getMessage() == 'Unexpected end of file from server' && !$this->attempt){
-        if($method == 'SubmitPayout' || $method == 'EditarDeposito' || $method == 'SubmitDeposito' || $method == 'ObtenerNombre'){
-          Log::custom(__CLASS__, "Execute Attempt \n Request: \n " . $this->getLastRequest() . "\n");
-          sleep(5);
-          $this->attempt = true;
-          $this->execute($method);
-        }
-      }
     }catch(Exception $ex){
       ExceptionManager::handleException($ex);
       $this->apiCode = self::RESPONSE_ERROR;
       $this->apiMessage = 'At this time, we can not process your request. Please try again in a few minutes!';
-
-      //re-try
-      if($ex->getMessage() == 'Unexpected end of file from server' && !$this->attempt){
-        if($method == 'SubmitPayout' || $method == 'EditarDeposito' || $method == 'SubmitDeposito' || $method == 'ObtenerNombre'){
-          Log::custom(__CLASS__, "Execute Attempt \n Request: \n " . $this->getLastRequest() . "\n");
-          sleep(5);
-          $this->attempt = true;
-          $this->execute($method);
-        }
-      }
     }
   }
 
@@ -483,21 +409,78 @@ class Saturno extends Provider
    */
   public function unpack($response)
   {
-    try{
-      if($response && $response instanceof stdClass){
-        $this->apiTransactionId = $response->trans;
-        $this->apiCode = $response->lstatus;
-        $this->apiStatus = strtolower($response->status);
-        $this->apiMessage = $response->comentario;
-      }else{
-        $this->apiCode = self::RESPONSE_ERROR;
-        $this->apiMessage = 'At this time, we can not process your request. Please try again in a few minutes!';
-        Log::custom(__CLASS__, "Invalid Object Response" . "\n Request: \n\n" . $this->getLastRequest() . "\n Response: \n\n" . Util::objToStr($response));
+    if($response && $response instanceof stdClass){
+      $this->apiTransactionId = $response->id;
+      $this->apiCode = $response->status;
+      $this->apiStatus = ($response->transaction_status) ? strtolower($response->transaction_status) : '';
+      $this->apiMessage = '';
+      if($this->apiCode != self::RESPONSE_SUCCESS){
+        $this->apiMessage = $response->error_message;
       }
-    }catch(Exception $ex){
+    }else{
       $this->apiCode = self::RESPONSE_ERROR;
       $this->apiMessage = 'At this time, we can not process your request. Please try again in a few minutes!';
-      ExceptionManager::handleException($ex);
+      Log::custom(__CLASS__, "Invalid Object Response" . "\n Request: \n\n" . $this->getLastRequest() . "\n Response: \n\n" . Util::objToStr($response));
+    }
+  }
+
+  /**
+   * @throws APIBlackListException|APIException|APILimitException|APIPersonException
+   */
+  private function checkResponse()
+  {
+    if($this->apiCode != self::RESPONSE_SUCCESS){
+      switch($this->apiCode){
+        case self::RESPONSE_ERROR:
+          $this->apiMessage = 'At this time, we can not process your request. Please try again in a few minutes!';
+          throw new APIException($this->apiMessage);
+          break;
+        case 1001: //No Names Available. Please contact Admin
+
+          $transaction = Session::getTransaction();
+          if($transaction->getTransactionTypeId() == Transaction::TYPE_RECEIVER){
+            $subject = "No deposit names available";
+            $body = "There are no deposit names available in " . __CLASS__ . " agency";
+          }else{
+            $subject = "No payouts names available";
+            $body = "There are no payouts names available in " . __CLASS__ . " agency";
+          }
+
+          $bodyTemplate = MailManager::getEmailTemplate('default', array('body' => $body, 'message' => $this->apiMessage));
+          $recipients = array('To' => 'mgoficinasf0117@outlook.com', 'Cc' => CoreConfig::MAIL_DEV);
+          MailManager::sendEmail($recipients, $subject, $bodyTemplate);
+          Log::custom(__CLASS__, $body);
+
+          $this->apiMessage = 'We cannot give a Receiver for this Customer';
+          throw new APIPersonException($this->apiMessage);
+          break;
+        case 1002: //Access Denied
+          $this->apiMessage = 'Access Denied';
+          throw new APIException($this->apiMessage);
+          break;
+        case 1003: //No Transaction Found
+          $this->apiMessage = 'This transaction not exist or not can be loaded';
+          throw new APIException($this->apiMessage);
+          break;
+        case 1007: //Sender reached requests limit
+          $this->apiMessage = 'The Customer has exceeded the limits';
+          throw new APILimitException($this->apiMessage);
+          break;
+        case 1034: //There are no names available for this Sender, please try again tomorrow.
+          $this->apiMessage = 'The Customer has exceeded the limits';
+          throw new APILimitException($this->apiMessage);
+          break;
+        case 1035: //Sender or Receiver is on Black List, please try again or use a different Sender
+          $this->apiMessage = 'The Customer has been blacklisted';
+          throw new APIBlackListException($this->apiMessage);
+          break;
+        default:
+          if($this->apiMessage){
+            throw new APIException($this->apiMessage);
+          }else{
+            throw new APIException('We cannot give a Receiver for this Customer');
+          }
+      }
     }
   }
 
