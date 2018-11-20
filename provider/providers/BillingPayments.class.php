@@ -176,8 +176,8 @@ class BillingPayments extends Provider
         if($response->id){
           $person->add();
           $transaction->setApiTransactionId($response->id);
-          if(is_numeric($response->charge)){
-            $transaction->setFee($response->charge);
+          if(is_numeric($response->fee)){
+            $transaction->setFee($response->fee);
           }
 
           $transaction->setAgencyId(self::AGENCY_ID);
@@ -299,6 +299,10 @@ class BillingPayments extends Provider
             if($transaction->getTransactionTypeId() == Transaction::TYPE_SENDER){
               if($response->control_number){
                 $transaction->setControlNumber($response->control_number);
+
+                if(is_numeric($response->fee)){
+                  $transaction->setFee($response->fee);
+                }
               }else{
                 Log::custom(__CLASS__, "Transaction without MTCN" . "\n Request: \n\n" . $this->getLastRequest() . "\n Response: \n\n" . Util::objToStr($response));
                 return false;
