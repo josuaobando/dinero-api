@@ -21,12 +21,14 @@ class Task_Report extends Task
    */
   public function process()
   {
-    $this->transactions['MG-Nicaragua'] = $this->tblTask->getReportTransactions(Transaction::AGENCY_TYPE_MG, CoreConfig::AGENCY_ID_NICARAGUA);
-    $this->transactions['MG-Saturno'] = $this->tblTask->getReportTransactions(Transaction::AGENCY_TYPE_MG, CoreConfig::AGENCY_ID_SATURNO, Transaction::TYPE_RECEIVER);
-    $this->transactions['MG-Saturno-Payouts'] = $this->tblTask->getReportTransactions(Transaction::AGENCY_TYPE_MG, CoreConfig::AGENCY_ID_SATURNO, Transaction::TYPE_SENDER);
+    $this->transactions['MG-Nicaragua'] = $this->tblTask->getReportTransactions(Transaction::AGENCY_TYPE_MG, Nicaragua::AGENCY_ID);
+    $this->transactions['MG-Saturno'] = $this->tblTask->getReportTransactions(Transaction::AGENCY_TYPE_MG, Saturno::AGENCY_ID, Transaction::TYPE_RECEIVER);
+    $this->transactions['MG-Saturno-Payouts'] = $this->tblTask->getReportTransactions(Transaction::AGENCY_TYPE_MG, Saturno::AGENCY_ID, Transaction::TYPE_SENDER);
+    $this->transactions['MG-Billing'] = $this->tblTask->getReportTransactions(Transaction::AGENCY_TYPE_MG, BillingPayments::AGENCY_ID, Transaction::TYPE_RECEIVER);
+    $this->transactions['MG-Billing-Payouts'] = $this->tblTask->getReportTransactions(Transaction::AGENCY_TYPE_MG, BillingPayments::AGENCY_ID, Transaction::TYPE_SENDER);
     $this->transactions['MG'] = $this->tblTask->getReportTransactions(Transaction::AGENCY_TYPE_MG);
     $this->transactions['RIA'] = $this->tblTask->getReportTransactions(Transaction::AGENCY_TYPE_RIA);
-    $this->transactions['RIA-Saturno'] = $this->tblTask->getReportTransactions(Transaction::AGENCY_TYPE_RIA, CoreConfig::AGENCY_ID_SATURNO_RIA);
+    $this->transactions['RIA-Saturno'] = $this->tblTask->getReportTransactions(Transaction::AGENCY_TYPE_RIA, Ria::AGENCY_ID);
 
     foreach($this->transactions as $group => $transactions){
       if(is_array($transactions) && count($transactions) > 0){
