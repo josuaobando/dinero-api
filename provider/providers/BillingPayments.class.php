@@ -424,7 +424,7 @@ class BillingPayments extends Provider
       $this->apiTransactionId = $response->id;
       $this->apiCode = $response->status;
       $this->apiStatus = ($response->transaction_status) ? strtolower($response->transaction_status) : '';
-      $this->apiMessage = '';
+      $this->apiMessage = $response->feedback;
       if($this->apiCode != self::RESPONSE_SUCCESS){
         $this->apiMessage = $response->error_message;
       }
