@@ -73,8 +73,8 @@ class ProviderTransaction
     $customer->getLastTransaction($transaction->getTransactionTypeId());
     $transaction->setCustomerId($customer->getCustomerId());
     //default values
-    $transaction->setAgencyId($customer->getLastTransaction()->getAgencyId());
-    $transaction->setProviderId($customer->getLastTransaction()->getProviderId());
+    //$transaction->setAgencyId($customer->getLastTransaction()->getAgencyId());
+    //$transaction->setProviderId($customer->getLastTransaction()->getProviderId());
 
     //evaluate limits
     /*
