@@ -69,6 +69,10 @@ class Dinero extends Provider
     //validate if customer is blacklisted
     $customer->isBlacklisted();
 
+    //evaluate limits
+    $limit = new Limit($transaction, $customer);
+    $limit->evaluate();
+
     //check stickiness
     $stickiness = Session::getStickiness(true);
     $stickiness->restoreByCustomerId($customer->getCustomerId());

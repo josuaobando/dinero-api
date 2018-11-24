@@ -77,9 +77,10 @@ class ProviderTransaction
     $transaction->setProviderId($customer->getLastTransaction()->getProviderId());
 
     //evaluate limits
+    /*
     $limit = new Limit($transaction, $customer);
     $limit->evaluate();
-
+    */
     //get name
     $person = new Person();
     $provider = new Provider();
