@@ -92,10 +92,6 @@ class Stickiness
   /**
    * @var int
    */
-  private $agencyTypeId;
-  /**
-   * @var int
-   */
   private $agencyP2P;
   /**
    * @var int
@@ -297,17 +293,6 @@ class Stickiness
    */
   public function rejectProvider()
   {
-    /*
-    try{
-      $tblCustomer = TblCustomer::getInstance();
-      $blocked = $tblCustomer->block($this->customer, $this->agencyTypeId, 'P2P Blocked');
-      if($blocked){
-        Log::custom('Blocked', "Agency: $this->agencyTypeId Customer: $this->customer");
-      }
-    }catch(Exception $ex){
-      ExceptionManager::handleException($ex);
-    }
-    */
     try{
       if($this->stickinessId){
         $this->tblStickiness->isActive($this->stickinessId, 0);
@@ -337,7 +322,6 @@ class Stickiness
       $this->verificationId = $stickinessData['Verification_Id'];
       $this->verification = $stickinessData['Verification'];
 
-      $this->agencyTypeId = $stickinessData['AgencyType_Id'];
       $this->agencyP2P = $stickinessData['AgencyP2P'];
       $this->agencyP2P_Url = $stickinessData['AgencyP2P_Url'];
 
@@ -362,7 +346,6 @@ class Stickiness
     $stickinessData = $this->tblStickiness->getByCustomerId($this->customerId);
     if($stickinessData){
       $this->stickinessId = $stickinessData['Stickiness_Id'];
-      $this->agencyTypeId = $stickinessData['AgencyType_Id'];
       $this->agencyP2P = $stickinessData['AgencyP2P'];
       $this->agencyP2P_Url = $stickinessData['AgencyP2P_Url'];
 
