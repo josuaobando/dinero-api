@@ -105,7 +105,7 @@ class TblApp extends Db
   /**
    * get a list of transactions report
    *
-   * @param $statusId
+   * @param $statusList
    * @param $transactionTypeId
    * @param $filterAgencyType
    * @param $agencyList
@@ -121,12 +121,12 @@ class TblApp extends Db
    *
    * @return array
    */
-  public function transactionReport($statusId, $transactionTypeId, $filterAgencyType, $agencyList, $accountId, $beginDate, $endDate, $controlNumber, $customer, $transactionId, $reference, $currentPage, $pageSize)
+  public function transactionReport($statusList, $transactionTypeId, $filterAgencyType, $agencyList, $accountId, $beginDate, $endDate, $controlNumber, $customer, $transactionId, $reference, $currentPage, $pageSize)
   {
-    $sql = "CALL spApp_Report_Transactions('{statusId}', '{transactionTypeId}', '{agencyType}', '{agencyList}', '{accountId}', '{beginDate}', '{endDate}', '{controlNumber}', '{customer}', '{transactionId}', '{reference}', '{pageStart}', '{pageSize}')";
+    $sql = "CALL spApp_Report_Transactions('{statusLis}', '{transactionTypeId}', '{agencyType}', '{agencyList}', '{accountId}', '{beginDate}', '{endDate}', '{controlNumber}', '{customer}', '{transactionId}', '{reference}', '{pageStart}', '{pageSize}')";
 
     $params = array();
-    $params['statusId'] = $statusId;
+    $params['statusLis'] = $statusList;
     $params['transactionTypeId'] = $transactionTypeId;
     $params['agencyType'] = $filterAgencyType;
     $params['agencyList'] = $agencyList;
@@ -140,7 +140,7 @@ class TblApp extends Db
     $params['pageStart'] = $currentPage;
     $params['pageSize'] = $pageSize;
 
-    return $this->executeMultiQuery($sql, array('transactions', 'total', 'summary'), $params);
+    return $this->executeMultiQuery($sql, array('transactions', 'summary'), $params);
   }
 
   /**

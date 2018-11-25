@@ -229,16 +229,18 @@ function transactionReport($wsRequest)
 
     $beginDate = $wsRequest->getParam("beginDate", "");
     $endDate = $wsRequest->getParam("endDate", "");
-    $statusId = $wsRequest->getParam("statusId");
-    $statusId = ($statusId == "-1") ? "0" : $statusId;
     $transactionType = $wsRequest->getParam("transactionTypeId", "0");
     $agencyType = $wsRequest->getParam("agencyTypeId", "0");
-    $agencyId = $wsRequest->getParam("agencyId", "0");
     $username = $wsRequest->getParam("username", "");
 
     $agencyList = $wsRequest->getParam("agencies");
     if (is_array($agencyList)){
       $agencyList = implode(",", $agencyList);
+    }
+
+    $statusList = $wsRequest->getParam("status");
+    if (is_array($statusList)){
+      $statusList = implode(",", $statusList);
     }
 
     //specific
@@ -253,23 +255,19 @@ function transactionReport($wsRequest)
         $wsResponse = new WSResponseOk();
         $wsResponse->addElement('transactions', array());
         $wsResponse->addElement('summary', array());
-        $wsResponse->addElement('total', 0);
-
         return $wsResponse;
       }
 
     }
 
     $appManager = new AppManager();
-    $dataReport = $appManager->transactionReport($statusId, $transactionType, $agencyType, $agencyList, $account->getAccountId(), $beginDate, $endDate, $controlNumber, $username, $transactionId, $merchantTransId, 0);
+    $dataReport = $appManager->transactionReport($statusList, $transactionType, $agencyType, $agencyList, $account->getAccountId(), $beginDate, $endDate, $controlNumber, $username, $transactionId, $merchantTransId, 0);
     $transactions = $dataReport['transactions'];
     $summary = $dataReport['summary'];
-    $total = $dataReport['total'][0]['total'];
 
     $wsResponse = new WSResponseOk();
     $wsResponse->addElement('transactions', $transactions);
     $wsResponse->addElement('summary', $summary);
-    $wsResponse->addElement('total', $total);
   }catch(InvalidParameterException $ex){
     $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception.parameter');
   }catch(SessionException $ex){
