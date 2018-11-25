@@ -121,6 +121,14 @@ function f_agencies()
 }
 
 /**
+ * get transaction status
+ */
+function f_transactionStatus()
+{
+  require_once('api/client.php');
+}
+
+/**
  * get transactions
  */
 function f_transactions()
