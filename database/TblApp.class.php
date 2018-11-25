@@ -34,7 +34,7 @@ class TblApp extends Db
    */
   public function getAgencies()
   {
-    $sql = "CALL agencies()";
+    $sql = "CALL spAgencies()";
 
     $params = array();
     $rows = array();

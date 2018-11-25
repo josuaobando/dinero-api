@@ -22,11 +22,11 @@ class AppManager
   }
 
   /**
-   * get agencies
+   * get a list of transactions status
    *
    * @return array
    */
-  public function getAgencies()
+  public function agencies()
   {
     return $this->tblApp->getAgencies();
   }

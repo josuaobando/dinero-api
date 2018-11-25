@@ -74,7 +74,7 @@ function logout($wsRequest)
  *
  * @return WSResponse
  */
-function getCountries($wsRequest)
+function countries($wsRequest)
 {
   try{
     Session::getAccount();
@@ -97,13 +97,40 @@ function getCountries($wsRequest)
  *
  * @return WSResponse
  */
-function getAgencies($wsRequest)
+function agencies($wsRequest)
 {
   try{
     Session::getAccount();
-    $agencies = Session::getAgencies();
+    $appManager = new AppManager();
+    $agencies = $appManager->agencies();
+
     $wsResponse = new WSResponseOk();
     $wsResponse->addElement('agencies', $agencies);
+  }catch(SessionException $ex){
+    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.session.expired');
+  }catch(Exception $ex){
+    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception');
+  }
+
+  return $wsResponse;
+}
+
+/**
+ * get transaction status
+ *
+ * @param WSRequest $wsRequest
+ *
+ * @return WSResponse
+ */
+function transactionStatus($wsRequest)
+{
+  try{
+    Session::getAccount();
+    $appManager = new AppManager();
+    $status = $appManager->transactionStatus();
+
+    $wsResponse = new WSResponseOk();
+    $wsResponse->addElement('transactionStatus', $status);
   }catch(SessionException $ex){
     $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.session.expired');
   }catch(Exception $ex){

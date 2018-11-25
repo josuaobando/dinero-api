@@ -132,7 +132,7 @@ class TblSystem extends Db
    */
   public function getTransactionStatus()
   {
-    $sql = "CALL transactionStatus()";
+    $sql = "CALL spTransactionStatus()";
 
     $params = array();
     $rows = array();

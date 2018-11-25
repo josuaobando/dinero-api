@@ -107,7 +107,7 @@ function f_logout()
 /**
  * get countries
  */
-function f_getCountries()
+function f_countries()
 {
   require_once('api/client.php');
 }
@@ -115,7 +115,7 @@ function f_getCountries()
 /**
  * get agencies
  */
-function f_getAgencies()
+function f_agencies()
 {
   require_once('api/client.php');
 }
