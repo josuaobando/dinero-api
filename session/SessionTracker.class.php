@@ -86,7 +86,7 @@ class SessionTracker
 
     $referrer = $wsRequest->getParam('referrer', $_SERVER['HTTP_REFERER']);
     $platform = $wsRequest->getParam('platform', '');
-    $remoteAddr = $wsRequest->getParam('ip');
+    $remoteAddr = $wsRequest->getParam('remoteIP');
 
     if(empty($remoteAddr)){
       if($_SERVER['REMOTE_ADDR'] == '127.0.0.1'){
