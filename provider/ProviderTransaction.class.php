@@ -70,11 +70,7 @@ class ProviderTransaction
 
     //validate if need to create the customer
     $customer->validateFromRequest($account, $this->wsRequest);
-    $customer->getLastTransaction($transaction->getTransactionTypeId());
     $transaction->setCustomerId($customer->getCustomerId());
-    //default values
-    //$transaction->setAgencyId($customer->getLastTransaction()->getAgencyId());
-    //$transaction->setProviderId($customer->getLastTransaction()->getProviderId());
 
     //evaluate limits
     /*
@@ -193,15 +189,11 @@ class ProviderTransaction
 
     //validate if need to create the customer
     $customer->validateFromRequest($account, $this->wsRequest);
-    $customer->getLastTransaction($transaction->getTransactionTypeId());
     $transaction->setCustomerId($customer->getCustomerId());
-    //default values
-    $transaction->setAgencyId($customer->getLastTransaction()->getAgencyId());
-    $transaction->setProviderId($customer->getLastTransaction()->getProviderId());
 
     //evaluate limits
-    $limit = new Limit($transaction, $customer);
-    $limit->evaluate();
+    //$limit = new Limit($transaction, $customer);
+    //$limit->evaluate();
 
     //get name
     $person = new Person();

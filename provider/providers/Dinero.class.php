@@ -24,16 +24,23 @@ class Dinero extends Provider
    *
    * @param float $amount
    * @param int $agencyTypeId
-   * @param int $agencyId
    *
    * @return array
    *
-   * @throws PersonException
+   * @throws PersonException|TransactionException
    */
-  private function getPersonAvailable($amount, $agencyTypeId, $agencyId)
+  private function getPersonAvailable($amount, $agencyTypeId)
   {
     $account = Session::getAccount();
     $tblManager = TblManager::getInstance();
+
+    $agencyId = $tblManager->getNextAgency($agencyTypeId, $account->getAccountId());
+    if(!$agencyId){
+      $this->apiStatus = self::REQUEST_ERROR;
+      $this->apiMessage = "No agency available";
+      throw new TransactionException("No agency available");
+    }
+
     $availableList = $tblManager->getPersonsAvailable($account->getAccountId(), $amount, $agencyTypeId, $agencyId);
     if(!$availableList || !is_array($availableList) || count($availableList) == 0){
 
@@ -62,8 +69,12 @@ class Dinero extends Provider
     $customer = Session::getCustomer();
     $transaction = Session::getTransaction();
 
-    if($customer->getIsAPI()){
-      throw new P2PException("Redirect to API...");
+    $lastTransaction = $customer->getLastTransaction($transaction->getTransactionTypeId());
+    if($lastTransaction){
+      $agencyId = $lastTransaction->getAgencyId();
+//      if($lastTransaction->getPersonId() != Dinero::PROVIDER_ID){
+//        throw new P2PException("Redirect to API...");
+//      }
     }
 
     //validate if customer is blacklisted
@@ -80,8 +91,9 @@ class Dinero extends Provider
     $personId = $stickiness->getPersonId();
     if(!$personId){
       //select and block the person for following transactions
-      $personSelected = $this->getPersonAvailable($transaction->getAmount(), $transaction->getAgencyTypeId(), $customer->getAgencyId());
+      $personSelected = $this->getPersonAvailable($transaction->getAmount(), $transaction->getAgencyTypeId());
       $personId = $personSelected['Person_Id'];
+      $agencyId = $personSelected['Agency_Id'];
     }
     $person = Session::getPerson($personId);
     //Check to API Controller and Register Stickiness
@@ -94,7 +106,7 @@ class Dinero extends Provider
     //------------------end validation
 
     $transaction->setProviderId(self::PROVIDER_ID);
-    $transaction->setAgencyId($customer->getAgencyId());
+    $transaction->setAgencyId($agencyId);
     return Session::setPerson($person);
   }
 

@@ -28,6 +28,31 @@ class TblManager extends Db
   }
 
   /**
+   * get next agency to processing
+   *
+   * @param int $agencyType
+   * @param int $accountId
+   *
+   * @return int
+   */
+  public function getNextAgency($agencyType, $accountId)
+  {
+    $sql = "CALL spAgencyNext('{agencyType}', '{accountId}')";
+
+    $params = array();
+    $params['agencyId'] = $agencyType;
+    $params['accountId'] = $accountId;
+
+    $row = array();
+    $this->executeSingleQuery($sql, $row, $params);
+    if($row){
+      return $row['Agency_Id'];
+    }
+
+    return 0;
+  }
+
+  /**
    * get available names
    *
    * @param int $accountId
