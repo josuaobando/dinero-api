@@ -31,6 +31,7 @@ class Person
   private $phone;
   private $nameId;
 
+  private $agencyId;
   private $personListId;
 
   /**
@@ -218,6 +219,13 @@ class Person
   public function getIsAPI()
   {
     return $this->nameId > 0;
+  }
+
+  /**
+   * @return int
+   */
+  public function getAgencyId(){
+    return $this->agencyId;
   }
 
   /**
@@ -410,6 +418,13 @@ class Person
   public function setPersonLisId($personListId)
   {
     $this->personListId = $personListId;
+  }
+
+  /**
+   * @param $agencyId
+   */
+  public function setAgencyId($agencyId){
+    $this->agencyId = $agencyId;
   }
 
   /**

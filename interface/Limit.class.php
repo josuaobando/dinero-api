@@ -70,7 +70,7 @@ class Limit
     $this->customer = $customer;
     $this->transaction = $transaction;
     $this->tblLimit = TblLimit::getInstance();
-    $this->limitDetails = $this->tblLimit->getLimitDetails($this->customer->getAgencyTypeId());
+    $this->limitDetails = $this->tblLimit->getLimitDetails($this->transaction->getAgencyTypeId());
   }
 
   /**
