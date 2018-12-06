@@ -171,7 +171,7 @@ class Ria extends Provider
 
     if($transaction->getAmount() < 60){
       throw new LimitException("The minimum allowed amount is: 60 USD");
-    }elseif($transaction->getAmount() > 450){
+    }elseif($transaction->getAmount() > 460){
       throw new LimitException("The maximum allowed amount is: 450 USD");
     }
 
