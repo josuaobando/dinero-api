@@ -506,10 +506,10 @@ class Stickiness
             break;
           default:
             ExceptionManager::handleException(new P2PException("Invalid Response Code >> Code: $resultCode  Message: $resultCodeMessage : (" . __FUNCTION__ . ")"));
-            throw new TransactionException("Due to external factors, we cannot give this customer a name.");
+            throw new P2PException("Due to external factors, we cannot give this customer a name.");
         }
       }else{
-        throw new TransactionException("Customer cannot be verify.");
+        throw new P2PException("Customer cannot be verify.");
       }
 
     }else{
