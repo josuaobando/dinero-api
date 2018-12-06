@@ -12,7 +12,9 @@ class Dinero extends Provider
   const PROVIDER_ID = 1;
 
   /**
-   * new Transaction instance
+   * Dinero constructor.
+   *
+   * @throws InvalidStateException
    */
   public function __construct()
   {
@@ -22,12 +24,14 @@ class Dinero extends Provider
   /**
    * get a new receiver id from all the available
    *
-   * @param float $amount
-   * @param int $agencyTypeId
+   * @param $amount
+   * @param $agencyTypeId
    *
-   * @return array
+   * @return int
    *
-   * @throws PersonException|TransactionException
+   * @throws PersonException
+   * @throws SessionException
+   * @throws TransactionException
    */
   private function getPersonAvailable($amount, $agencyTypeId)
   {
@@ -62,7 +66,12 @@ class Dinero extends Provider
    *
    * @return Person
    *
-   * @throws TransactionException
+   * @throws \CustomerBlackListException
+   * @throws \LimitException
+   * @throws \P2PException
+   * @throws \P2PLimitException
+   * @throws \PersonException
+   * @throws \TransactionException
    */
   public function receiver()
   {

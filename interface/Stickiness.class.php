@@ -338,6 +338,8 @@ class Stickiness
    * restore or get stickiness data
    *
    * @param $customerId
+   *
+   * @throws P2PException
    */
   public function restoreByCustomerId($customerId)
   {
@@ -358,8 +360,10 @@ class Stickiness
         $this->personalId = $stickinessData['PersonalId'];
       }
 
+    }else{
+      Log::custom(__CLASS__, 'stickinessData is unavailable to customerId: ' . $customerId);
+      throw new P2PException("Agency is unavailable");
     }
-
   }
 
   /**
@@ -386,7 +390,6 @@ class Stickiness
       $this->person = $this->stickinessTransactionData['Person'];
       $this->personalId = $this->stickinessTransactionData['PersonalId'];
     }
-
   }
 
   //---------------------------------------------------
