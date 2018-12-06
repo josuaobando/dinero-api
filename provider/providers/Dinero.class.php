@@ -62,19 +62,20 @@ class Dinero extends Provider
    *
    * @return Person
    *
-   * @throws P2PException
+   * @throws TransactionException
    */
   public function receiver()
   {
     $customer = Session::getCustomer();
     $transaction = Session::getTransaction();
 
+    $agencyId = $customer->getAgencyId();
     $lastTransaction = $customer->getLastTransaction($transaction->getTransactionTypeId());
-    if($lastTransaction){
+    if($lastTransaction && $lastTransaction->getTransactionId()){
       $agencyId = $lastTransaction->getAgencyId();
-//      if($lastTransaction->getPersonId() != Dinero::PROVIDER_ID){
-//        throw new P2PException("Redirect to API...");
-//      }
+      if($lastTransaction->getProviderId() != Dinero::PROVIDER_ID){
+        throw new TransactionException("We cannot give a Receiver for this Customer (Receiver)");
+      }
     }
 
     //validate if customer is blacklisted
@@ -94,6 +95,9 @@ class Dinero extends Provider
       $personSelected = $this->getPersonAvailable($transaction->getAmount(), $transaction->getAgencyTypeId());
       $personId = $personSelected['Person_Id'];
       $agencyId = $personSelected['Agency_Id'];
+      //update new agency
+      $customer->setAgencyId($agencyId);
+      $customer->update();
     }
     $person = Session::getPerson($personId);
     //Check to API Controller and Register Stickiness

@@ -72,11 +72,6 @@ class ProviderTransaction
     $customer->validateFromRequest($account, $this->wsRequest);
     $transaction->setCustomerId($customer->getCustomerId());
 
-    //evaluate limits
-    /*
-    $limit = new Limit($transaction, $customer);
-    $limit->evaluate();
-    */
     //get name
     $person = new Person();
     $provider = new Provider();
@@ -92,6 +87,9 @@ class ProviderTransaction
             break;
           }
         }catch(CustomerBlackListException $exception){
+          $providerException = $exception;
+          continue;
+        }catch(LimitException $exception){
           $providerException = $exception;
           continue;
         }catch(P2PException $exception){
@@ -191,10 +189,6 @@ class ProviderTransaction
     $customer->validateFromRequest($account, $this->wsRequest);
     $transaction->setCustomerId($customer->getCustomerId());
 
-    //evaluate limits
-    //$limit = new Limit($transaction, $customer);
-    //$limit->evaluate();
-
     //get name
     $person = new Person();
     $provider = new Provider();
@@ -210,6 +204,9 @@ class ProviderTransaction
             break;
           }
         }catch(CustomerBlackListException $exception){
+          $providerException = $exception;
+          continue;
+        }catch(LimitException $exception){
           $providerException = $exception;
           continue;
         }catch(P2PException $exception){

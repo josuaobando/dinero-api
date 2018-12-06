@@ -40,7 +40,7 @@ class TblManager extends Db
     $sql = "CALL spAgencyNext('{agencyType}', '{accountId}')";
 
     $params = array();
-    $params['agencyId'] = $agencyType;
+    $params['agencyType'] = $agencyType;
     $params['accountId'] = $accountId;
 
     $row = array();
