@@ -440,6 +440,7 @@ class Person
       $this->personId = $personId;
 
       $personData = $this->tblPerson->getPerson($personId);
+      $this->agencyId = $personData['Agency_Id'];
 
       $this->country = $personData['Country'];
       $this->countryId = $personData['Country_Id'];
