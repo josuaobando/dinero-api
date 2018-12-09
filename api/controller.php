@@ -105,6 +105,14 @@ function f_logout()
 }
 
 /**
+ * update password
+ */
+function f_changePassword()
+{
+  require_once('api/client.php');
+}
+
+/**
  * get countries
  */
 function f_countries()

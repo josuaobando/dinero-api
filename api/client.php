@@ -68,6 +68,54 @@ function logout($wsRequest)
 }
 
 /**
+ * update password
+ *
+ * @param WSRequest $wsRequest
+ *
+ * @return WSResponse
+ */
+function changePassword($wsRequest)
+{
+  try{
+    $newPassword = trim($wsRequest->requireNotNullOrEmpty('new'));
+    $confirmPassword = trim($wsRequest->requireNotNullOrEmpty('confirm'));
+
+    $account = Session::getAccount();
+    $sessionTracker = new SessionTracker(Session::$sid, true);
+
+    $newPassword = str_replace("~@", "", $newPassword);
+    $newPassword = str_replace("@~", "", $newPassword);
+    $confirmPassword = str_replace("~!", "", $confirmPassword);
+    $confirmPassword = str_replace("!~", "", $confirmPassword);
+
+    $wsResponse = new WSResponseOk();
+    if($newPassword === $confirmPassword){
+      if($account->changePassword($newPassword)){
+        $sessionTracker->add($wsRequest, 'changePassword.success');
+        $wsResponse->addElement('changed', true);
+        $wsResponse->addElement('result', 'user.changePassword.success');
+      }else{
+        $sessionTracker->add($wsRequest, 'changePassword.fail');
+        $wsResponse->addElement('changed', false);
+        $wsResponse->addElement('result', 'user.changePassword.fail');
+      }
+    }else{
+      $sessionTracker->add($wsRequest, 'changePassword.reject');
+      $wsResponse->addElement('changed', false);
+      $wsResponse->addElement('result', 'user.changePassword.reject');
+    }
+  }catch(InvalidParameterException $ex){
+    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception.parameter');
+  }catch(SessionException $ex){
+    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.session.expired');
+  }catch(Exception $ex){
+    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception');
+  }
+
+  return $wsResponse;
+}
+
+/**
  * get countries
  *
  * @param WSRequest $wsRequest
