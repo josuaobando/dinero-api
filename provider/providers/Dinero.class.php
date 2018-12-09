@@ -66,26 +66,12 @@ class Dinero extends Provider
    *
    * @return Person
    *
-   * @throws \CustomerBlackListException
-   * @throws \LimitException
-   * @throws \P2PException
-   * @throws \P2PLimitException
-   * @throws \PersonException
-   * @throws \TransactionException
+   * @throws CustomerBlackListException|LimitException|P2PException|P2PLimitException|PersonException|TransactionException
    */
   public function receiver()
   {
     $customer = Session::getCustomer();
     $transaction = Session::getTransaction();
-
-    $agencyId = $customer->getAgencyId();
-    $lastTransaction = $customer->getLastTransaction($transaction->getTransactionTypeId());
-    if($lastTransaction && $lastTransaction->getTransactionId()){
-      $agencyId = $lastTransaction->getAgencyId();
-      if($lastTransaction->getProviderId() != Dinero::PROVIDER_ID){
-        throw new TransactionException("We cannot give a Receiver for this Customer (Receiver)");
-      }
-    }
 
     //validate if customer is blacklisted
     $customer->isBlacklisted();
@@ -107,7 +93,15 @@ class Dinero extends Provider
       //update new agency
       $customer->setAgencyId($agencyId);
       $customer->update();
+      //re-try | check stickiness
+      $stickiness = Session::getStickiness(true);
+      $stickiness->restoreByCustomerId($customer->getCustomerId());
     }
+
+    if($customer->getIsAPI()){
+      throw new P2PException("Customer (Receiver) belongs to another agency");
+    }
+
     $person = Session::getPerson($personId);
     //Check to API Controller and Register Stickiness
     $stickiness->setPerson($person->getName());
@@ -119,7 +113,7 @@ class Dinero extends Provider
     //------------------end validation
 
     $transaction->setProviderId(self::PROVIDER_ID);
-    $transaction->setAgencyId($agencyId);
+    $transaction->setAgencyId($customer->getAgencyId());
     return Session::setPerson($person);
   }
 

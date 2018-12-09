@@ -106,7 +106,7 @@ class TblPerson extends Db
    */
   public function available($personId, $available)
   {
-    $sql = "CALL person_available('{personId}', '{available}')";
+    $sql = "CALL spPerson_Available('{personId}', '{available}')";
 
     $params = array();
     $params['personId'] = $personId;
