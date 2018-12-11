@@ -496,6 +496,7 @@ class BillingPayments extends Provider
           throw new APIPersonException($this->apiMessage);
           break;
         default:
+          Log::custom(__CLASS__, "Unmapped >> Error: " . $this->apiCode . " Message: " . $this->apiMessage);
           if($this->apiMessage){
             throw new APIException($this->apiMessage);
           }else{
