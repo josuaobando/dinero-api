@@ -32,6 +32,14 @@ class AppManager
   }
 
   /**
+   * @return array
+   */
+  public function users()
+  {
+    return $this->tblApp->getUsers();
+  }
+
+  /**
    * get a list of transactions status
    *
    * @return array

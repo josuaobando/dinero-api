@@ -116,6 +116,31 @@ function changePassword($wsRequest)
 }
 
 /**
+ * @param WSRequest $wsRequest
+ *
+ * @return WSResponseError|WSResponseOk
+ */
+function users($wsRequest)
+{
+  try{
+    Session::getAccount();
+    $appManager = new AppManager();
+    $users = $appManager->users();
+
+    $wsResponse = new WSResponseOk();
+    $wsResponse->addElement('users', $users);
+  }catch(InvalidParameterException $ex){
+    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception.parameter');
+  }catch(SessionException $ex){
+    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.session.expired');
+  }catch(Exception $ex){
+    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception');
+  }
+
+  return $wsResponse;
+}
+
+/**
  * get countries
  *
  * @param WSRequest $wsRequest

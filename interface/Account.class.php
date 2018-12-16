@@ -240,6 +240,7 @@ class Account
     $data = array();
     $data['username'] = $this->username;
     if($this->authenticated){
+      $data['id'] = $this->accountId;
       $data['name'] = $this->name;
       $data['permission'] = $this->permission;
     }

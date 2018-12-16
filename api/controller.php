@@ -113,6 +113,14 @@ function f_changePassword()
 }
 
 /**
+ * get users
+ */
+function f_users()
+{
+  require_once('api/client.php');
+}
+
+/**
  * get countries
  */
 function f_countries()

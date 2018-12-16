@@ -175,6 +175,22 @@ class TblApp extends Db
     return $rows;
   }
 
+  /**
+   * get users
+   *
+   * @return array
+   */
+  public function getUsers()
+  {
+    $sql = "CALL spUsers()";
+
+    $params = array();
+    $rows = array();
+    $this->executeQuery($sql, $rows, $params);
+
+    return $rows;
+  }
+
 }
 
 ?>
