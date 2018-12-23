@@ -378,7 +378,7 @@ class ProviderTransaction
    *
    * @return int
    *
-   * @throws InvalidStateException|TransactionException
+   * @throws InvalidStateException|TransactionException|P2PException
    */
   public function transactionUpdate()
   {

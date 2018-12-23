@@ -367,10 +367,13 @@ function transactionUpdate($wsRequest)
 
     $wsResponse = new WSResponseOk();
     $wsResponse->addElement('update', $update);
+    $wsResponse->addElement('result', 'processing.p2p.updated');
   }catch(InvalidParameterException $ex){
     $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception.parameter');
   }catch(SessionException $ex){
     $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.session.expired');
+  }catch(P2PException $ex){
+    $wsResponse = new WSResponseError($ex->getMessage(), 'processing.p2p.rejected');
   }catch(Exception $ex){
     $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception');
   }
