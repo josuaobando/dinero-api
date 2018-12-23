@@ -589,7 +589,7 @@ class Stickiness
             throw new P2PLimitException("Max amount per month exceeded. Reject this transaction.");
             break;
           default:
-            ExceptionManager::handleException(new P2PException("Invalid Response Code >> Code: $resultCode  Message: $resultCodeMessage : (" . __FUNCTION__ . ")"));
+            ExceptionManager::handleException(new GeneralException("Invalid Response Code >> Code: $resultCode  Message: $resultCodeMessage : (" . __FUNCTION__ . ")"));
             throw new P2PException("Customer is linked with another Agency (Merchant) or Person. Reject this transaction.");
         }
       }
