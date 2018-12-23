@@ -137,6 +137,14 @@ function f_agencies()
 }
 
 /**
+ * get companies
+ */
+function f_companies()
+{
+  require_once('api/client.php');
+}
+
+/**
  * get transaction status
  */
 function f_transactionStatus()

@@ -189,6 +189,31 @@ function agencies($wsRequest)
 }
 
 /**
+ * get companies
+ *
+ * @param WSRequest $wsRequest
+ *
+ * @return WSResponse
+ */
+function companies($wsRequest)
+{
+  try{
+    $account = Session::getAccount();
+    $appManager = new AppManager();
+    $agencies = $appManager->companies($account->getAccountId());
+
+    $wsResponse = new WSResponseOk();
+    $wsResponse->addElement('companies', $agencies);
+  }catch(SessionException $ex){
+    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.session.expired');
+  }catch(Exception $ex){
+    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception');
+  }
+
+  return $wsResponse;
+}
+
+/**
  * get transaction status
  *
  * @param WSRequest $wsRequest

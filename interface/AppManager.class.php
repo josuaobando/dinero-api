@@ -32,6 +32,16 @@ class AppManager
   }
 
   /**
+   * @param $accountId
+   *
+   * @return array
+   */
+  public function companies($accountId)
+  {
+    return $this->tblApp->getCompanies($accountId);
+  }
+
+  /**
    * @return array
    */
   public function users()

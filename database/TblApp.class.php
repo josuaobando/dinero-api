@@ -28,6 +28,26 @@ class TblApp extends Db
   }
 
   /**
+   * get companies
+   *
+   * @param $accountId
+   *
+   * @return array
+   */
+  public function getCompanies($accountId)
+  {
+    $sql = "CALL spCompany('{accountId}')";
+
+    $params = array();
+    $params['accountId'] = $accountId;
+
+    $rows = array();
+    $this->executeQuery($sql, $rows, $params);
+
+    return $rows;
+  }
+
+  /**
    * get agencies
    *
    * @return array
