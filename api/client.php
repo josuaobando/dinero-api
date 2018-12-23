@@ -330,6 +330,7 @@ function transactionReport($wsRequest)
     $transactionType = $wsRequest->getParam("transactionTypeId", "0");
     $agencyType = $wsRequest->getParam("agencyTypeId", "0");
     $username = $wsRequest->getParam("username", "");
+    $companyId = $wsRequest->getParam("companyId", "0");
 
     $agencyList = $wsRequest->getParam("agencies");
     if (is_array($agencyList)){
@@ -359,7 +360,7 @@ function transactionReport($wsRequest)
     }
 
     $appManager = new AppManager();
-    $dataReport = $appManager->transactionReport($statusList, $transactionType, $agencyType, $agencyList, $account->getAccountId(), $beginDate, $endDate, $controlNumber, $username, $transactionId, $merchantTransId, 0);
+    $dataReport = $appManager->transactionReport($statusList, $transactionType, $agencyType, $agencyList, $account->getAccountId(), $companyId, $beginDate, $endDate, $controlNumber, $username, $transactionId, $merchantTransId, 0);
     $transactions = $dataReport['transactions'];
     $summary = $dataReport['summary'];
 
