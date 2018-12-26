@@ -45,16 +45,6 @@ class Ria extends Provider
     $customer = Session::getCustomer();
     $transaction = Session::getTransaction();
 
-    //validate if customer is blacklisted
-    $customer->isBlacklisted();
-    /*
-        if($transaction->getAmount() < 60){
-          throw new APILimitException("The minimum allowed amount is: 60 USD");
-        }elseif($transaction->getAmount() > 460){
-          throw new APILimitException("The maximum allowed amount is: 460 USD");
-        }
-    */
-
     //transaction
     $request = array();
     $request['ctacte'] = $transaction->getUsername();

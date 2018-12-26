@@ -417,7 +417,7 @@ class Customer
     if($this->customerId){
       //add log if customer has similar name
       Log::custom('Similar', "Request: $customerNameRequest Register: $customerNameSimilar Percent: $maxPercent");
-      $this->isBlacklisted($customerNameSimilar);
+      //$this->isBlacklisted($customerNameSimilar);
     }else{
       //if not have register, check customer from request
       $customerData = $this->tblCustomer->validate($companyId, $accountId, $this->agencyTypeId, $this->firstName, $this->lastName, $this->countryId, $this->stateId, $this->phone);

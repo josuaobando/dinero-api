@@ -43,9 +43,6 @@ class Nicaragua extends Provider
     $customer = Session::getCustomer();
     $transaction = Session::getTransaction();
 
-    //validate if customer is blacklisted
-    $customer->isBlacklisted();
-
     //transaction
     $request = array();
     $request['ctacte'] = $transaction->getUsername();
