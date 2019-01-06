@@ -57,6 +57,22 @@ class TblTask extends Db
   }
 
   /**
+   * get reports
+   *
+   * @return array
+   */
+  public function getReports()
+  {
+    $sql = "CALL spTask_Report()";
+
+    $params = array();
+    $rows = array();
+    $this->executeQuery($sql, $rows, $params);
+
+    return $rows;
+  }
+
+  /**
    * get report transactions
    *
    * @param int $agencyTypeId
@@ -77,6 +93,20 @@ class TblTask extends Db
     $rows = array();
     $this->executeQuery($sql, $rows, $params);
 
+    return $rows;
+  }
+
+  /**
+   * execute report script
+   *
+   * @param $sql
+   *
+   * @return array
+   */
+  public function executeReport($sql)
+  {
+    $rows = array();
+    $this->executeQuery("CALL $sql", $rows);
     return $rows;
   }
 

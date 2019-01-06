@@ -110,6 +110,9 @@ class ProviderTransaction
         }catch(APIException $exception){
           $providerException = $exception;
           continue;
+        }catch(P2PAgencyException $exception){
+          $providerException = $exception;
+          continue;
         }catch(Exception $exception){
           throw $exception;
         }
@@ -225,6 +228,9 @@ class ProviderTransaction
           $providerException = $exception;
           continue;
         }catch(APIException $exception){
+          $providerException = $exception;
+          continue;
+        }catch(P2PAgencyException $exception){
           $providerException = $exception;
           continue;
         }catch(Exception $exception){

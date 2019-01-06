@@ -66,7 +66,7 @@ class Dinero extends Provider
    *
    * @return Person
    *
-   * @throws CustomerBlackListException|LimitException|P2PException|P2PLimitException|PersonException|TransactionException
+   * @throws Exception|P2PAgencyException|P2PException
    */
   public function receiver()
   {
@@ -109,7 +109,25 @@ class Dinero extends Provider
     $stickiness->setCustomer($customer->getCustomer());
     $stickiness->setPersonalId($person->getPersonalId());
     $stickiness->setCustomerId($customer->getCustomerId());
-    $stickiness->register();
+
+    try{
+      $stickiness->register();
+    }catch(P2PAgencyException $agencyException){
+      $update = $person->updatePersonList();
+      if($update){
+        $person = new Person($person->getPersonId());
+        if($person->getAgencyIdRemote()){
+          $stickiness->setAgencyP2P($person->getAgencyIdRemote());
+          $stickiness->register();
+        }else{
+          throw $agencyException;
+        }
+      }else{
+        throw $agencyException;
+      }
+    }catch(Exception $exception){
+      throw $exception;
+    }
     //------------------end validation
 
     $transaction->setProviderId(self::PROVIDER_ID);

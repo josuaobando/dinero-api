@@ -32,4 +32,5 @@ try{
 
 
 Log::custom('JobService', 'Finished');
+echo 'Finished';
 ?>

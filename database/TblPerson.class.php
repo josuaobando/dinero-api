@@ -134,6 +134,23 @@ class TblPerson extends Db
     return $this->executeUpdate($sql, $params);
   }
 
+  /**
+   * update person
+   *
+   * @param int $personId
+   *
+   * @return int
+   */
+  public function updatePersonList($personId)
+  {
+    $sql = "CALL spPerson_UpdatePersonList('{personId}')";
+
+    $params = array();
+    $params['personId'] = $personId;
+
+    return $this->executeUpdate($sql, $params);
+  }
+
 }
 
 ?>

@@ -33,6 +33,7 @@ class Person
 
   private $agencyId;
   private $personListId;
+  private $agencyIdRemote;
 
   /**
    * TblPerson reference
@@ -229,6 +230,13 @@ class Person
   }
 
   /**
+   * @return int
+   */
+  public function getAgencyIdRemote(){
+    return $this->agencyIdRemote;
+  }
+
+  /**
    * @param int|null $personId
    */
   public function setPersonId($personId)
@@ -421,6 +429,14 @@ class Person
   }
 
   /**
+   * @param int $agencyIdRemote
+   */
+  public function setAgencyIdRemote($agencyIdRemote)
+  {
+    $this->agencyIdRemote = $agencyIdRemote;
+  }
+
+  /**
    * @param $agencyId
    */
   public function setAgencyId($agencyId){
@@ -441,6 +457,8 @@ class Person
 
       $personData = $this->tblPerson->getPerson($personId);
       $this->agencyId = $personData['Agency_Id'];
+      $this->personListId = $personData['PersonList_Id'];
+      $this->agencyIdRemote = $personData['AgencyIdRemote'];
 
       $this->country = $personData['Country'];
       $this->countryId = $personData['Country_Id'];
@@ -498,6 +516,16 @@ class Person
   public function unblock()
   {
     $this->tblPerson->available($this->personId, 1);
+  }
+
+  /**
+   * update person list
+   *
+   * @return int
+   */
+  public function updatePersonList()
+  {
+    return $this->tblPerson->updatePersonList($this->personId);
   }
 
   /**

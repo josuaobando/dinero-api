@@ -140,9 +140,10 @@ class Customer
   public function getIsAPI()
   {
     if($this->isAPI ||
-      $this->agencyId == CoreConfig::AGENCY_ID_SATURNO ||
-      $this->agencyId == CoreConfig::AGENCY_ID_NICARAGUA ||
-      $this->agencyId == CoreConfig::AGENCY_ID_SATURNO_RIA
+      $this->agencyId == Saturno::AGENCY_ID ||
+      $this->agencyId == BillingPayments::AGENCY_ID ||
+      $this->agencyId == Nicaragua::AGENCY_ID ||
+      $this->agencyId == Ria::AGENCY_ID
     ){
       return 1;
     }

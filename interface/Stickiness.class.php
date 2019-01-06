@@ -127,14 +127,6 @@ class Stickiness
   private $stickinessTransactionData;
 
   /**
-   * new instance
-   */
-  public function __construct()
-  {
-    $this->tblStickiness = TblStickiness::getInstance();
-  }
-
-  /**
    * @return int
    */
   public function getStickinessId()
@@ -268,6 +260,22 @@ class Stickiness
   public function setControlNumber($controlNumber)
   {
     $this->controlNumber = $controlNumber;
+  }
+
+  /**
+   * @param $agencyP2P
+   */
+  public function setAgencyP2P($agencyP2P)
+  {
+    $this->agencyP2P = $agencyP2P;
+  }
+
+  /**
+   * new instance
+   */
+  public function __construct()
+  {
+    $this->tblStickiness = TblStickiness::getInstance();
   }
 
   /**
@@ -464,22 +472,20 @@ class Stickiness
         $wsConnector = new WS();
         $wsConnector->setReader(new Reader_Json());
         $result = $wsConnector->execPost($this->agencyP2P_Url . 'check/', $params);
-
         $this->tblStickiness->addProviderMessage($this->stickinessId, $wsConnector->getLastRequest(), $result);
+
       }catch(WSException $ex){
         ExceptionManager::handleException($ex);
+        throw new P2PException("Customer cannot be verify.");
       }
 
       if($result){
-
-        if($result->response && $result->response->verification){
-          $verification = $result->response->verification;
-          $this->verificationId = $verification->id;
-          $this->verification = $verification->status;
-        }
-
-        $resultCodeMessage = $result->systemMessage;
         $resultCode = $result->code;
+        $resultCodeMessage = $result->systemMessage;
+        $verification = $result->response->verification;
+        $this->verificationId = $verification->id;
+        $this->verification = $verification->status;
+
         switch($resultCode){
           case self::STATUS_CODE_SUCCESS:
           case self::STATUS_CODE_LINKED:
@@ -495,7 +501,7 @@ class Stickiness
           case self::STATUS_CODE_LINKED_OTHER:
           case self::STATUS_CODE_LINKED_OTHER_CUSTOMER:
             $this->rejectProvider();
-            throw new P2PException("Customer is linked to another Agency (Merchant).");
+            throw new P2PException("Customer is linked to another Agency (Merchant)");
             break;
           case self::STATUS_CODE_LIMIT_TRANSACTIONS:
             throw new P2PLimitException("Max # of transactions per month exceeded");
@@ -504,12 +510,12 @@ class Stickiness
             throw new P2PLimitException("Max amount per month exceeded");
             break;
           case self::STATUS_CODE_LINKED_OTHER_AGENCY:
-            Log::custom(__CLASS__, "Customer [$this->customer] already linked to other of yours agencies or network.");
-            throw new P2PException("Customer is linked to another Agency or Network.");
+            Log::custom(__CLASS__, "Customer [$this->customer] already linked to other of yours agencies");
+            throw new P2PAgencyException("Customer is linked to another Agency");
             break;
           default:
-            ExceptionManager::handleException(new P2PException("Invalid Response Code >> Code: $resultCode  Message: $resultCodeMessage : (" . __FUNCTION__ . ")"));
-            throw new P2PException("Due to external factors, we cannot give this customer a name.");
+            ExceptionManager::handleException(new P2PException("Invalid Response Code >> Code: $resultCode  Message: $resultCodeMessage : (".__FUNCTION__.")"));
+            throw new P2PException("Due to external factors, we cannot give this customer a name");
         }
       }else{
         throw new P2PException("Customer cannot be verify.");

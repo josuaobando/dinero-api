@@ -6,11 +6,6 @@
 class Task_Report extends Task
 {
 
-  /**
-   * @var array
-   */
-  private $transactions = array();
-
   public function init($setting)
   {
     parent::init($setting);
@@ -21,22 +16,18 @@ class Task_Report extends Task
    */
   public function process()
   {
-    $this->transactions['MG-Nicaragua'] = $this->tblTask->getReportTransactions(Transaction::AGENCY_TYPE_MG, Nicaragua::AGENCY_ID);
-    $this->transactions['MG-Saturno'] = $this->tblTask->getReportTransactions(Transaction::AGENCY_TYPE_MG, Saturno::AGENCY_ID, Transaction::TYPE_RECEIVER);
-    $this->transactions['MG-Saturno-Payouts'] = $this->tblTask->getReportTransactions(Transaction::AGENCY_TYPE_MG, Saturno::AGENCY_ID, Transaction::TYPE_SENDER);
-    $this->transactions['MG-Billing'] = $this->tblTask->getReportTransactions(Transaction::AGENCY_TYPE_MG, BillingPayments::AGENCY_ID, Transaction::TYPE_RECEIVER);
-    $this->transactions['MG-Billing-Payouts'] = $this->tblTask->getReportTransactions(Transaction::AGENCY_TYPE_MG, BillingPayments::AGENCY_ID, Transaction::TYPE_SENDER);
-    $this->transactions['RIA-Saturno'] = $this->tblTask->getReportTransactions(Transaction::AGENCY_TYPE_RIA, Ria::AGENCY_ID);
-
-    $this->transactions['MG'] = $this->tblTask->getReportTransactions(Transaction::AGENCY_TYPE_MG);
-    $this->transactions['RIA'] = $this->tblTask->getReportTransactions(Transaction::AGENCY_TYPE_RIA);
-
-    foreach($this->transactions as $group => $transactions){
-      if(is_array($transactions) && count($transactions) > 0){
-        if($group == 'MG-Saturno-Payouts' || $group == 'MG-Billing-Payouts'){
-          $this->reportPayouts($group, $transactions);
+    $reports = $this->tblTask->getReports();
+    foreach($reports as $report){
+      $query = $report['Query'];
+      $rows = $this->tblTask->executeReport($query);
+      if(is_array($rows) && count($rows) > 0){
+        $emailTo = $report['To'];
+        $emailCc = $report['Cc'];
+        $reportName = $report['Name'];
+        if(stripos(strtoupper($reportName), strtoupper('Payouts')) !== false){
+          $this->reportPayouts($reportName, $rows, $emailTo, $emailCc);
         }else{
-          $this->report($group, $transactions);
+          $this->report($reportName, $rows, $emailTo, $emailCc);
         }
       }
     }
@@ -45,10 +36,12 @@ class Task_Report extends Task
   /**
    * @param $name
    * @param $transactions
+   * @param $emailTo
+   * @param $emailCc
    *
    * @return bool
    */
-  private function report($name, $transactions)
+  private function report($name, $transactions, $emailTo, $emailCc)
   {
     try{
 
@@ -80,7 +73,7 @@ class Task_Report extends Task
       $format['Amount'] = array('DataType' => Export::FIELD_DATA_TYPE_NUMERIC, 'Format' => '0.00');
       $format['Fee'] = array('DataType' => Export::FIELD_DATA_TYPE_NUMERIC, 'Format' => '0.00');
 
-      return $this->send($name, $rows, $headers, 'Report', $format);
+      return $this->send($name, $rows, $headers, 'Report', $format, $emailTo, $emailCc);
     }catch(Exception $ex){
       ExceptionManager::handleException($ex);
       return false;
@@ -90,10 +83,12 @@ class Task_Report extends Task
   /**
    * @param $name
    * @param $transactions
+   * @param $emailTo
+   * @param $emailCc
    *
    * @return bool
    */
-  private function reportPayouts($name, $transactions)
+  private function reportPayouts($name, $transactions, $emailTo, $emailCc)
   {
     try{
 
@@ -121,7 +116,7 @@ class Task_Report extends Task
       $format['Amount'] = array('DataType' => Export::FIELD_DATA_TYPE_NUMERIC, 'Format' => '0.00');
       $format['Fee'] = array('DataType' => Export::FIELD_DATA_TYPE_NUMERIC, 'Format' => '0.00');
 
-      return $this->send($name, $rows, $headers, 'Report', $format);
+      return $this->send($name, $rows, $headers, 'Report', $format, $emailTo, $emailCc);
     }catch(Exception $ex){
       ExceptionManager::handleException($ex);
       return false;
@@ -134,10 +129,12 @@ class Task_Report extends Task
    * @param $headers
    * @param $title
    * @param $format
+   * @param string $to
+   * @param string $cc
    *
    * @return bool
    */
-  private function send($name, $rows, $headers, $title, $format)
+  private function send($name, $rows, $headers, $title, $format, $to, $cc)
   {
     try{
       $export = new ExportXSLX($name, $rows, $headers, $title, $format);
@@ -148,7 +145,7 @@ class Task_Report extends Task
         $subject = "Report Transactions | $name";
         $body = "The attachment include all approved transaction of $name";
         $bodyTemplate = MailManager::getEmailTemplate('default', array('body' => $body, 'message' => ''));
-        $recipients = array('To' => 'eric.barahona@gmail.com', 'Cc' => 'gidyet01@gmail.com', 'Bcc' => CoreConfig::MAIL_DEV);
+        $recipients = array('To' => $to, 'Cc' => $cc, 'Bcc' => CoreConfig::MAIL_DEV);
 
         MailManager::sendAdvancedEmail($recipients, $subject, $bodyTemplate, array($attachment));
       }
