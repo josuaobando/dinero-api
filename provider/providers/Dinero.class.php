@@ -115,6 +115,7 @@ class Dinero extends Provider
     }catch(P2PAgencyException $agencyException){
       $update = $person->updatePersonList();
       if($update){
+        Log::custom(__CLASS__, $person->getName(). "has been changed of person list");
         $person = new Person($person->getPersonId());
         if($person->getAgencyIdRemote()){
           $stickiness->setAgencyP2P($person->getAgencyIdRemote());
