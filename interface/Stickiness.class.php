@@ -469,6 +469,14 @@ class Stickiness
         $params['amount'] = $transaction->getAmount();
         $params['account'] = $transaction->getUsername();
 
+        if($transaction->getAgencyTypeId() == Transaction::AGENCY_TYPE_MG){
+          $params['providerId'] = 1;
+        }elseif($transaction->getAgencyTypeId() == Transaction::AGENCY_TYPE_RIA){
+          $params['providerId'] = 2;
+        }else{
+          $params['providerId'] = 0;
+        }
+
         $wsConnector = new WS();
         $wsConnector->setReader(new Reader_Json());
         $result = $wsConnector->execPost($this->agencyP2P_Url . 'check/', $params);
@@ -548,6 +556,14 @@ class Stickiness
         $params['receiverId'] = $this->personalId;
         $params['controlNumber'] = $this->controlNumber;
         $params['amountConfirmed'] = $transaction->getAmount();
+
+        if($transaction->getAgencyTypeId() == Transaction::AGENCY_TYPE_MG){
+          $params['providerId'] = 1;
+        }elseif($transaction->getAgencyTypeId() == Transaction::AGENCY_TYPE_RIA){
+          $params['providerId'] = 2;
+        }else{
+          $params['providerId'] = 0;
+        }
 
         $apiURL = $this->agencyP2P_Url;
         $wsConnector = new WS();
