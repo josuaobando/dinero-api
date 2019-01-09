@@ -360,8 +360,9 @@ class Connector
    * @param string $wsdl
    * @param string $method
    * @param array $params
+   * @param array $options
    *
-   * @return null|object
+   * @return XmlElement|stdClass|string|object|array
    *
    * @throws WSException
    */

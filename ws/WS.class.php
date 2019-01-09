@@ -233,7 +233,7 @@ class WS
    *
    * @throws WSException
    *
-   * @return XmlElement
+   * @return XmlElement|stdClass|string
    */
   public function execPost($webservice, $params = null)
   {
@@ -249,7 +249,7 @@ class WS
    *
    * @throws WSException
    *
-   * @return XmlElement
+   * @return XmlElement|stdClass|string
    */
   public function execPostMethod($webservice, $method, $params = null)
   {
@@ -266,7 +266,7 @@ class WS
    *
    * @throws WSException
    *
-   * @return XmlElement
+   * @return XmlElement|stdClass|string
    */
   public function execGet($webservice, $params = null)
   {
@@ -281,7 +281,7 @@ class WS
    * @param $params
    * @param null $options
    *
-   * @return null|object
+   * @return XmlElement|stdClass|string|object
    *
    * @throws WSException
    */
@@ -331,7 +331,6 @@ class WS
     if(!$obj){
       $this->lastError = $connector->getLastError();
       $this->lastErrorCode = $connector->getLastErrorCode();
-
       throw new WSException($connector->__toString(), $data);
     }else{
       if(count($obj) == 1){
@@ -423,7 +422,7 @@ class WS
    *
    * @throws WSException
    *
-   * @return mixed
+   * @return XmlElement|stdClass|string
    */
   private function execWS($webservice, $postParams, $getParams)
   {
@@ -485,7 +484,6 @@ class WS
     }
 
     $defaultReader = new Reader_XML();
-
     return $defaultReader->parse($this->lastContent);
   }
 

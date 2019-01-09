@@ -299,12 +299,11 @@ class Stickiness
   /**
    *  disable stickiness
    */
-  public function rejectProvider()
+  public function reject()
   {
     try{
       if($this->stickinessId){
         $this->tblStickiness->isActive($this->stickinessId, 0);
-
         if($this->stickinessTransactionData){
           $stickinessTransactionId = $this->stickinessTransactionData['StickinessTransaction_Id'];
           $verificationId = $this->stickinessTransactionData['Verification_Id'];
@@ -312,7 +311,6 @@ class Stickiness
           $tblStickinessTransaction = TblStickinessTransaction::getInstance();
           $tblStickinessTransaction->update($stickinessTransactionId, $verificationId, 'rejected', 0);
         }
-
       }
     }catch(Exception $ex){
       ExceptionManager::handleException($ex);
@@ -400,10 +398,6 @@ class Stickiness
     }
   }
 
-  //---------------------------------------------------
-  //--External connection to validate Person 2 Person--
-  //---------------------------------------------------
-
   /**
    * authentication params
    *
@@ -456,9 +450,7 @@ class Stickiness
   public function register()
   {
     if(CoreConfig::WS_STICKINESS_ACTIVE && $this->checkConnection()){
-      $result = null;
       try{
-
         $transaction = Session::getTransaction();
 
         $params = $this->authParams();
@@ -488,12 +480,19 @@ class Stickiness
       }
 
       if($result){
-        $resultCode = $result->code;
-        $resultCodeMessage = $result->systemMessage;
         $verification = $result->response->verification;
         $this->verificationId = $verification->id;
         $this->verification = $verification->status;
+        if($this->checkResponse($result)){
+          if($this->verification == self::STATUS_VERIFICATION_PENDING){
+            $this->createProvider();
+          }else{
+            $this->reject();
+            throw new P2PException("Customer is linked to another Person.");
+          }
+        }
 
+        /*
         switch($resultCode){
           case self::STATUS_CODE_SUCCESS:
           case self::STATUS_CODE_LINKED:
@@ -525,6 +524,7 @@ class Stickiness
             ExceptionManager::handleException(new P2PException("Invalid Response Code >> Code: $resultCode  Message: $resultCodeMessage : (".__FUNCTION__.")"));
             throw new P2PException("Due to external factors, we cannot give this customer a name");
         }
+        */
       }else{
         throw new P2PException("Customer cannot be verify.");
       }
@@ -593,7 +593,7 @@ class Stickiness
             if($this->verification == self::STATUS_VERIFICATION_APPROVED){
               $this->createProvider();
             }else{
-              $this->rejectProvider();
+              $this->reject();
               throw new P2PException("Customer is linked to another Person.");
             }
             break;
@@ -601,7 +601,7 @@ class Stickiness
           case self::STATUS_CODE_LINKED_OTHER_AGENCY:
           case self::STATUS_CODE_LINKED_OTHER_COMPANY:
           case self::STATUS_CODE_LINKED_OTHER_CUSTOMER:
-            $this->rejectProvider();
+            $this->reject();
             throw new P2PException("Customer is linked with another Merchant or Person. Reject this transaction.");
             break;
           case self::STATUS_CODE_LIMIT_TRANSACTIONS:
@@ -616,6 +616,41 @@ class Stickiness
         }
       }
 
+    }
+  }
+
+  /**
+   * @param stdClass $result
+   *
+   * @return bool
+   *
+   * @throws P2PAgencyException|P2PException|P2PLimitException
+   */
+  private function checkResponse($result)
+  {
+    $resultCodeMessage = $result->systemMessage;
+    $resultCode = $result->code;
+    switch($resultCode){
+      case self::STATUS_CODE_SUCCESS:
+      case self::STATUS_CODE_LINKED:
+      case self::STATUS_CODE_LINKED_PENDING:
+        // do nothing
+        return true;
+      case self::STATUS_CODE_LINKED_OTHER_COMPANY:
+      case self::STATUS_CODE_LINKED_OTHER:
+      case self::STATUS_CODE_LINKED_OTHER_CUSTOMER:
+        $this->reject();
+        throw new P2PException("Customer is linked to another Agency (Merchant)");
+      case self::STATUS_CODE_LIMIT_TRANSACTIONS:
+        throw new P2PLimitException("Max # of transactions per month exceeded");
+      case self::STATUS_CODE_LIMIT_AMOUNT:
+        throw new P2PLimitException("Max amount per month exceeded");
+      case self::STATUS_CODE_LINKED_OTHER_AGENCY:
+        Log::custom(__CLASS__, "Customer [$this->customer] already linked to other of yours agencies");
+        throw new P2PAgencyException("Customer is linked to another Agency");
+      default:
+        ExceptionManager::handleException(new P2PException("Invalid Response Code >> Code: $resultCode  Message: $resultCodeMessage : (".__FUNCTION__.")"));
+        throw new P2PException("Due to external factors, we cannot give this customer a name");
     }
   }
 
