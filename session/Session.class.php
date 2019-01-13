@@ -13,6 +13,7 @@ class Session
   const SID_CUSTOMER = 'customer';
   const SID_PERSON = 'person';
   const SID_STICKINESS = 'stickiness';
+  const SID_PROVIDER = 'provider';
 
   /**
    * get sid generated
@@ -219,7 +220,21 @@ class Session
   }
 
   /**
-   * get person
+   * set person
+   *
+   * @param Person $person
+   *
+   * @return Person
+   */
+  public static function setPerson($person)
+  {
+    self::storeSessionObject(self::SID_PERSON, $person, true);
+    $personSession = self::getSessionObject(self::SID_PERSON);
+    return $personSession;
+  }
+
+  /**
+   * get stickiness
    *
    * @param bool $crate
    *
@@ -239,17 +254,45 @@ class Session
   }
 
   /**
-   * set person
+   * get provider
    *
-   * @param Person $person
+   * @param int id
    *
-   * @return Person
+   * @return Provider|Dinero|BillingPayments|Nicaragua|Ria|Saturno
    */
-  public static function setPerson($person)
+  public static function getProvider($id = 0)
   {
-    self::storeSessionObject(self::SID_PERSON, $person, true);
-    $personSession = self::getSessionObject(self::SID_PERSON);
-    return $personSession;
+    if($id){
+      switch($id){
+        case Dinero::PROVIDER_ID:
+          $provider = new Dinero();
+          break;
+        case Saturno::PROVIDER_ID:
+          $provider = new Saturno();
+          break;
+        case Nicaragua::PROVIDER_ID:
+          $provider = new Nicaragua();
+          break;
+        case Ria::PROVIDER_ID:
+          $provider = new Ria();
+          break;
+        case BillingPayments::PROVIDER_ID:
+          $provider = new BillingPayments();
+          break;
+        default:
+          $provider = new Provider($id);
+      }
+      self::storeSessionObject(self::SID_PROVIDER, $provider, true);
+    }else{
+      $providerSession = self::getSessionObject(self::SID_PROVIDER);
+      if($providerSession){
+        $provider = $providerSession;
+      }else{
+        $provider = new Provider();
+      }
+    }
+
+    return $provider;
   }
 
 }

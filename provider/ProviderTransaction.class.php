@@ -78,10 +78,11 @@ class ProviderTransaction
     $providerException = null;
     foreach($this->providers as $providerData){
       $providerException = null;
+      $providerId = $providerData['Provider_Id'];
       $providerClassName = $providerData['Name'];
       if(class_exists($providerClassName)){
         try{
-          $provider = new $providerClassName();
+          $provider = Session::getProvider($providerId);
           $person = $provider->receiver();
           if($person && $person->getPersonId()){
             break;
@@ -198,10 +199,11 @@ class ProviderTransaction
     $providerException = null;
     foreach($this->providers as $providerData){
       $providerException = null;
+      $providerId = $providerData['Provider_Id'];
       $providerClassName = $providerData['Name'];
       if(class_exists($providerClassName)){
         try{
-          $provider = new $providerClassName();
+          $provider = Session::getProvider($providerId);
           $person = $provider->sender();
           if($person && $person->getPersonId()){
             break;

@@ -51,7 +51,6 @@ class TblCustomer extends Db
    *
    * @param int $companyId
    * @param int $accountId
-   * @param int $agencyTypeId
    * @param string $firstName
    * @param string $lastName
    * @param int $countryId
@@ -60,14 +59,13 @@ class TblCustomer extends Db
    *
    * @return array [CustomerId, AgencyId]
    */
-  public function validate($companyId, $accountId, $agencyTypeId, $firstName, $lastName, $countryId, $countryStateId, $phone)
+  public function validate($companyId, $accountId, $firstName, $lastName, $countryId, $countryStateId, $phone)
   {
-    $sql = "CALL spCustomer_Validate('{companyId}', '{accountId}', '{agencyTypeId}', '{firstName}', '{lastName}', '{countryId}', '{countryStateId}', '{phone}', @CustomerId, @AgencyId)";
+    $sql = "CALL spCustomer_Validate('{companyId}', '{accountId}', '{firstName}', '{lastName}', '{countryId}', '{countryStateId}', '{phone}', @CustomerId, @AgencyId)";
 
     $params = array();
     $params['companyId'] = $companyId;
     $params['accountId'] = $accountId;
-    $params['agencyTypeId'] = $agencyTypeId;
     $params['firstName'] = ucwords(strtolower($firstName));
     $params['lastName'] = ucwords(strtolower($lastName));
     $params['countryId'] = $countryId;
@@ -84,7 +82,6 @@ class TblCustomer extends Db
   /**
    * update customer information
    *
-   * @param $agencyId
    * @param $customerId
    * @param $firstName
    * @param $lastName
@@ -95,12 +92,11 @@ class TblCustomer extends Db
    *
    * @return int
    */
-  public function update($agencyId, $customerId, $firstName, $lastName, $countryId, $countryStateId, $phone, $isAPI = 0)
+  public function update($customerId, $firstName, $lastName, $countryId, $countryStateId, $phone, $isAPI = 0)
   {
     $sql = "CALL spCustomer_Update('{agencyId}', '{customerId}', '{firstName}', '{lastName}', '{countryId}', '{countryStateId}', '{phone}', '{isAPI}')";
 
     $params = array();
-    $params['agencyId'] = $agencyId;
     $params['customerId'] = $customerId;
     $params['firstName'] = ucwords(strtolower($firstName));
     $params['lastName'] = ucwords(strtolower($lastName));
@@ -200,36 +196,14 @@ class TblCustomer extends Db
    * get stats
    *
    * @param int $customerId
-   * @param int $transactionTypeId
-   *
-   * @return array
-   */
-  public function getStats($customerId, $transactionTypeId)
-  {
-    $sql = "CALL spCustomer_Stats('{customerId}', '{transactionTypeId}')";
-
-    $params = array();
-    $params['customerId'] = $customerId;
-    $params['transactionTypeId'] = $transactionTypeId;
-
-    $rows = array();
-    $this->executeSingleQuery($sql, $rows, $params);
-
-    return $rows;
-  }
-
-  /**
-   * get last transaction [pending|confirm|approved]
-   *
-   * @param int $customerId
    * @param int $agencyTypeId
    * @param int $transactionTypeId
    *
    * @return array
    */
-  public function getLastTransaction($customerId, $agencyTypeId, $transactionTypeId)
+  public function getStats($customerId, $agencyTypeId, $transactionTypeId)
   {
-    $sql = "CALL spCustomer_LastTransaction('{customerId}', '{agencyTypeId}', '{transactionTypeId}')";
+    $sql = "CALL spCustomer_Stats('{customerId}', '{transactionTypeId}')";
 
     $params = array();
     $params['customerId'] = $customerId;

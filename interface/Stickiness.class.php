@@ -325,15 +325,9 @@ class Stickiness
     $stickinessData = $this->tblStickiness->get($this->stickinessId);
     if($stickinessData){
       $this->stickinessId = $stickinessData['Stickiness_Id'];
-      $this->verificationId = $stickinessData['Verification_Id'];
-      $this->verification = $stickinessData['Verification'];
-
       $this->agencyP2P = $stickinessData['AgencyP2P'];
-      $this->agencyP2P_Url = $stickinessData['AgencyP2P_Url'];
-
       $this->customerId = $stickinessData['Customer_Id'];
       $this->customer = $stickinessData['Customer'];
-
       $this->personId = $stickinessData['Person_Id'];
       $this->person = $stickinessData['Person'];
       $this->personalId = $stickinessData['PersonalId'];
@@ -344,18 +338,17 @@ class Stickiness
    * restore or get stickiness data
    *
    * @param $customerId
+   * @param $agencyTypeId
    *
    * @throws P2PException
    */
-  public function restoreByCustomerId($customerId)
+  public function restoreByCustomerId($customerId, $agencyTypeId)
   {
     $this->customerId = $customerId;
-
-    $stickinessData = $this->tblStickiness->getByCustomerId($this->customerId);
+    $stickinessData = $this->tblStickiness->getByCustomerId($this->customerId, $agencyTypeId);
     if($stickinessData){
       $this->stickinessId = $stickinessData['Stickiness_Id'];
       $this->agencyP2P = $stickinessData['AgencyP2P'];
-      $this->agencyP2P_Url = $stickinessData['AgencyP2P_Url'];
 
       $this->customerId = $stickinessData['Customer_Id'];
       $this->customer = $stickinessData['Customer'];
@@ -387,7 +380,6 @@ class Stickiness
       $this->verificationId = $this->stickinessTransactionData['Verification_Id'];
       $this->verification = $this->stickinessTransactionData['Verification'];
       $this->agencyP2P = $this->stickinessTransactionData['AgencyP2P'];
-      $this->agencyP2P_Url = $this->stickinessTransactionData['AgencyP2P_Url'];
 
       $this->customerId = $this->stickinessTransactionData['Customer_Id'];
       $this->customer = $this->stickinessTransactionData['Customer'];
@@ -405,12 +397,14 @@ class Stickiness
    */
   private function authParams()
   {
-    $params = array();
+    $provider = new Provider(Dinero::PROVIDER_ID);
+    $this->agencyP2P_Url = $provider->getSetting(Provider::SETTING_URL);
 
+    $params = array();
     $params['format'] = 'json';
-    $params['companyId'] = CoreConfig::WS_STICKINESS_CREDENTIAL_COMPANY;
-    $params['password'] = CoreConfig::WS_STICKINESS_CREDENTIAL_PASSWORD;
-    $params['key'] = CoreConfig::WS_STICKINESS_CREDENTIAL_KEY;
+    $params['companyId'] = $provider->getSetting(Provider::SETTING_USER);
+    $params['password'] = $provider->getSetting(Provider::SETTING_PASSWORD);
+    $params['key'] = $provider->getSetting(Provider::SETTING_KEY);
     $params['agencyId'] = $this->agencyP2P;
 
     return $params;
@@ -466,7 +460,7 @@ class Stickiness
         }elseif($transaction->getAgencyTypeId() == Transaction::AGENCY_TYPE_RIA){
           $params['providerId'] = 2;
         }else{
-          $params['providerId'] = 0;
+          throw new TransactionException("Problem loading the provider.");
         }
 
         $wsConnector = new WS();
@@ -491,40 +485,6 @@ class Stickiness
             throw new P2PException("Customer is linked to another Person.");
           }
         }
-
-        /*
-        switch($resultCode){
-          case self::STATUS_CODE_SUCCESS:
-          case self::STATUS_CODE_LINKED:
-          case self::STATUS_CODE_LINKED_PENDING:
-            if($this->verification == self::STATUS_VERIFICATION_PENDING){
-              $this->createProvider();
-            }else{
-              $this->rejectProvider();
-              throw new P2PException("Customer is linked to another Person.");
-            }
-            break;
-          case self::STATUS_CODE_LINKED_OTHER_COMPANY:
-          case self::STATUS_CODE_LINKED_OTHER:
-          case self::STATUS_CODE_LINKED_OTHER_CUSTOMER:
-            $this->rejectProvider();
-            throw new P2PException("Customer is linked to another Agency (Merchant)");
-            break;
-          case self::STATUS_CODE_LIMIT_TRANSACTIONS:
-            throw new P2PLimitException("Max # of transactions per month exceeded");
-            break;
-          case self::STATUS_CODE_LIMIT_AMOUNT:
-            throw new P2PLimitException("Max amount per month exceeded");
-            break;
-          case self::STATUS_CODE_LINKED_OTHER_AGENCY:
-            Log::custom(__CLASS__, "Customer [$this->customer] already linked to other of yours agencies");
-            throw new P2PAgencyException("Customer is linked to another Agency");
-            break;
-          default:
-            ExceptionManager::handleException(new P2PException("Invalid Response Code >> Code: $resultCode  Message: $resultCodeMessage : (".__FUNCTION__.")"));
-            throw new P2PException("Due to external factors, we cannot give this customer a name");
-        }
-        */
       }else{
         throw new P2PException("Customer cannot be verify.");
       }
@@ -565,10 +525,9 @@ class Stickiness
           $params['providerId'] = 0;
         }
 
-        $apiURL = $this->agencyP2P_Url;
         $wsConnector = new WS();
         $wsConnector->setReader(new Reader_Json());
-        $result = $wsConnector->execPost($apiURL . 'confirm/', $params);
+        $result = $wsConnector->execPost($this->agencyP2P_Url . 'confirm/', $params);
 
         $this->tblStickiness->addProviderMessage($this->stickinessId, $wsConnector->getLastRequest(), $result);
       }catch(Exception $ex){

@@ -20,9 +20,8 @@ class Customer
    */
   private $tblUtil;
 
-  private $customerId;
-  private $agencyId;
   private $agencyTypeId;
+  private $customerId;
   private $firstName;
   private $lastName;
   private $country;
@@ -33,10 +32,6 @@ class Customer
   private $stateName;
   private $phone;
   private $isAPI;
-  /**
-   * @var Transaction
-   */
-  private $lastTransaction;
 
   /**
    * @return int
@@ -44,22 +39,6 @@ class Customer
   public function getCustomerId()
   {
     return $this->customerId;
-  }
-
-  /**
-   * @return int
-   */
-  public function getAgencyId()
-  {
-    return $this->agencyId;
-  }
-
-  /**
-   * @return int
-   */
-  public function getAgencyTypeId()
-  {
-    return $this->agencyTypeId;
   }
 
   /**
@@ -135,22 +114,6 @@ class Customer
   }
 
   /**
-   * @return int
-   */
-  public function getIsAPI()
-  {
-    if($this->isAPI ||
-      $this->agencyId == Saturno::AGENCY_ID ||
-      $this->agencyId == BillingPayments::AGENCY_ID ||
-      $this->agencyId == Nicaragua::AGENCY_ID ||
-      $this->agencyId == Ria::AGENCY_ID
-    ){
-      return 1;
-    }
-    return 0;
-  }
-
-  /**
    * get the customer
    *
    * @return string
@@ -176,22 +139,6 @@ class Customer
   public function setCustomerId($customerId)
   {
     $this->customerId = $customerId;
-  }
-
-  /**
-   * @param mixed $agencyId
-   */
-  public function setAgencyId($agencyId)
-  {
-    $this->agencyId = $agencyId;
-  }
-
-  /**
-   * @param mixed $agencyTypeId
-   */
-  public function setAgencyTypeId($agencyTypeId)
-  {
-    $this->agencyTypeId = $agencyTypeId;
   }
 
   /**
@@ -291,8 +238,6 @@ class Customer
 
       $customerData = $this->tblCustomer->getCustomer($customerId);
 
-      $this->agencyId = $customerData['Agency_Id'];
-      $this->agencyTypeId = $customerData['AgencyType_Id'];
       $this->firstName = $customerData['FirstName'];
       $this->lastName = $customerData['LastName'];
       $this->country = $customerData['countryCode'];
@@ -373,9 +318,6 @@ class Customer
     if(!$this->customerId){
       throw new CustomerException("Invalid Customer information");
     }
-    if(!$this->agencyId){
-      throw new CustomerException("The Agency is not Available");
-    }
 
   }
 
@@ -404,7 +346,6 @@ class Customer
           if($percent >= CoreConfig::CUSTOMER_SIMILAR_PERCENT && $percent > $maxPercent){
 
             $this->customerId = $similar['CustomerId'];
-            $this->agencyId = $similar['AgencyId'];
             $this->firstName = $similar['FirstName'];
             $this->lastName = $similar['LastName'];
 
@@ -418,12 +359,10 @@ class Customer
     if($this->customerId){
       //add log if customer has similar name
       Log::custom('Similar', "Request: $customerNameRequest Register: $customerNameSimilar Percent: $maxPercent");
-      //$this->isBlacklisted($customerNameSimilar);
     }else{
       //if not have register, check customer from request
-      $customerData = $this->tblCustomer->validate($companyId, $accountId, $this->agencyTypeId, $this->firstName, $this->lastName, $this->countryId, $this->stateId, $this->phone);
+      $customerData = $this->tblCustomer->validate($companyId, $accountId, $this->firstName, $this->lastName, $this->countryId, $this->stateId, $this->phone);
       $this->customerId = $customerData['CustomerId'];
-      $this->agencyId = $customerData['AgencyId'];
     }
 
   }
@@ -435,7 +374,7 @@ class Customer
    */
   public function update()
   {
-    return $this->tblCustomer->update($this->agencyId, $this->customerId, $this->firstName, $this->lastName, $this->countryId, $this->stateId, $this->phone, $this->getIsAPI());
+    return $this->tblCustomer->update($this->customerId, $this->firstName, $this->lastName, $this->countryId, $this->stateId, $this->phone, 0);
   }
 
   /**
@@ -498,29 +437,9 @@ class Customer
    */
   public function getStats($transactionTypeId = 0)
   {
-    return $this->tblCustomer->getStats($this->customerId, $transactionTypeId);
+    return $this->tblCustomer->getStats($this->customerId, $this->agencyTypeId, $transactionTypeId);
   }
 
-  /**
-   * get the las proceed transaction
-   *
-   * @param null $transactionTypeId
-   *
-   * @return Transaction
-   */
-  public function getLastTransaction($transactionTypeId = null)
-  {
-    if(!$transactionTypeId){
-      return $this->lastTransaction;
-    }
-    $this->lastTransaction = new Transaction();
-    $customerTransaction = $this->tblCustomer->getLastTransaction($this->customerId, $this->agencyTypeId, $transactionTypeId);
-    if($customerTransaction){
-      $transactionId = $customerTransaction['Transaction_Id'];
-      $this->lastTransaction->restore($transactionId);
-    }
-    return $this->lastTransaction;
-  }
 }
 
 ?>

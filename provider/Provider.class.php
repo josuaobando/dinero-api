@@ -97,7 +97,7 @@ class Provider extends WS
    *
    * @throws InvalidStateException
    */
-  protected function getSetting($code)
+  public function getSetting($code)
   {
     $setting = $this->settings[$code];
     if(!$setting){

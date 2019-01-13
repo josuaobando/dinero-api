@@ -32,20 +32,16 @@ class TblStickiness extends Db
    *
    * @param $customerId
    * @param $personId
-   * @param $verificationId
-   * @param $verification
    *
    * @return int
    */
-  public function create($customerId, $personId, $verificationId = null, $verification = null)
+  public function create($customerId, $personId)
   {
-    $sql = "CALL spStickiness_Add('{customerId}', '{personId}', '{verificationId}', '{verification}', @stickinessId)";
+    $sql = "CALL spStickiness_Add('{customerId}', '{personId}', @stickinessId)";
 
     $params = array();
     $params['customerId'] = $customerId;
     $params['personId'] = $personId;
-    $params['verificationId'] = $verificationId;
-    $params['verification'] = $verification;
 
     $this->setOutputParams(array('stickinessId'));
     $this->executeUpdate($sql, $params);
@@ -59,19 +55,15 @@ class TblStickiness extends Db
    * update stickiness
    *
    * @param $stickinessId
-   * @param $verificationId
-   * @param $verification
    *
    * @return int
    */
-  public function update($stickinessId, $verificationId, $verification)
+  public function update($stickinessId)
   {
-    $sql = "CALL spStickiness_Update('{stickinessId}', '{verificationId}', '{verification}')";
+    $sql = "CALL spStickiness_Update('{stickinessId}')";
 
     $params = array();
     $params['stickinessId'] = $stickinessId;
-    $params['verificationId'] = $verificationId;
-    $params['verification'] = $verification;
 
     return $this->executeUpdate($sql, $params);
   }
@@ -119,15 +111,17 @@ class TblStickiness extends Db
    * get stickiness data by Customer Id
    *
    * @param int $customerId
+   * @param int $agencyTypeId
    *
    * @return array
    */
-  public function getByCustomerId($customerId)
+  public function getByCustomerId($customerId, $agencyTypeId)
   {
-    $sql = "CALL spStickiness_ByCustomerId('{customerId}')";
+    $sql = "CALL spStickiness_ByCustomerId('{customerId}', 'agencyTypeId')";
 
     $params = array();
     $params['customerId'] = $customerId;
+    $params['agencyTypeId'] = $agencyTypeId;
 
     $row = array();
     $this->executeSingleQuery($sql, $row, $params);
@@ -154,38 +148,6 @@ class TblStickiness extends Db
     $params['response'] = Util::toString($response);
 
     return $this->executeUpdate($sql, $params);
-  }
-
-  /**
-   * get stickiness pending
-   *
-   * @return array
-   */
-  public function getPending()
-  {
-    $sql = "CALL spStickiness_Pending()";
-
-    $params = array();
-    $rows = array();
-    $this->executeQuery($sql, $rows, $params);
-
-    return $rows;
-  }
-
-  /**
-   * get stickiness approved
-   *
-   * @return array
-   */
-  public function getApproved()
-  {
-    $sql = "CALL spStickiness_Approved()";
-
-    $params = array();
-    $rows = array();
-    $this->executeQuery($sql, $rows, $params);
-
-    return $rows;
   }
 
 }

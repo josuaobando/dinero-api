@@ -73,6 +73,9 @@ class Dinero extends Provider
     $customer = Session::getCustomer();
     $transaction = Session::getTransaction();
 
+    $customerId = $customer->getCustomerId();
+    $agencyTypeId = $transaction->getAgencyTypeId();
+
     //validate if customer is blacklisted
     $customer->isBlacklisted();
 
@@ -82,24 +85,13 @@ class Dinero extends Provider
 
     //check stickiness
     $stickiness = Session::getStickiness(true);
-    $stickiness->restoreByCustomerId($customer->getCustomerId());
+    $stickiness->restoreByCustomerId($customerId, $agencyTypeId);
     //get person id from stickiness
     $personId = $stickiness->getPersonId();
     if(!$personId){
       //select and block the person for following transactions
-      $personSelected = $this->getPersonAvailable($transaction->getAmount(), $transaction->getAgencyTypeId());
+      $personSelected = $this->getPersonAvailable($transaction->getAmount(), $agencyTypeId);
       $personId = $personSelected['Person_Id'];
-      $agencyId = $personSelected['Agency_Id'];
-      //update new agency
-      $customer->setAgencyId($agencyId);
-      $customer->update();
-      //re-try | check stickiness
-      $stickiness = Session::getStickiness(true);
-      $stickiness->restoreByCustomerId($customer->getCustomerId());
-    }
-
-    if($customer->getIsAPI()){
-      throw new P2PException("Customer (Receiver) belongs to another agency");
     }
 
     $person = Session::getPerson($personId);
@@ -109,6 +101,7 @@ class Dinero extends Provider
     $stickiness->setCustomer($customer->getCustomer());
     $stickiness->setPersonalId($person->getPersonalId());
     $stickiness->setCustomerId($customer->getCustomerId());
+    $stickiness->setAgencyP2P($person->getAgencyIdRemote());
 
     try{
       $stickiness->register();
@@ -132,7 +125,7 @@ class Dinero extends Provider
     //------------------end validation
 
     $transaction->setProviderId(self::PROVIDER_ID);
-    $transaction->setAgencyId($customer->getAgencyId());
+    $transaction->setAgencyId($person->getAgencyId());
     return Session::setPerson($person);
   }
 
