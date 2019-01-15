@@ -453,7 +453,7 @@ class BillingPayments extends Provider
           MailManager::sendEmail($recipients, $subject, $bodyTemplate);
           Log::custom(__CLASS__, $body);
 
-          $this->apiMessage = 'We cannot give a Receiver for this Customer';
+          $this->apiMessage = 'We cannot give a Receiver for this Sender';
           throw new APIPersonException($this->apiMessage);
           break;
         case 1002: //Access Denied
@@ -473,7 +473,7 @@ class BillingPayments extends Provider
           throw new APILimitException($this->apiMessage);
           break;
         case 1035: //Sender or Receiver is on Black List, please try again or use a different Sender
-          $this->apiMessage = 'The Customer has been blacklisted';
+          $this->apiMessage = 'The Sender has been blacklisted';
           throw new APIBlackListException($this->apiMessage);
           break;
         case 1036: //Receiver reached payouts names limit
@@ -489,15 +489,19 @@ class BillingPayments extends Provider
           MailManager::sendEmail($recipients, $subject, $bodyTemplate);
           Log::custom(__CLASS__, $body);
 
-          $this->apiMessage = 'We cannot give a Receiver for this Customer';
+          $this->apiMessage = 'We cannot give a Receiver for this Sender';
           throw new APIPersonException($this->apiMessage);
+          break;
+        case 1038: //Sender or Receiver is on Black List, please try again or use a different Receiver
+          $this->apiMessage = 'The Receiver has been blacklisted';
+          throw new APIBlackListException($this->apiMessage);
           break;
         default:
           Log::custom(__CLASS__, "Unmapped >> Error: " . $this->apiCode . " Message: " . $this->apiMessage);
           if($this->apiMessage){
             throw new APIException($this->apiMessage);
           }else{
-            throw new APIException('We cannot give a Receiver for this Customer');
+            throw new APIException('We cannot give a name for this Customer');
           }
       }
     }
