@@ -81,8 +81,9 @@ class Limit
   public function evaluate()
   {
     //load customer stats
+    $agencyTypeId = $this->transaction->getAgencyTypeId();
     $transactionTypeId = $this->transaction->getTransactionTypeId();
-    $this->stats = $this->customer->getStats($transactionTypeId);
+    $this->stats = $this->customer->getStats($agencyTypeId, $transactionTypeId);
 
     foreach($this->limitDetails as $limit){
       $limitTransactionType = $limit['TransactionType_Id'];

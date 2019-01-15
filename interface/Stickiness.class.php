@@ -361,7 +361,7 @@ class Stickiness
 
     }else{
       Log::custom(__CLASS__, 'stickinessData is unavailable to customerId: ' . $customerId);
-      throw new P2PException("Agency is unavailable");
+      //throw new P2PException("Agency is unavailable");
     }
   }
 

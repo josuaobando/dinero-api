@@ -429,15 +429,16 @@ class Customer
   /**
    * get customer stats
    *
+   * @param int $agencyTypeId
    * @param int $transactionTypeId
    *
    * @see Transaction::TYPE_RECEIVER, Transaction::TYPE_SENDER
    *
    * @return array
    */
-  public function getStats($transactionTypeId = 0)
+  public function getStats($agencyTypeId, $transactionTypeId = 0)
   {
-    return $this->tblCustomer->getStats($this->customerId, $this->agencyTypeId, $transactionTypeId);
+    return $this->tblCustomer->getStats($this->customerId, $agencyTypeId, $transactionTypeId);
   }
 
 }

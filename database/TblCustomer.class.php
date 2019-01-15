@@ -61,7 +61,7 @@ class TblCustomer extends Db
    */
   public function validate($companyId, $accountId, $firstName, $lastName, $countryId, $countryStateId, $phone)
   {
-    $sql = "CALL spCustomer_Validate('{companyId}', '{accountId}', '{firstName}', '{lastName}', '{countryId}', '{countryStateId}', '{phone}', @CustomerId, @AgencyId)";
+    $sql = "CALL spCustomer_Validate('{companyId}', '{accountId}', '{firstName}', '{lastName}', '{countryId}', '{countryStateId}', '{phone}', @CustomerId)";
 
     $params = array();
     $params['companyId'] = $companyId;
@@ -72,7 +72,7 @@ class TblCustomer extends Db
     $params['countryStateId'] = $countryStateId;
     $params['phone'] = $phone;
 
-    $this->setOutputParams(array('CustomerId', 'AgencyId'));
+    $this->setOutputParams(array('CustomerId'));
     $this->executeUpdate($sql, $params);
     $output = $this->getOutputResults();
 
