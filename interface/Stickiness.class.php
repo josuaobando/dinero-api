@@ -283,7 +283,8 @@ class Stickiness
    */
   public function create()
   {
-    $this->stickinessId = $this->tblStickiness->create($this->customerId, $this->personId);
+    $transaction = Session::getTransaction();
+    $this->stickinessId = $this->tblStickiness->create($this->customerId, $transaction->getAgencyTypeId(), $this->personId);
   }
 
   /**
@@ -292,7 +293,8 @@ class Stickiness
   private function createProvider()
   {
     if(!$this->stickinessId){
-      $this->stickinessId = $this->tblStickiness->create($this->customerId, $this->personId);
+      $transaction = Session::getTransaction();
+      $this->stickinessId = $this->tblStickiness->create($this->customerId, $transaction->getAgencyTypeId(), $this->personId);
     }
   }
 
@@ -359,9 +361,6 @@ class Stickiness
         $this->personalId = $stickinessData['PersonalId'];
       }
 
-    }else{
-      Log::custom(__CLASS__, 'stickinessData is unavailable to customerId: ' . $customerId);
-      //throw new P2PException("Agency is unavailable");
     }
   }
 

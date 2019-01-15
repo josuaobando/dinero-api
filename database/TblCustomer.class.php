@@ -203,7 +203,7 @@ class TblCustomer extends Db
    */
   public function getStats($customerId, $agencyTypeId, $transactionTypeId)
   {
-    $sql = "CALL spCustomer_Stats('{customerId}', '{transactionTypeId}')";
+    $sql = "CALL spCustomer_Stats('{customerId}', '{agencyTypeId}', '{transactionTypeId}')";
 
     $params = array();
     $params['customerId'] = $customerId;
