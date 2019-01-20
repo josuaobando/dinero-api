@@ -320,6 +320,89 @@ function rejections($wsRequest)
  *
  * @return WSResponseError|WSResponseOk
  */
+function transaction($wsRequest)
+{
+  try{
+    Session::getAccount();
+
+    $transactionId = $wsRequest->requireNumericAndPositive("transactionId");
+
+    $tblTransaction = TblTransaction::getInstance();
+    $transactionData = $tblTransaction->getTransaction($transactionId);
+
+    $wsResponse = new WSResponseOk();
+    $wsResponse->addElement('transaction', $transactionData);
+  }catch(InvalidParameterException $ex){
+    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception.parameter');
+  }catch(SessionException $ex){
+    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.session.expired');
+  }catch(Exception $ex){
+    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception');
+  }
+
+  return $wsResponse;
+}
+
+/**
+ * @param WSRequest $wsRequest
+ *
+ * @return WSResponseError|WSResponseOk
+ */
+function transactionConfirm($wsRequest)
+{
+  try{
+    Session::getAccount();
+
+    $providerTransaction = new ProviderTransaction($wsRequest);
+    $confirm = $providerTransaction->confirm();
+
+    $wsResponse = new WSResponseOk();
+    $wsResponse->addElement('confirmed', $confirm instanceof WSResponseOk);
+  }catch(InvalidParameterException $ex){
+    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception.parameter');
+  }catch(SessionException $ex){
+    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.session.expired');
+  }catch(Exception $ex){
+    $wsResponse = new WSResponseError($ex->getMessage(), 'transaction.confirm.error');
+  }
+
+  return $wsResponse;
+}
+
+/**
+ * @param WSRequest $wsRequest
+ *
+ * @return WSResponseError|WSResponseOk
+ */
+function transactionUpdate($wsRequest)
+{
+  try{
+    Session::getAccount();
+
+    $providerTransaction = new ProviderTransaction($wsRequest);
+    $update = $providerTransaction->transactionUpdate();
+
+    $wsResponse = new WSResponseOk();
+    $wsResponse->addElement('update', $update);
+    $wsResponse->addElement('result', 'processing.p2p.updated');
+  }catch(InvalidParameterException $ex){
+    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception.parameter');
+  }catch(SessionException $ex){
+    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.session.expired');
+  }catch(P2PException $ex){
+    $wsResponse = new WSResponseError($ex->getMessage(), 'processing.p2p.rejected');
+  }catch(Exception $ex){
+    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception');
+  }
+
+  return $wsResponse;
+}
+
+/**
+ * @param WSRequest $wsRequest
+ *
+ * @return WSResponseError|WSResponseOk
+ */
 function transactionReport($wsRequest)
 {
   try{
@@ -367,63 +450,6 @@ function transactionReport($wsRequest)
     $wsResponse = new WSResponseOk();
     $wsResponse->addElement('transactions', $transactions);
     $wsResponse->addElement('summary', $summary);
-  }catch(InvalidParameterException $ex){
-    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception.parameter');
-  }catch(SessionException $ex){
-    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.session.expired');
-  }catch(Exception $ex){
-    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception');
-  }
-
-  return $wsResponse;
-}
-
-/**
- * @param WSRequest $wsRequest
- *
- * @return WSResponseError|WSResponseOk
- */
-function transactionUpdate($wsRequest)
-{
-  try{
-    Session::getAccount();
-
-    $providerTransaction = new ProviderTransaction($wsRequest);
-    $update = $providerTransaction->transactionUpdate();
-
-    $wsResponse = new WSResponseOk();
-    $wsResponse->addElement('update', $update);
-    $wsResponse->addElement('result', 'processing.p2p.updated');
-  }catch(InvalidParameterException $ex){
-    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception.parameter');
-  }catch(SessionException $ex){
-    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.session.expired');
-  }catch(P2PException $ex){
-    $wsResponse = new WSResponseError($ex->getMessage(), 'processing.p2p.rejected');
-  }catch(Exception $ex){
-    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception');
-  }
-
-  return $wsResponse;
-}
-
-/**
- * @param WSRequest $wsRequest
- *
- * @return WSResponseError|WSResponseOk
- */
-function transaction($wsRequest)
-{
-  try{
-    Session::getAccount();
-
-    $transactionId = $wsRequest->requireNumericAndPositive("transactionId");
-
-    $tblTransaction = TblTransaction::getInstance();
-    $transactionData = $tblTransaction->getTransaction($transactionId);
-
-    $wsResponse = new WSResponseOk();
-    $wsResponse->addElement('transaction', $transactionData);
   }catch(InvalidParameterException $ex){
     $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception.parameter');
   }catch(SessionException $ex){

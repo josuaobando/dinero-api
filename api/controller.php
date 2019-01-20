@@ -169,6 +169,14 @@ function f_transactionReport()
 }
 
 /**
+ * confirm transaction
+ */
+function f_transactionConfirm()
+{
+  require_once('api/client.php');
+}
+
+/**
  * update transaction
  */
 function f_transactionUpdate()

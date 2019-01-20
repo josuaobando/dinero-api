@@ -256,7 +256,7 @@ class Customer
    *
    * @param WSRequest $wsRequest
    *
-   * @throws InvalidParameterException|CustomerException
+   * @throws InvalidParameterException|CustomerException|TransactionException
    */
   public function restoreFromRequest($wsRequest)
   {
@@ -269,14 +269,14 @@ class Customer
 
     $countryData = $this->tblUtil->getCountry($this->country);
     if(!$countryData){
-      //throw new InvalidParameterException('country', $this->country, 'CountryCode');
+      throw new TransactionException('Invalid Country: ' . $this->country);
     }
     $this->countryId = $countryData['Country_Id'];
     $this->countryName = $countryData['Name'];
 
     $stateData = $this->tblUtil->getState($this->countryId, $this->state);
     if(!$stateData){
-      //throw new InvalidParameterException('state', $this->state, 'StateCode');
+      throw new TransactionException('Invalid State: ' . $this->state);
     }
     $this->stateId = $stateData['CountryState_Id'];
     $this->stateName = $stateData['Name'];
