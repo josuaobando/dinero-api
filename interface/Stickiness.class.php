@@ -50,6 +50,12 @@ class Stickiness
    * [Rejected] Receiver already linked to other of yours agencies
    */
   const STATUS_CODE_LINKED_OTHER_AGENCY = '9';
+  /**
+   * Agency in my company
+   *
+   * [Rejected] This sender already linked to other of yours agencies
+   */
+  const STATUS_CODE_SENDER_LINKED_OTHER_AGENCY = '12';
 
   /**
    * Pending Stickiness
@@ -604,6 +610,7 @@ class Stickiness
       case self::STATUS_CODE_LIMIT_AMOUNT:
         throw new P2PLimitException("Max amount per month exceeded");
       case self::STATUS_CODE_LINKED_OTHER_AGENCY:
+      case self::STATUS_CODE_SENDER_LINKED_OTHER_AGENCY:
         Log::custom(__CLASS__, "Customer [$this->customer] already linked to other of yours agencies");
         throw new P2PAgencyException("Customer is linked to another Agency");
       default:
