@@ -75,6 +75,7 @@ class AppManager
   /**
    * get transactions by filters
    *
+   * @param $providerId
    * @param $statusList
    * @param $transactionTypeId
    * @param $filterAgencyType
@@ -91,9 +92,9 @@ class AppManager
    *
    * @return array
    */
-  public function transactionReport($statusList, $transactionTypeId, $filterAgencyType, $agencyList, $accountId, $companyId, $beginDate, $endDate, $controlNumber, $customer, $transactionId, $reference, $currentPage)
+  public function transactionReport($providerId, $statusList, $transactionTypeId, $filterAgencyType, $agencyList, $accountId, $companyId, $beginDate, $endDate, $controlNumber, $customer, $transactionId, $reference, $currentPage)
   {
-    return $this->tblApp->transactionReport($statusList, $transactionTypeId, $filterAgencyType, $agencyList, $accountId, $companyId, $beginDate, $endDate, $controlNumber, $customer, $transactionId, $reference, $currentPage, 9999);
+    return $this->tblApp->transactionReport($providerId, $statusList, $transactionTypeId, $filterAgencyType, $agencyList, $accountId, $companyId, $beginDate, $endDate, $controlNumber, $customer, $transactionId, $reference, $currentPage, 9999);
   }
 
   /**

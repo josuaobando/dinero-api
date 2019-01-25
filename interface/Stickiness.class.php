@@ -51,8 +51,10 @@ class Stickiness
    */
   const STATUS_CODE_LINKED_OTHER_AGENCY = '9';
   /**
-   * Agency in my company
-   *
+   * [Rejected] Receiver already linked to other of yours provider
+   */
+  const STATUS_CODE_RECEIVER_LINKED_OTHER_PROVIDER = '10';
+  /**
    * [Rejected] This sender already linked to other of yours agencies
    */
   const STATUS_CODE_SENDER_LINKED_OTHER_AGENCY = '12';
@@ -605,6 +607,9 @@ class Stickiness
       case self::STATUS_CODE_LINKED_OTHER_CUSTOMER:
         $this->reject();
         throw new P2PException("Customer is linked to another Agency (Merchant)");
+      case self::STATUS_CODE_RECEIVER_LINKED_OTHER_PROVIDER:
+        $this->reject();
+        throw new P2PException("Customer is linked to another Provider");
       case self::STATUS_CODE_LIMIT_TRANSACTIONS:
         throw new P2PLimitException("Max # of transactions per month exceeded");
       case self::STATUS_CODE_LIMIT_AMOUNT:
