@@ -94,7 +94,7 @@ class TblCustomer extends Db
    */
   public function update($customerId, $firstName, $lastName, $countryId, $countryStateId, $phone, $isAPI = 0)
   {
-    $sql = "CALL spCustomer_Update('{agencyId}', '{customerId}', '{firstName}', '{lastName}', '{countryId}', '{countryStateId}', '{phone}', '{isAPI}')";
+    $sql = "CALL spCustomer_Update('{customerId}', '{firstName}', '{lastName}', '{countryId}', '{countryStateId}', '{phone}', '{isAPI}')";
 
     $params = array();
     $params['customerId'] = $customerId;
