@@ -17,25 +17,25 @@ class Stickiness
    */
   const STATUS_CODE_LINKED_OTHER_COMPANY = '2';
   /**
-   * [Rejected] Already linked to a one of your receivers
+   * Agency in my company
    *
-   * @TODO: review
+   * [Rejected] Already linked to a one of your receivers
    */
   const STATUS_CODE_LINKED = '3';
   /**
+   * Agency in my company
+   *
    * [Pending] Already linked to a one of your pending receivers
    */
-  const STATUS_CODE_LINKED_PENDING = '4';
+  const STATUS_CODE_CUSTOMER_LINKED_OTHER_PERSON = '4';
   /**
    * [Rejected] Already linked to other receiver (company)
    */
-  const STATUS_CODE_LINKED_OTHER = '5';
+  const STATUS_CODE_CUSTOMER_LINKED_OTHER_COMPANY = '5';
   /**
    * [Rejected] This receiver is not linked to this sender
-   *
-   * @TODO: review
    */
-  const STATUS_CODE_LINKED_OTHER_CUSTOMER = '6';
+  const STATUS_CODE_PERSON_LINKED_OTHER_CUSTOMER = '6';
   /**
    * [Rejected] Max # of transaction per month exceeded
    */
@@ -49,15 +49,27 @@ class Stickiness
    *
    * [Rejected] Receiver already linked to other of yours agencies
    */
-  const STATUS_CODE_LINKED_OTHER_AGENCY = '9';
+  const STATUS_CODE_PERSON_LINKED_OTHER_AGENCY = '9';
   /**
-   * [Rejected] Receiver already linked to other of yours provider
+   * Agency in my company
+   *
+   * [Rejected] Receiver already linked to other of yours providers
    */
-  const STATUS_CODE_RECEIVER_LINKED_OTHER_PROVIDER = '10';
+  const STATUS_CODE_PERSON_LINKED_OTHER_PROVIDER = '10';
   /**
+   * [Rejected] This Receiver was restricted by provider
+   */
+  const STATUS_CODE_PERSON_RESTRICTED_PROVIDER = '11';
+  /**
+   * Agency in my company
+   *
    * [Rejected] This sender already linked to other of yours agencies
    */
-  const STATUS_CODE_SENDER_LINKED_OTHER_AGENCY = '12';
+  const STATUS_CODE_CUSTOMER_LINKED_OTHER_AGENCY = '12';
+  /**
+   * [Rejected] This receiver already linked to other company
+   */
+  const STATUS_CODE_PERSON_LINKED_OTHER_COMPANY = '13';
 
   /**
    * Pending Stickiness
@@ -555,7 +567,7 @@ class Stickiness
         switch($resultCode){
           case self::STATUS_CODE_SUCCESS:
           case self::STATUS_CODE_LINKED:
-          case self::STATUS_CODE_LINKED_PENDING:
+          case self::STATUS_CODE_CUSTOMER_LINKED_OTHER_PERSON:
             if($this->verification == self::STATUS_VERIFICATION_APPROVED){
               $this->createProvider();
             }else{
@@ -563,10 +575,10 @@ class Stickiness
               throw new P2PException("Customer is linked to another Person.");
             }
             break;
-          case self::STATUS_CODE_LINKED_OTHER:
-          case self::STATUS_CODE_LINKED_OTHER_AGENCY:
+          case self::STATUS_CODE_CUSTOMER_LINKED_OTHER_COMPANY:
+          case self::STATUS_CODE_PERSON_LINKED_OTHER_AGENCY:
           case self::STATUS_CODE_LINKED_OTHER_COMPANY:
-          case self::STATUS_CODE_LINKED_OTHER_CUSTOMER:
+          case self::STATUS_CODE_PERSON_LINKED_OTHER_CUSTOMER:
             $this->reject();
             throw new P2PException("Customer is linked with another Merchant or Person. Reject this transaction.");
             break;
@@ -599,25 +611,27 @@ class Stickiness
     switch($resultCode){
       case self::STATUS_CODE_SUCCESS:
       case self::STATUS_CODE_LINKED:
-      case self::STATUS_CODE_LINKED_PENDING:
+      case self::STATUS_CODE_CUSTOMER_LINKED_OTHER_PERSON:
         // do nothing
         return true;
       case self::STATUS_CODE_LINKED_OTHER_COMPANY:
-      case self::STATUS_CODE_LINKED_OTHER:
-      case self::STATUS_CODE_LINKED_OTHER_CUSTOMER:
+      case self::STATUS_CODE_CUSTOMER_LINKED_OTHER_COMPANY:
+      case self::STATUS_CODE_PERSON_LINKED_OTHER_CUSTOMER:
+      case self::STATUS_CODE_PERSON_LINKED_OTHER_COMPANY:
         $this->reject();
         throw new P2PException("Customer is linked to another Agency (Merchant)");
-      case self::STATUS_CODE_RECEIVER_LINKED_OTHER_PROVIDER:
+      case self::STATUS_CODE_PERSON_LINKED_OTHER_PROVIDER:
         $this->reject();
         throw new P2PException("Customer is linked to another Provider");
       case self::STATUS_CODE_LIMIT_TRANSACTIONS:
         throw new P2PLimitException("Max # of transactions per month exceeded");
       case self::STATUS_CODE_LIMIT_AMOUNT:
         throw new P2PLimitException("Max amount per month exceeded");
-      case self::STATUS_CODE_LINKED_OTHER_AGENCY:
-      case self::STATUS_CODE_SENDER_LINKED_OTHER_AGENCY:
+      case self::STATUS_CODE_PERSON_LINKED_OTHER_AGENCY:
         Log::custom(__CLASS__, "Customer [$this->customer] already linked to other of yours agencies");
-        throw new P2PAgencyException("Customer is linked to another Agency");
+        throw new P2PAgencyException("Person is linked to another Agency");
+      case self::STATUS_CODE_CUSTOMER_LINKED_OTHER_AGENCY:
+        throw new P2PException("Customer is linked to another Agency");
       default:
         ExceptionManager::handleException(new P2PException("Invalid Response Code >> Code: $resultCode  Message: $resultCodeMessage : (".__FUNCTION__.")"));
         throw new P2PException("Due to external factors, we cannot give this customer a name");
