@@ -464,6 +464,18 @@ class BillingPayments extends Provider
           $this->apiMessage = 'This transaction not exist or not can be loaded';
           throw new APIException($this->apiMessage);
           break;
+        case 1004: //Not enough Balance
+          $subject = "Not enough Balance";
+          $body = "";
+
+          $bodyTemplate = MailManager::getEmailTemplate('default', array('body' => $body, 'message' => $this->apiMessage));
+          $recipients = array('To' => 'mgoficinasf0117@outlook.com', 'Cc' => CoreConfig::MAIL_DEV);
+          MailManager::sendEmail($recipients, $subject, $bodyTemplate);
+          Log::custom(__CLASS__, $body);
+
+          $this->apiMessage = 'Please contact the administrator as there is not enough balance.';
+          throw new APILimitException($this->apiMessage);
+          break;
         case 1007: //Sender reached requests limit
           $this->apiMessage = 'The Customer has exceeded the limits';
           throw new APILimitException($this->apiMessage);

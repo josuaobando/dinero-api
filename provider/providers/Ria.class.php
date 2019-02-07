@@ -159,12 +159,6 @@ class Ria extends Provider
     $transactionStatus = $transaction->getTransactionStatusId();
     $isSubmit = ($transactionStatus == Transaction::STATUS_REQUESTED);
 
-    if($transaction->getAmount() < 60){
-      throw new LimitException("The minimum allowed amount is: 60 USD");
-    }elseif($transaction->getAmount() > 460){
-      throw new LimitException("The maximum allowed amount is: 450 USD");
-    }
-
     //transaction
     $params = array();
     $params['trans'] = $apiTransactionId;
