@@ -590,7 +590,7 @@ class Stickiness
             break;
           default:
             ExceptionManager::handleException(new GeneralException("Invalid Response Code >> Code: $resultCode  Message: $resultCodeMessage : (" . __FUNCTION__ . ")"));
-            throw new P2PException("Customer is linked with another Agency (Merchant) or Person. Reject this transaction.");
+            throw new P2PException("Customer is linked with another Company or Person. Reject this transaction.");
         }
       }
 
@@ -619,7 +619,7 @@ class Stickiness
       case self::STATUS_CODE_PERSON_LINKED_OTHER_CUSTOMER:
       case self::STATUS_CODE_PERSON_LINKED_OTHER_COMPANY:
         $this->reject();
-        throw new P2PException("Customer is linked to another Agency (Merchant)");
+        throw new P2PException("Customer is linked to another Company");
       case self::STATUS_CODE_PERSON_LINKED_OTHER_PROVIDER:
         $this->reject();
         throw new P2PException("Customer is linked to another Provider");
@@ -628,7 +628,7 @@ class Stickiness
       case self::STATUS_CODE_LIMIT_AMOUNT:
         throw new P2PLimitException("Max amount per month exceeded");
       case self::STATUS_CODE_PERSON_LINKED_OTHER_AGENCY:
-        Log::custom(__CLASS__, "Customer [$this->customer] already linked to other of yours agencies");
+        Log::custom(__CLASS__, "Customer [$this->customer] already linked to other of yours Agencies");
         throw new P2PAgencyException("Person is linked to another Agency");
       case self::STATUS_CODE_CUSTOMER_LINKED_OTHER_AGENCY:
         throw new P2PException("Customer is linked to another Agency");
