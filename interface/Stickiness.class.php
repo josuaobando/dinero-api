@@ -616,9 +616,16 @@ class Stickiness
         return true;
       case self::STATUS_CODE_LINKED_OTHER_COMPANY:
       case self::STATUS_CODE_CUSTOMER_LINKED_OTHER_COMPANY:
+        $this->reject();
+        throw new P2PException("Customer is linked to another Company");
       case self::STATUS_CODE_PERSON_LINKED_OTHER_CUSTOMER:
       case self::STATUS_CODE_PERSON_LINKED_OTHER_COMPANY:
         $this->reject();
+        $person = Session::getPerson();
+        if($person->getPersonalId()){
+          $person->inactive();
+          Log::custom(__CLASS__, "Person turn off: " . $person->getPersonId());
+        }
         throw new P2PException("Customer is linked to another Company");
       case self::STATUS_CODE_PERSON_LINKED_OTHER_PROVIDER:
         $this->reject();
