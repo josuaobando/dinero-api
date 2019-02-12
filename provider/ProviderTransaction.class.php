@@ -87,6 +87,9 @@ class ProviderTransaction
           if($person && $person->getPersonId()){
             break;
           }
+        }catch(PersonException $exception){
+          $providerException = $exception;
+          continue;
         }catch(CustomerBlackListException $exception){
           $providerException = $exception;
           continue;
@@ -208,6 +211,9 @@ class ProviderTransaction
           if($person && $person->getPersonId()){
             break;
           }
+        }catch(PersonException $exception){
+          $providerException = $exception;
+          continue;
         }catch(CustomerBlackListException $exception){
           $providerException = $exception;
           continue;
