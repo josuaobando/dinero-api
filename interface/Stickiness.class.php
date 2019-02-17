@@ -29,11 +29,13 @@ class Stickiness
    */
   const STATUS_CODE_CUSTOMER_LINKED_OTHER_PERSON = '4';
   /**
-   * [Rejected] Already linked to other receiver (company)
+   * [Rejected] This sender is linked to other company
    */
   const STATUS_CODE_CUSTOMER_LINKED_OTHER_COMPANY = '5';
   /**
-   * [Rejected] This receiver is not linked to this sender
+   * Agency in my company
+   *
+   * [Rejected] This receiver is not linked to this sender [Fix]
    */
   const STATUS_CODE_PERSON_LINKED_OTHER_CUSTOMER = '6';
   /**
@@ -47,13 +49,13 @@ class Stickiness
   /**
    * Agency in my company
    *
-   * [Rejected] Receiver already linked to other of yours agencies
+   * [Rejected] Receiver linked to other of your agencies [Fix]
    */
   const STATUS_CODE_PERSON_LINKED_OTHER_AGENCY = '9';
   /**
    * Agency in my company
    *
-   * [Rejected] Receiver already linked to other of yours providers
+   * [Rejected] Receiver already linked to other of yours providers [Fix]
    */
   const STATUS_CODE_PERSON_LINKED_OTHER_PROVIDER = '10';
   /**
