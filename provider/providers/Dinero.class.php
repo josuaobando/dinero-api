@@ -119,6 +119,25 @@ class Dinero extends Provider
       }else{
         throw $agencyException;
       }
+    }catch(P2PRelationException $relationException){
+      $relation = $stickiness->getRelation();
+      if($relation->receiverId){
+        $person = new Person();
+        $person->restoreById($relation->receiverId);
+        if($person->getPersonId()){
+          $stickiness->setPerson($person->getName());
+          $stickiness->setPersonId($person->getPersonId());
+          $stickiness->setPersonalId($person->getPersonalId());
+          $stickiness->setAgencyP2P($relation->agencyId);
+          $stickiness->create();
+          $stickiness->register();
+          $person->unblock();
+        }else{
+          throw new P2PException("Customer is linked to another Company");
+        }
+      }else{
+        throw new P2PException("Customer is linked to another Company");
+      }
     }catch(Exception $exception){
       throw $exception;
     }

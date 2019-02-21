@@ -55,7 +55,7 @@ class Stickiness
   /**
    * Agency in my company
    *
-   * [Rejected] Receiver already linked to other of yours providers [Fix]
+   * [Rejected] Receiver already linked to other of yours providers
    */
   const STATUS_CODE_PERSON_LINKED_OTHER_PROVIDER = '10';
   /**
@@ -147,6 +147,11 @@ class Stickiness
    * @var array
    */
   private $stickinessTransactionData;
+
+  /**
+   * @var stdClass {"receiverId": "", "receiver": "", "providerId": "", "agencyId": "", "sender": ""}
+   */
+  private $relation;
 
   /**
    * @return int
@@ -290,6 +295,13 @@ class Stickiness
   public function setAgencyP2P($agencyP2P)
   {
     $this->agencyP2P = $agencyP2P;
+  }
+
+  /**
+   * @return stdClass {"receiverId": "603650742", "receiver": "FRANCELA RODRIGUEZ PORRAS", "providerId": "1", "agencyId": "14", "sender": "KENNETH JOYNER"}
+   */
+  public function getRelation(){
+    return $this->relation;
   }
 
   /**
@@ -604,7 +616,7 @@ class Stickiness
    *
    * @return bool
    *
-   * @throws P2PAgencyException|P2PException|P2PLimitException
+   * @throws P2PAgencyException|P2PException|P2PLimitException|P2PRelationException
    */
   private function checkResponse($result)
   {
@@ -621,6 +633,12 @@ class Stickiness
         $this->reject();
         throw new P2PException("Customer is linked to another Company");
       case self::STATUS_CODE_PERSON_LINKED_OTHER_CUSTOMER:
+        if($result->response->currentInformation){
+          $this->relation = $result->response->currentInformation;
+          throw new P2PRelationException("Customer has other relation");
+        }else{
+          throw new P2PException("Customer is linked to another Company");
+        }
       case self::STATUS_CODE_PERSON_LINKED_OTHER_COMPANY:
         $this->reject();
         $person = Session::getPerson();

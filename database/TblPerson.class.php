@@ -97,6 +97,26 @@ class TblPerson extends Db
   }
 
   /**
+   * get person data
+   *
+   * @param string $personalId
+   *
+   * @return array
+   */
+  public function getPersonById($personalId)
+  {
+    $sql = "CALL spPerson_ById('{personalId}')";
+
+    $params = array();
+    $params['personalId'] = $personalId;
+
+    $row = array();
+    $this->executeSingleQuery($sql, $row, $params);
+
+    return $row;
+  }
+
+  /**
    * change the available flag in a person.
    *
    * @param int $personId

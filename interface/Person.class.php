@@ -454,35 +454,55 @@ class Person
 
     if($personId){
       $this->personId = $personId;
-
       $personData = $this->tblPerson->getPerson($personId);
-      $this->agencyId = $personData['Agency_Id'];
-      $this->personListId = $personData['PersonList_Id'];
-      $this->agencyIdRemote = $personData['AgencyIdRemote'];
-
-      $this->country = $personData['Country'];
-      $this->countryId = $personData['Country_Id'];
-      $this->countryName = trim($personData['CountryName']);
-      $this->state = $personData['CountryState'];
-      $this->stateId = $personData['CountryState_Id'];
-      $this->stateName = $personData['CountryStateName'];
-      $this->available = $personData['Available'];
-      $this->isActive = $personData['IsActive'];
-      $this->nameId = $personData['Name_Id'];
-      $this->name = $personData['Name'];
-      $this->surnames = $personData['Surnames'];
-
-      $this->personalId = $personData['PersonalId'];
-      $this->typeId = $personData['TypeId'];
-      $this->expirationDateId = $personData['ExpirationDateId'];
-      $this->address = $personData['Address'];
-      $this->city = $personData['City'];
-      $this->birthDate = $personData['BirthDate'];
-      $this->maritalStatus = $personData['MaritalStatus'];
-      $this->gender = $personData['Gender'];
-      $this->profession = $personData['Profession'];
-      $this->phone = $personData['Phone'];
+      $this->load($personData);
     }
+  }
+
+  /**
+   * @param string $personalId
+   */
+  public function restoreById($personalId)
+  {
+    $personData = $this->tblPerson->getPersonById($personalId);
+    $this->load($personData);
+  }
+
+  /**
+   * @param array $personData
+   */
+  private function load($personData)
+  {
+    if(!$personData){
+      return;
+    }
+    $this->personId = $personData['Person_Id'];
+    $this->agencyId = $personData['Agency_Id'];
+    $this->personListId = $personData['PersonList_Id'];
+    $this->agencyIdRemote = $personData['AgencyIdRemote'];
+
+    $this->country = $personData['Country'];
+    $this->countryId = $personData['Country_Id'];
+    $this->countryName = trim($personData['CountryName']);
+    $this->state = $personData['CountryState'];
+    $this->stateId = $personData['CountryState_Id'];
+    $this->stateName = $personData['CountryStateName'];
+    $this->available = $personData['Available'];
+    $this->isActive = $personData['IsActive'];
+    $this->nameId = $personData['Name_Id'];
+    $this->name = $personData['Name'];
+    $this->surnames = $personData['Surnames'];
+
+    $this->personalId = $personData['PersonalId'];
+    $this->typeId = $personData['TypeId'];
+    $this->expirationDateId = $personData['ExpirationDateId'];
+    $this->address = $personData['Address'];
+    $this->city = $personData['City'];
+    $this->birthDate = $personData['BirthDate'];
+    $this->maritalStatus = $personData['MaritalStatus'];
+    $this->gender = $personData['Gender'];
+    $this->profession = $personData['Profession'];
+    $this->phone = $personData['Phone'];
   }
 
   /**
