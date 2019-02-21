@@ -125,6 +125,7 @@ class Dinero extends Provider
         $person = new Person();
         $person->restoreById($relation->receiverId);
         if($person->getPersonId()){
+          $stickiness->reject();
           $stickiness->setPerson($person->getName());
           $stickiness->setPersonId($person->getPersonId());
           $stickiness->setPersonalId($person->getPersonalId());
