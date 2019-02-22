@@ -105,7 +105,7 @@ class Dinero extends Provider
 
     try{
       $stickiness->register();
-    }catch(P2PAgencyException $agencyException){
+    }catch(P2PAgencyException $exception){
       $update = $person->updatePersonList();
       if($update){
         Log::custom(__CLASS__, $person->getName(). " has been changed of person list");
@@ -114,13 +114,14 @@ class Dinero extends Provider
           $stickiness->setAgencyP2P($person->getAgencyIdRemote());
           $stickiness->register();
         }else{
-          throw $agencyException;
+          throw $exception;
         }
       }else{
-        throw $agencyException;
+        throw $exception;
       }
-    }catch(P2PRelationException $relationException){
+    }catch(P2PRelationException $exception){
       $relation = $stickiness->getRelation();
+      Log::custom(__CLASS__."-Relation", "Invalid Relation" . Util::objToStr($relation));
       if($relation->receiverId){
         $person = new Person();
         $person->restoreById($relation->receiverId);

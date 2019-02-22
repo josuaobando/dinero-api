@@ -117,6 +117,9 @@ class ProviderTransaction
         }catch(P2PAgencyException $exception){
           $providerException = $exception;
           continue;
+        }catch(P2PRelationException $exception){
+          $providerException = $exception;
+          continue;
         }catch(Exception $exception){
           throw $exception;
         }
