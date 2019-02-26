@@ -121,7 +121,6 @@ class Dinero extends Provider
       }
     }catch(P2PRelationException $exception){
       $relation = $stickiness->getRelation();
-      Log::custom(__CLASS__."-Relation", "Invalid Relation" . Util::objToStr($relation));
       if($relation->receiverId){
         $person = new Person();
         $person->restoreById($relation->receiverId);
