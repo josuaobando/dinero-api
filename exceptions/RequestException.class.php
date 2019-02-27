@@ -17,7 +17,8 @@ class RequestException extends Exception
   const ERROR_P2P_PERSON = 520;
   const ERROR_P2P_LIMIT = 530;
   const ERROR_P2P_AGENCY = 540;
-  const ERROR_P2P_RELATION = 550;
+  const ERROR_P2P_RELATION_CUSTOMER = 550;
+  const ERROR_P2P_RELATION_PERSON = 560;
   const ERROR_API = 600;
   const ERROR_API_BLACKLIST = 610;
   const ERROR_API_PERSON = 620;

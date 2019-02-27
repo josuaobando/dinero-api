@@ -616,7 +616,7 @@ class Stickiness
    *
    * @return bool
    *
-   * @throws P2PAgencyException|P2PException|P2PLimitException|P2PRelationException
+   * @throws P2PAgencyException|P2PException|P2PLimitException|P2PRelationCustomerException|P2PRelationPersonException
    */
   private function checkResponse($result)
   {
@@ -637,10 +637,12 @@ class Stickiness
           $this->relation = $result->response->currentInformation;
           if($this->relation->sender){
             Log::custom(__CLASS__."-Relation-Receiver", "Invalid Relation " . Util::objToStr($this->relation));
-            throw new P2PException("Customer is linked to another Company");
-          }else{
+            throw new P2PRelationPersonException("Person is linked to another Company");
+          }elseif($this->relation->receiverId){
             Log::custom(__CLASS__."-Relation-Sender", "Invalid Relation " . Util::objToStr($this->relation));
-            throw new P2PRelationException("Customer has other relation");
+            throw new P2PRelationCustomerException("Customer has other relation");
+          }else{
+            throw new P2PException("Customer is linked to another Company");
           }
         }else{
           throw new P2PException("Customer is linked to another Company");
