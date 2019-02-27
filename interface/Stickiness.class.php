@@ -663,8 +663,9 @@ class Stickiness
       case self::STATUS_CODE_LIMIT_AMOUNT:
         throw new P2PLimitException("Max amount per month exceeded");
       case self::STATUS_CODE_PERSON_LINKED_OTHER_AGENCY:
+        //@todo: pending fix
+        throw new P2PAgencyException("Customer is linked to another Agency");
       case self::STATUS_CODE_CUSTOMER_LINKED_OTHER_AGENCY:
-        Log::custom(__CLASS__, "Customer [$this->customer] | [$this->person] already linked to other of yours Agencies");
         throw new P2PAgencyException("Customer is linked to another Agency");
       default:
         ExceptionManager::handleException(new P2PException("Invalid Response Code >> Code: $resultCode  Message: $resultCodeMessage : (".__FUNCTION__.")"));
