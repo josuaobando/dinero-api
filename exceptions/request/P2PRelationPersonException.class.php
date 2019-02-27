@@ -2,6 +2,8 @@
 
 /**
  * @author Josua
+ *
+ * @inheritdoc exception to link right customer to name
  */
 class P2PRelationPersonException extends RequestException
 {

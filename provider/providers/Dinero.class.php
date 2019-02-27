@@ -119,7 +119,7 @@ class Dinero extends Provider
       }else{
         throw $exception;
       }
-    }catch(P2PRelationCustomerException $exception){
+    }catch(P2PRelationPersonException $exception){
       $relation = $stickiness->getRelation();
       $person = new Person();
       $person->restoreById($relation->receiverId);

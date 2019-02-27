@@ -635,11 +635,11 @@ class Stickiness
       case self::STATUS_CODE_PERSON_LINKED_OTHER_CUSTOMER:
         if($result->response->currentInformation){
           $this->relation = $result->response->currentInformation;
-          if($this->relation->sender){
-            Log::custom(__CLASS__."-Relation-Receiver", "Invalid Relation " . Util::objToStr($this->relation));
+          if($result->response->sender->original_sender == $this->relation->sender){
+            Log::custom(__CLASS__ . "-Relation-Receiver", "Invalid Relation " . Util::objToStr($result->response));
             throw new P2PRelationPersonException("Person is linked to another Company");
           }elseif($this->relation->receiverId){
-            Log::custom(__CLASS__."-Relation-Sender", "Invalid Relation " . Util::objToStr($this->relation));
+            Log::custom(__CLASS__ . "-Relation-Sender", "Invalid Relation " . Util::objToStr($result->response));
             throw new P2PRelationCustomerException("Customer has other relation");
           }else{
             throw new P2PException("Customer is linked to another Company");
