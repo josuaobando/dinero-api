@@ -125,6 +125,7 @@ class Transaction
   const STATUS_REJECTED = 4;
   const STATUS_CANCELED = 5;
   const STATUS_EXPIRED = 6;
+  const STATUS_REFUNDED = 7;
 
   /**
    * Agency Type
@@ -530,6 +531,8 @@ class Transaction
         return "canceled";
       case Transaction::STATUS_EXPIRED:
         return "expired";
+      case Transaction::STATUS_REFUNDED:
+        return "refunded";
       default:
         return "unknown";
     }
