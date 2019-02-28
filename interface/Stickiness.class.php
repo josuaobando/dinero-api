@@ -636,7 +636,6 @@ class Stickiness
         if($result->response->currentInformation){
           $this->relation = $result->response->currentInformation;
           if($result->response->sender->original_sender == $this->relation->sender){
-            Log::custom(__CLASS__ . "-Relation-Receiver", "Invalid Relation " . Util::objToStr($result->response));
             throw new P2PRelationPersonException("Person is linked to another Company");
           }elseif($this->relation->receiverId){
             Log::custom(__CLASS__ . "-Relation-Sender", "Invalid Relation " . Util::objToStr($result->response));
@@ -652,7 +651,7 @@ class Stickiness
         $person = Session::getPerson();
         if($person->getPersonalId()){
           $person->inactive();
-          Log::custom(__CLASS__, "Person turn off: " . $person->getPersonId());
+          Log::custom(__CLASS__ . "TurnOff", "Person turn off: " . $person->getPersonId());
         }
         throw new P2PException("Customer is linked to another Company");
       case self::STATUS_CODE_PERSON_LINKED_OTHER_PROVIDER:
