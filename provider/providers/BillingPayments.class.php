@@ -455,43 +455,38 @@ class BillingPayments extends Provider
 
           $this->apiMessage = 'We cannot give a Receiver for this Sender';
           throw new APIPersonException($this->apiMessage);
-          break;
         case 1002: //Access Denied
           $this->apiMessage = 'Access Denied';
           throw new APIException($this->apiMessage);
-          break;
-        case 1003: //No Transaction Found
-          $this->apiMessage = 'This transaction not exist or not can be loaded';
+        case 1003: //No Transaction Found | No Processors Available. Please contact Admin
+
+          $bodyTemplate = MailManager::getEmailTemplate('default', array('body' => '', 'message' => $this->apiMessage));
+          $recipients = array('To' => 'mgoficinasf0117@outlook.com', 'Cc' => CoreConfig::MAIL_DEV);
+          MailManager::sendEmail($recipients, $this->apiMessage, $bodyTemplate);
+
+          $this->apiMessage = 'We cannot give a Sender for this Receiver';
           throw new APIException($this->apiMessage);
-          break;
         case 1004: //Not enough Balance
           $subject = "Not enough Balance";
-          $body = "";
 
           $bodyTemplate = MailManager::getEmailTemplate('default', array('body' => $body, 'message' => $this->apiMessage));
           $recipients = array('To' => 'mgoficinasf0117@outlook.com', 'Cc' => CoreConfig::MAIL_DEV);
           MailManager::sendEmail($recipients, $subject, $bodyTemplate);
-          Log::custom(__CLASS__, $body);
 
           $this->apiMessage = 'Please contact the administrator as there is not enough balance.';
           throw new APILimitException($this->apiMessage);
-          break;
         case 1007: //Sender reached requests limit
           $this->apiMessage = 'The Customer has exceeded the limits';
           throw new APILimitException($this->apiMessage);
-          break;
         case 1034: //There are no names available for this Sender, please try again tomorrow.
           $this->apiMessage = 'The Customer has exceeded the limits';
           throw new APILimitException($this->apiMessage);
-          break;
         case 1035: //Sender or Receiver is on Black List, please try again or use a different Sender
           $this->apiMessage = 'The Sender has been blacklisted';
           throw new APIBlackListException($this->apiMessage);
-          break;
         case 1036: //Receiver reached payouts names limit
           $this->apiMessage = 'The Customer has exceeded the limits';
           throw new APILimitException($this->apiMessage);
-          break;
         case 1037: //No Payouts Names Available. Please contact Admin
           $subject = "No payouts names available";
           $body = "There are no payouts names available in ".__CLASS__." agency";
@@ -503,11 +498,9 @@ class BillingPayments extends Provider
 
           $this->apiMessage = 'We cannot give a Receiver for this Sender';
           throw new APIPersonException($this->apiMessage);
-          break;
         case 1038: //Sender or Receiver is on Black List, please try again or use a different Receiver
           $this->apiMessage = 'The Receiver has been blacklisted';
           throw new APIBlackListException($this->apiMessage);
-          break;
         default:
           Log::custom(__CLASS__, "Unmapped >> Error: " . $this->apiCode . " Message: " . $this->apiMessage);
           if($this->apiMessage){
