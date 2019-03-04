@@ -39,7 +39,7 @@ class BillingPayments extends Provider
   }
 
   /**
-   * get receiver
+   * get receiver [deposits]
    *
    * @return Person
    *
@@ -111,7 +111,7 @@ class BillingPayments extends Provider
   }
 
   /**
-   * get sender name
+   * get sender name [payouts]
    *
    * @return null
    *
@@ -121,6 +121,10 @@ class BillingPayments extends Provider
   {
     $customer = Session::getCustomer();
     $transaction = Session::getTransaction();
+
+    if($transaction->getAmount() > 450){
+      throw new APILimitException("The maximum allowed amount is: $450 USD");
+    }
 
     //transaction
     $request = array();
