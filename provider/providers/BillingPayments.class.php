@@ -473,7 +473,7 @@ class BillingPayments extends Provider
         case 1004: //Not enough Balance
           $subject = "Not enough Balance";
 
-          $bodyTemplate = MailManager::getEmailTemplate('default', array('body' => $body, 'message' => $this->apiMessage));
+          $bodyTemplate = MailManager::getEmailTemplate('default', array('body' => '', 'message' => $this->apiMessage));
           $recipients = array('To' => 'mgoficinasf0117@outlook.com', 'Cc' => CoreConfig::MAIL_DEV);
           MailManager::sendEmail($recipients, $subject, $bodyTemplate);
 
