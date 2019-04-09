@@ -270,6 +270,8 @@ class ProviderTransaction
     //create transaction after the validation of the data
     $transaction->create();
     if($transaction->getTransactionId()){
+      $provider->stickiness();
+
       $wsResponse = new WSResponseOk();
       $wsResponse->addElement('transaction', $transaction);
       $wsResponse->addElement('sender', $person);

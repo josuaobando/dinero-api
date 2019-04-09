@@ -153,6 +153,10 @@ class Dinero extends Provider
    */
   public function sender()
   {
+    $transaction = Session::getTransaction();
+    if($transaction->getAgencyTypeId() == Transaction::AGENCY_TYPE_RIA){
+      return $this->receiver();
+    }
     return new Person();
   }
 
