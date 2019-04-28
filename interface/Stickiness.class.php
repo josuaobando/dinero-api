@@ -638,7 +638,8 @@ class Stickiness
           if($result->response->sender->original_sender == $this->relation->sender || $result->response->sender->sender == $this->relation->sender){
             throw new P2PRelationPersonException("Person is linked to another Company");
           }elseif($this->relation->receiverId){
-            throw new P2PRelationCustomerException("Customer has other relation");
+            //@todo: fix... it need re-try
+            throw new P2PRelationPersonException("Customer has other relation");
           }else{
             throw new P2PException("Customer is linked to another Company");
           }
