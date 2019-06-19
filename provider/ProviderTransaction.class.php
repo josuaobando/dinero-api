@@ -43,7 +43,7 @@ class ProviderTransaction
    *
    * @return WSResponse
    *
-   * @throws APIBlackListException|APIException|Exception|P2PException|TransactionException
+   * @throws APIBlackListException|APIException|APILimitException|APIPersonException|CustomerBlackListException|CustomerException|InvalidParameterException|InvalidStateException|LimitException|P2PAgencyException|P2PException|P2PLimitException|P2PRelationCustomerException|P2PRelationPersonException|PersonException|SessionException|TransactionException
    */
   public function receiver()
   {
@@ -173,7 +173,7 @@ class ProviderTransaction
    *
    * @return WSResponse
    *
-   * @throws APIBlackListException|APIException|Exception|P2PException|TransactionException
+   * @throws APIBlackListException|APIException|APILimitException|APIPersonException|CustomerBlackListException|CustomerException|InvalidParameterException|InvalidStateException|LimitException|P2PAgencyException|P2PException|P2PLimitException|P2PRelationCustomerException|P2PRelationPersonException|PersonException|SessionException|TransactionException
    */
   public function sender()
   {
@@ -287,8 +287,8 @@ class ProviderTransaction
    * confirm transaction with the control number
    *
    * @return WSResponse
-   *
-   * @throws TransactionException
+
+   * @throws APIException|CustomerException|InvalidParameterException|InvalidStateException|LimitException|SessionException|TransactionException
    */
   public function confirm()
   {
@@ -366,7 +366,7 @@ class ProviderTransaction
    *
    * @return WSResponse|Transaction
    *
-   * @throws InvalidStateException
+   * @throws InvalidParameterException|InvalidStateException
    */
   public function status($webRequest = false)
   {
@@ -400,7 +400,7 @@ class ProviderTransaction
    *
    * @return int
    *
-   * @throws InvalidStateException|TransactionException|P2PException
+   * @throws APIException|InvalidParameterException|InvalidStateException|LimitException|P2PException|P2PLimitException|SessionException|TransactionException
    */
   public function transactionUpdate()
   {

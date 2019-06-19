@@ -38,7 +38,7 @@ function authenticate($wsRequest)
     }
 
   }catch(InvalidParameterException $ex){
-    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception.parameter');
+    $wsResponse = new WSResponseError($ex->getKey(), $ex->getParameter());
   }catch(Exception $ex){
     $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception');
   }
@@ -105,7 +105,7 @@ function changePassword($wsRequest)
       $wsResponse->addElement('result', 'user.changePassword.reject');
     }
   }catch(InvalidParameterException $ex){
-    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception.parameter');
+    $wsResponse = new WSResponseError($ex->getKey(), $ex->getParameter());
   }catch(SessionException $ex){
     $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.session.expired');
   }catch(Exception $ex){
@@ -129,8 +129,6 @@ function users($wsRequest)
 
     $wsResponse = new WSResponseOk();
     $wsResponse->addElement('users', $users);
-  }catch(InvalidParameterException $ex){
-    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception.parameter');
   }catch(SessionException $ex){
     $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.session.expired');
   }catch(Exception $ex){
@@ -255,7 +253,7 @@ function transactions($wsRequest)
     $wsResponse = new WSResponseOk();
     $wsResponse->addElement('transactions', $transactions);
   }catch(InvalidParameterException $ex){
-    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception.parameter');
+    $wsResponse = new WSResponseError($ex->getKey(), $ex->getParameter());
   }catch(SessionException $ex){
     $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.session.expired');
   }catch(Exception $ex){
@@ -279,8 +277,6 @@ function attempts($wsRequest)
 
     $wsResponse = new WSResponseOk();
     $wsResponse->addElement('attempts', $attempts);
-  }catch(InvalidParameterException $ex){
-    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception.parameter');
   }catch(SessionException $ex){
     $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.session.expired');
   }catch(Exception $ex){
@@ -304,8 +300,6 @@ function rejections($wsRequest)
 
     $wsResponse = new WSResponseOk();
     $wsResponse->addElement('rejections', $rejections);
-  }catch(InvalidParameterException $ex){
-    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception.parameter');
   }catch(SessionException $ex){
     $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.session.expired');
   }catch(Exception $ex){
@@ -333,7 +327,7 @@ function transaction($wsRequest)
     $wsResponse = new WSResponseOk();
     $wsResponse->addElement('transaction', $transactionData);
   }catch(InvalidParameterException $ex){
-    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception.parameter');
+    $wsResponse = new WSResponseError($ex->getKey(), $ex->getParameter());
   }catch(SessionException $ex){
     $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.session.expired');
   }catch(Exception $ex){
@@ -359,7 +353,7 @@ function transactionConfirm($wsRequest)
     $wsResponse = new WSResponseOk();
     $wsResponse->addElement('confirmed', $confirm instanceof WSResponseOk);
   }catch(InvalidParameterException $ex){
-    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception.parameter');
+    $wsResponse = new WSResponseError($ex->getKey(), $ex->getParameter());
   }catch(SessionException $ex){
     $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.session.expired');
   }catch(Exception $ex){
@@ -386,7 +380,7 @@ function transactionUpdate($wsRequest)
     $wsResponse->addElement('update', $update);
     $wsResponse->addElement('result', 'processing.p2p.updated');
   }catch(InvalidParameterException $ex){
-    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception.parameter');
+    $wsResponse = new WSResponseError($ex->getKey(), $ex->getParameter());
   }catch(SessionException $ex){
     $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.session.expired');
   }catch(P2PException $ex){
@@ -451,8 +445,6 @@ function transactionReport($wsRequest)
     $wsResponse = new WSResponseOk();
     $wsResponse->addElement('transactions', $transactions);
     $wsResponse->addElement('summary', $summary);
-  }catch(InvalidParameterException $ex){
-    $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.exception.parameter');
   }catch(SessionException $ex){
     $wsResponse = new WSResponseError($ex->getMessage(), 'invalid.session.expired');
   }catch(Exception $ex){
