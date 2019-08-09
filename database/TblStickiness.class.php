@@ -119,7 +119,7 @@ class TblStickiness extends Db
    */
   public function getByCustomerId($customerId, $agencyTypeId)
   {
-    $sql = "CALL spStickiness_ByCustomerId('{customerId}', 'agencyTypeId')";
+    $sql = "CALL spStickiness_ByCustomerId('{customerId}', '{agencyTypeId}')";
 
     $params = array();
     $params['customerId'] = $customerId;
