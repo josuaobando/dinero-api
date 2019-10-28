@@ -564,7 +564,9 @@ class Person
     }
 
     $data['country'] = $this->countryName;
+    $data['countryISO'] = $this->country;
     $data['state'] = $this->stateName;
+    $data['stateISO'] = $this->state;
 
     return $data;
   }
