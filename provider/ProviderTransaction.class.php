@@ -27,8 +27,10 @@ class ProviderTransaction
   {
     $agencyTypeId = $wsRequest->getParam('type');
     if($agencyTypeId){
+      $account = Session::getAccount();
+      $companyId = $account->getCompanyId();
       $tblSystem = TblSystem::getInstance();
-      $this->providers = $tblSystem->getAgencyProviders($agencyTypeId);
+      $this->providers = $tblSystem->getAgencyProviders($agencyTypeId, $companyId);
       if(!$this->providers){
         throw new TransactionException("At this time, we can not process your request. Please, try later!");
       }

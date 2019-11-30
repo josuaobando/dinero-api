@@ -156,6 +156,16 @@ class WS
   }
 
   /**
+   * get the headers
+   *
+   * @return array
+   */
+  public function getHeaders()
+  {
+    return $this->headers;
+  }
+
+  /**
    * get the last content of the request
    *
    * @return string

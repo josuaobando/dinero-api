@@ -52,15 +52,17 @@ class TblSystem extends Db
    * get provider by agency type id
    *
    * @param int $agencyTypeId
+   * @param int $companyId
    *
    * @return array
    */
-  public function getAgencyProviders($agencyTypeId)
+  public function getAgencyProviders($agencyTypeId, $companyId)
   {
-    $sql = "CALL spProviderAgency('{agencyTypeId}')";
+    $sql = "CALL spProviderAgency('{agencyTypeId}', '{companyId}')";
 
     $params = array();
     $params['agencyTypeId'] = $agencyTypeId;
+    $params['companyId'] = $companyId;
 
     $rows = array();
     $this->executeQuery($sql, $rows, $params);
