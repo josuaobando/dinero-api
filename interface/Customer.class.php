@@ -273,13 +273,13 @@ class Customer
     }
     $this->countryId = $countryData['Country_Id'];
     $this->countryName = $countryData['Name'];
+    $this->stateName = $this->state;
 
     $stateData = $this->tblUtil->getState($this->countryId, $this->state);
-    if(!$stateData){
-      throw new TransactionException('Invalid State: ' . $this->state);
+    if($stateData){
+      $this->stateId = $stateData['CountryState_Id'];
+      $this->stateName = $stateData['Name'];
     }
-    $this->stateId = $stateData['CountryState_Id'];
-    $this->stateName = $stateData['Name'];
   }
 
   /**
@@ -306,13 +306,13 @@ class Customer
     }
     $this->countryId = $countryData['Country_Id'];
     $this->countryName = $countryData['Name'];
+    $this->stateName = $this->state;
 
     $stateData = $this->tblUtil->getState($this->countryId, $this->state);
-    if(!$stateData){
-      throw new InvalidParameterException('state', $this->state, 'StateCode');
+    if($stateData){
+      $this->stateId = $stateData['CountryState_Id'];
+      $this->stateName = $stateData['Name'];
     }
-    $this->stateId = $stateData['CountryState_Id'];
-    $this->stateName = $stateData['Name'];
 
     $this->validate($account->getCompanyId(), $account->getAccountId());
     if(!$this->customerId){
@@ -361,7 +361,7 @@ class Customer
       Log::custom('Similar', "Request: $customerNameRequest Register: $customerNameSimilar Percent: $maxPercent");
     }else{
       //if not have register, check customer from request
-      $customerData = $this->tblCustomer->validate($companyId, $accountId, $this->firstName, $this->lastName, $this->countryId, $this->stateId, $this->phone);
+      $customerData = $this->tblCustomer->validate($companyId, $accountId, $this->firstName, $this->lastName, $this->countryId, $this->stateId, $this->state, $this->phone);
       $this->customerId = $customerData['CustomerId'];
     }
 

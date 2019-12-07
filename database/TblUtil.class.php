@@ -56,7 +56,7 @@ class TblUtil extends Db
    */
   public function getState($countryId, $code)
   {
-    $sql = "CALL state('{countryId}', '{code}')";
+    $sql = "CALL spCountryState('{countryId}', '{code}')";
 
     $params = array();
     $params['countryId'] = $countryId;

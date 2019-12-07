@@ -55,13 +55,14 @@ class TblCustomer extends Db
    * @param string $lastName
    * @param int $countryId
    * @param int $countryStateId
+   * @param string $countryState
    * @param string $phone
    *
    * @return array [CustomerId, AgencyId]
    */
-  public function validate($companyId, $accountId, $firstName, $lastName, $countryId, $countryStateId, $phone)
+  public function validate($companyId, $accountId, $firstName, $lastName, $countryId, $countryStateId, $countryState, $phone)
   {
-    $sql = "CALL spCustomer_Validate('{companyId}', '{accountId}', '{firstName}', '{lastName}', '{countryId}', '{countryStateId}', '{phone}', @CustomerId)";
+    $sql = "CALL spCustomer_Validate('{companyId}', '{accountId}', '{firstName}', '{lastName}', '{countryId}', '{countryStateId}', '{countryState}', '{phone}', @CustomerId)";
 
     $params = array();
     $params['companyId'] = $companyId;
@@ -70,6 +71,7 @@ class TblCustomer extends Db
     $params['lastName'] = ucwords(strtolower($lastName));
     $params['countryId'] = $countryId;
     $params['countryStateId'] = $countryStateId;
+    $params['countryState'] = $countryState;
     $params['phone'] = $phone;
 
     $this->setOutputParams(array('CustomerId'));
